@@ -1,6 +1,6 @@
 {
   "name": "nixix",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Nixix is a JavaScript UI Library.",
   "main": "index.js",
   "type": "module",
