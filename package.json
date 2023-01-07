@@ -1,5 +1,5 @@
 {
-  "name": "flux",
+  "name": "flux.js",
   "version": "1.0.0",
   "description": "Flux is a JavaScript UI Library.",
   "main": "index.js",
