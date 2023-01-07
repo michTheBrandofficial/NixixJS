@@ -1,0 +1,17 @@
+{
+  "name": "flux",
+  "version": "1.0.0",
+  "description": "Flux is a JavaScript UI Library.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "tsc *.ts --target es6 --module es6 && cd ../../"
+  },
+  "keywords": [
+    "flux",
+    "JavaScript"
+  ],
+  "author": "Ikechukwu Charles",
+  "license": "ISC"
+}
