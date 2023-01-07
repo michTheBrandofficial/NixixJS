@@ -1,14 +1,14 @@
 {
   "name": "nixix",
-  "version": "1.0.0",
-  "description": "Nix is a JavaScript UI Library.",
+  "version": "1.0.1",
+  "description": "Nixix is a JavaScript UI Library.",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "nix",
+    "nixix",
     "JavaScript"
   ],
   "author": "Ikechukwu Charles",
