@@ -1,12 +1,11 @@
 {
-  "name": "nix",
+  "name": "nixix",
   "version": "1.0.0",
   "description": "Nix is a JavaScript UI Library.",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "tsc *.ts --target es6 --module es6 && cd ../../"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "nix",
@@ -14,5 +13,5 @@
   ],
   "author": "Ikechukwu Charles",
   "license": "ISC",
-  "homepage": "https://github.com/michTheBrandofficial/NixJS"
+  "homepage": "https://github.com/michTheBrandofficial/NixixJS"
 }
