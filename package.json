@@ -1,7 +1,7 @@
 {
-  "name": "flux",
+  "name": "nix",
   "version": "1.0.0",
-  "description": "Flux is a JavaScript UI Library.",
+  "description": "Nix is a JavaScript UI Library.",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -9,10 +9,10 @@
     "compile": "tsc *.ts --target es6 --module es6 && cd ../../"
   },
   "keywords": [
-    "flux",
+    "nix",
     "JavaScript"
   ],
   "author": "Ikechukwu Charles",
   "license": "ISC",
-  "homepage": "https://github.com/michTheBrandofficial/FluxJS"
+  "homepage": "https://github.com/michTheBrandofficial/NixJS"
 }
