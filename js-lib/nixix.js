@@ -9,20 +9,27 @@ const Nixix = (tag, props, ...children) => {
     const element = document.createElement(tag);
     if ((props != null) || (props != undefined)) {
         for (const [k, v] of Object.entries(props)) {
-            element.setAttribute(k, v);
+            if (k === 'className') {
+                element.setAttribute('class', v);
+            }
+            else if (k.startsWith('on')) {
+                const domAttribute = k.slice(2);
+                element.setAttribute(`on${domAttribute.toLowerCase()}`, v);
+            }
         }
         ;
     }
-    // if ((children != undefined) || (children != null)) {
-    //   for (const child of children) {
-    //     if (typeof child === 'string') {
-    //       element.textContent = child as string;
-    //     } else if (typeof child === 'object') {
-    //       element.append(child);
-    //     }
-    //   }
-    // }
-    console.log(children);
+    if ((children != undefined) || (children != null)) {
+        for (const child of children) {
+            if (typeof child === 'string') {
+                element.textContent = child;
+            }
+            else if (typeof child === 'object') {
+                element.append(child);
+            }
+        }
+    }
+    console.log(element);
     return element;
 };
 export default Nixix;

@@ -5,3 +5,7 @@ type elementType =
   | 'bdo' 
   | 'body' ;
   
+
+declare namespace Nixix {
+  interface Element extends Node{}
+}

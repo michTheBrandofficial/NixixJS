@@ -1,4 +1,3 @@
-/// <reference types="./types/" />
 /**
  * @version nixix@1.0.3
  * @param tag tagName property of the element to create e.g 'div', 'a', 'main'

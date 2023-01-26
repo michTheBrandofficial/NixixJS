@@ -11,19 +11,24 @@ const Nixix = (tag: elementType, props: {} | null | undefined, ...children: [] |
   const element = document.createElement(tag);
   if ((props != null) || (props != undefined)) {
     for (const [k, v] of Object.entries(props)) {
-      element.setAttribute(k, v as string);
+      if (k === 'className') {
+        element.setAttribute('class', v as string);
+      } else if (k.startsWith('on')) {
+        const domAttribute = k.slice(2);
+        element.setAttribute(`on${domAttribute.toLowerCase()}`, v as string);
+      }
     };
   }
-  // if ((children != undefined) || (children != null)) {
-  //   for (const child of children) {
-  //     if (typeof child === 'string') {
-  //       element.textContent = child as string;
-  //     } else if (typeof child === 'object') {
-  //       element.append(child);
-  //     }
-  //   }
-  // }
-  console.log(children)
+  if ((children != undefined) || (children != null)) {
+    for (const child of children) {
+      if (typeof child === 'string') {
+        element.textContent = child as string;
+      } else if (typeof child === 'object') {
+        element.append(child);
+      }
+    }
+  }
+  console.log(element)
 
   return element;
 
