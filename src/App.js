@@ -1,5 +1,13 @@
-import Flux from "../flux/index";
+import Nixix from '../js-lib/nixix.js';
 
-function chalre() {
-  return 
-}
+const App = () => {
+  return (
+    <div>
+      <ul>
+        <li>Home</li>
+        <li>About</li>
+        <li>Contact</li>
+      </ul>
+    </div>
+  )
+};

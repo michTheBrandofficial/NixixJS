@@ -5,6 +5,9 @@
     "lib": [
       "dom",
       "es2017"
+    ],
+    "typeRoots": [
+      "./ts-lib/types/"
     ]
   }
 }

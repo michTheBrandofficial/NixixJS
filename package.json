@@ -1,17 +1,26 @@
 {
   "name": "nixix",
-  "version": "1.0.2",
-  "description": "Nixix is a JavaScript UI Library.",
+  "version": "1.0.3",
+  "description": "NixixJS is a lightweight JavaScript Library for making stateful User Interfaces.",
   "main": "index.js",
   "type": "module",
+  "bin": {
+    "create-nixix-app": "./index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "nixix",
-    "JavaScript"
+    "JavaScript",
+    "nixix"
   ],
   "author": "Ikechukwu Charles",
   "license": "ISC",
-  "homepage": "https://github.com/michTheBrandofficial/NixixJS"
+  "dependencies": {
+    "@babel/cli": "^7.20.7",
+    "@babel/core": "^7.20.12",
+    "@babel/plugin-transform-react-jsx": "^7.20.13",
+    "@types/react": "^18.0.27",
+    "inquirer": "^9.1.4"
+  }
 }
