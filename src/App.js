@@ -1,13 +1,14 @@
-import Nixix from '../js-lib/nixix.js';
+import Nixix, {fragment} from '@nixix';
+import Header from './components/Header.js';
+import './App.css'
 
-const App = () => {
+function App({name, watch, classname}) {
+
   return (
-    <div>
-      <ul>
-        <li>Home</li>
-        <li>About</li>
-        <li>Contact</li>
-      </ul>
+    <div className='jobj'>
+      text content is jon
     </div>
   )
-};
+}
+
+export default App;

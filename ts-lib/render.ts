@@ -1,4 +1,4 @@
-function render(element:Nixix.Element, root: HTMLElement) {
+function render(element:Nix.Element, root: HTMLElement) {
   root.replaceWith(element);
 }
 
