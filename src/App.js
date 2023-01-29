@@ -2,12 +2,23 @@ import Nixix, {fragment} from '@nixix';
 import Header from './components/Header.js';
 import './App.css'
 
+// remove the JSDoc comment from fragment
+
 function App({name, watch, classname}) {
+  const update = () => {
+    const main = document.querySelector('main');
+    if (main.classList.contains('blue') === false) {
+      main.classList.add('blue');
+    } else {
+      main.classList.remove('blue')
+    }
+  }
 
   return (
-    <div className='jobj'>
-      text content is jon
-    </div>
+    <main className='black'>
+      <Header />
+      <button onClick={update}>click me</button>
+    </main>
   )
 }
 

@@ -3,12 +3,14 @@ const htmlWebpackPlugin = require('html-webpack-plugin');
 const miniCSSExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
-  entry: './dist/index.js',
+  entry: './src/index.js',
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, ''),
     filename: 'output.js'
   },
-  devServer: 8080,
+  devServer: {
+    port: 2000,
+  },
   mode: 'development',
   devtool: false,
   resolve: {

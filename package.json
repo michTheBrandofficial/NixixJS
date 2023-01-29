@@ -9,28 +9,32 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "transpile": "npx babel src -d dist -w",
-    "build": "npx webpack --config ./webpack.config.cjs -w"
+    "build": "npx webpack --config ./webpack.config.cjs",
+    "start": "webpack serve --config ./webpack.config.cjs --open --hot"
   },
   "keywords": [
     "JavaScript",
     "nixix"
   ],
   "author": "Ikechukwu Charles",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@babel/cli": "^7.20.7",
     "@babel/core": "^7.20.12",
     "@babel/plugin-transform-react-jsx": "^7.20.13",
     "@types/react": "^18.0.27",
-    "babel-loader": "^9.1.2",
-    "babel-preset-env": "^1.7.0",
     "html-webpack-plugin": "^5.5.0",
     "inquirer": "^9.1.4",
     "mini-css-extract-plugin": "^2.7.2",
     "style-loader": "^3.3.1",
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.1",
-    "webpack-dev-server": "^4.11.1"
+    "webpack-dev-server": "^4.11.1",
+    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-react": "^7.18.6",
+    "babel-loader": "^9.1.2",
+    "css-loader": "^6.7.3"
+  },
+  "devDependencies": {
   }
 }
