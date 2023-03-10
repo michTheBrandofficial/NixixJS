@@ -1,30 +1,26 @@
 {
   "compilerOptions": {
-
-    /* Language and Environment */
     "target": "es2022",                                 
     "lib": [
       "dom", 
       "es2017"
     ],
-
-    /* Modules */
-    "module": "es2022",         
-    "types": [
-      "./types/"
-    ],              
-
-    /* Emit */
-    "declaration": true,                        
-    "outDir": "../nixix/js-lib/",                                  
-    "newLine": "lf",                                /* Set the newline character for emitting files. */
-
-    "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */
-
-    /* Type Checking */                
+    "module": "es2022",                      
+    "baseUrl": "../",
+    "outDir": "../nixix/",                                  
+    "newLine": "lf",  
+    "watch": true,  
+    "paths": {
+      "@types": [
+        "types/index"
+      ]
+    },    
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": true, 
     "noImplicitAny": true,                          
     "noUnusedLocals": true,  
     "noUnusedParameters": true, 
-    "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
+    "skipLibCheck": true                        
   }
 }

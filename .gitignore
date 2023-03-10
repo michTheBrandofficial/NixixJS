@@ -1,7 +1,2 @@
-nixix/
 node_modules/
-public/
-src/
-.babelrc
-jsconfig.json 
-webpack.config.cjs
+
