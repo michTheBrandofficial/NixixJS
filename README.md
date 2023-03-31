@@ -34,11 +34,10 @@ Now you are ready to code 😁!!!!
 
 1. Support for JSX has been added. JSX will be it's primary templating language.The [@types/react](https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react) library was used to get intellisense for the JSX elements and their properties.
 
-2. Components will be made from functions that return JSX elements. They are called Functional Components. They will make describing the UI  very easy to do. To demonstrate this, let's write a Functional Component that returns 'HELLO WORLD' and render it on the DOM. 
+2. Components will be made from functions that return JSX elements. They are called Functional Components. They will make describing the UI very easy to do. To demonstrate this, let's write a Functional Component that returns 'HELLO WORLD' and render it on the DOM. 
 
-  ***App.js***
+  ***App.jsx***
   ``` javascript 
-    import Nixix from '@nixix';
 
     function App() {
       return (
@@ -48,11 +47,10 @@ Now you are ready to code 😁!!!!
     
     export default App;
   ```
-  ***index.js***
+  ***index.jsx***
   ``` javascript
-    import Nixix from '@nixix';
-    import render from '@nixix-render';
-    import App from './App.js';
+    import { render } from 'nixix';
+    import App from './App.jsx';
 
     render(<App />, document.querySelector('div#root'));
   ```
@@ -61,3 +59,16 @@ Now you are ready to code 😁!!!!
     npm start
   ```
   This will start a local development server on port 2000 and 'HELLO WORLD' will be displayed in your browser window.
+
+  ## Bug fixes 
+
+  @version 1.1.2
+
+  - Fixed the bug of the render function rendering '[object HTMLElement]' when it is passed an array of elements and arrays of elements.
+  ```javascript
+    render([<div>me</div>, [<img src={'avatar.png'} alt="">]]);
+  ```
+  The above code renders displays 'me [object HTMLImageElement]' on the browser.
+  - Fixed the bug of errorFunc calling eval with 'callState.caller.name' because the callState hooks was changed to callSignal.
+
+  - Switched to jsdoc comments for types for easy readability and maintainability of the code.
