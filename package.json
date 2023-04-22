@@ -1,13 +1,16 @@
 {
   "name": "nixix",
-  "version": "1.1.2",
-  "description": "NixixJS is a lightweight JavaScript Library for making stateful User Interfaces.",
-  "main": "index.js",
+  "version": "1.4.7",
+  "description": "NixixJS is a lightweight JavaScript Library used for building reactive User Interfaces.",
+  "main": "./index.js",
   "type": "module",
   "bin": {
     "create-nixix-app": "./index.js"
   },
-  "scripts": {},
+  "scripts": {
+    "start": "vite",
+    "pub": "npm i nixix-types && npm publish"
+  },
   "keywords": [
     "JavaScript",
     "nixix"
@@ -15,10 +18,11 @@
   "author": "Ikechukwu Charles",
   "license": "MIT",
   "dependencies": {
-    "csstype": "^3.1.1",
-    "nixix-types": "^1.0.2",
+    "nixix-types": "^1.3.0",
     "vite": "^4.2.1",
-    "vite-jsconfig-paths": "^2.0.1",
-    "vite-plugin-svgr": "^2.4.0"
+    "vite-jsconfig-paths": "^2.0.1"
+  },
+  "devDependencies": {
+    "sass": "^1.62.0"
   }
 }

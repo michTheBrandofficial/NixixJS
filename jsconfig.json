@@ -1,18 +1,16 @@
 {
+  "configPath": "../jsconfig.json",
   "compilerOptions": {
-    "target": "es2022",                                 
     "lib": [
-      "dom", 
-      "es2017"
+      "es2017",
+      "dom"
     ],
-    "module": "es2022",                      
-    "baseUrl": ".",                               
-    "newLine": "lf", 
-    "types": ["./types"],    
+    "paths": {
+      "nixix/router": ["../nixix-types/router/"],
+      "@nixix": ["../nixix-types/"]
+    },
     "checkJs": true,
-    "allowSyntheticDefaultImports": true,
     "jsx": "react-jsxdev",
     "jsxImportSource": "nixix-types",
-    "moduleResolution": "node",                     
   }
 }

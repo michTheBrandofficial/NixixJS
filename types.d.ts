@@ -2,8 +2,9 @@
 declare namespace Root {
   interface Dependents {
     element: Element, 
-    typeOf: 'AriaProp' | 'className' | 'regularAttribute' | 'styleProp' | 'DOMProp' | 'childTextNode',
+    typeOf: 'AriaProp' | 'className' | 'regularAttribute' | 'styleProp' | 'DOMProp' | 'childTextNode' | 'strokeProp',
     property: any,
+    accessor?: string;
     oldCallback?: EventListenerObject
   }
   interface Window {
@@ -36,12 +37,12 @@ export type target = keyof HTMLElementTagNameMap | ((props?: {} | null) => Eleme
 
 export type SetSignalDispatcher<S> = (arg: S) => void;
 
-export type SignalObject<S> = { $$__value: S, $$__id: number, [index: string]: any };
+export type SignalObject<S> = { value: S, $$__id: number };
 
 interface Current extends Element{}
 
 export interface MutableRefObject{
-  current: Current & object;
+  current: (Current & object) ;
   refId: number;
   nextElementSibling: Element['nextElementSibling'] | null;
   prevElementSibling: Element['previousElementSibling'] | null;
@@ -50,10 +51,15 @@ export interface MutableRefObject{
 };
 
 export interface NixixNode extends Node, String, JSX.Element {
+}
 
+export interface StoreClass {
+  '$$__id': string | number;
+  '$$__value'?: any;
+  '$$__name'?: string
 }
 
 export {
   Root, 
-  SignalRoot
+  SignalRoot,
 }

@@ -1,7 +1,10 @@
 node_modules/
 jsdoc/
 signal/
+src/
 *.jsx
 *.tsx
 esbuild.config.js
-
+out.js
+*.html
+vite.config.js
