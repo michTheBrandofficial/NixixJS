@@ -1,28 +1,26 @@
-<style>
-  h2 {
-    color: lightblue;
-  }
-</style>
+# NixixJS - A JavaScript UI library or framework(anyone goes) used for creating beautiful user interfaces.
 
-# NixixJS
+## Table of Contents
 
-### Nixix JS is JavaScript UI library used for creating beautiful user interfaces.
+- [Getting Started](#getting-started)
+- [Bug fixes](#bug-fixes)
+- [New features](#new-features)
 
-<h2>Getting started</h2>
+## Getting Started 
 
-#### To get started, you have to initialize your project with npm, that is, if you haven't already. Type this in the terminal:
+### To get started, you have to initialize your project with npm, that is, if you haven't already. Type this in the terminal:
 ```bash 
   npm init -y 
 ```
 
-#### Then, configure your workspace. To do that, type:
+### Then, configure your workspace. To do that, type:
 ``` bash
   npm install create-nixix-app
   npx create-nixix-app
 ```
 
 
-#### The final step is to download the library, type:
+### The final step is to download the library, type:
 ``` bash
   npm install nixix
 ```
@@ -60,7 +58,7 @@ Now you are ready to code 😁!!!!
   ```
   This will start a local development server on port 2000 and 'HELLO WORLD' will be displayed in your browser window.
 
-  ## Bug fixes 
+## Bug fixes 
 
   @version 1.1.2
 
@@ -73,7 +71,7 @@ Now you are ready to code 😁!!!!
 
   - Switched to jsdoc comments for types for easy readability and maintainability of the code.
 
-  ## New Features 
+## New Features 
   @version 1.2.0
 
   - Nixix now has a routing library for basic client-side routing, with the nixix/router package.  
@@ -100,7 +98,7 @@ Now you are ready to code 😁!!!!
   ```
 
   Under the hood, the callStore function returns a proxy(not the real object). The properties are as follows:
-  - $$__value: this property contains the actual object which was passed in as the initial value. 
+  - '$$__value': this property contains the actual object which was passed in as the initial value. 
   - The other properties of the actual object passed to it. 
   Example usage: 
   ```javascript

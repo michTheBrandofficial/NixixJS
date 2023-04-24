@@ -143,10 +143,21 @@ function Img(props) {
   )
 }
 
+function addSpanProps(props) {
+  const suspenseProps = ['fallback', 'onError', 'children'];
+  let object = {};
+  Object.keys(props).forEach((key) => {
+    if (suspenseProps.includes(key) === false) {
+      object[key] = props[key];
+    }
+  })
+  return object;
+}
+
 /**
- * @param {{fallback: string | Element | Signal, children?: [Promise<any>], onError?: string | Element | Signal}} param0
+ * @param {{fallback: string | Element | Signal, children?: [Promise<any>], onError?: string | Element | Signal}} props
  */
-function Suspense({fallback, children, onError}) {
+function Suspense(props) {
   const [isWaiting, setIsWaiting] = callSignal(true);
   const span = callRef(null);
   let finalModule = null;
@@ -159,17 +170,17 @@ function Suspense({fallback, children, onError}) {
       }
     }
   })
-  children[0].then(value => {
+  props.children[0].then(value => {
     finalModule = value;
     setIsWaiting(false);
   }).catch(error => {
-    if (onError !== undefined && onError !== null) {
-      finalModule = onError;
+    if (props.onError !== undefined && props.onError !== null) {
+      finalModule = props.onError;
       setIsWaiting(false);
     } 
   })
   return (
-    Nixix.create('span', { 'bind:ref': span }, fallback)
+    Nixix.create('span', { 'bind:ref': span, ...addSpanProps(props) }, props.fallback)
   )
 }
 
