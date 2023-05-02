@@ -5,7 +5,8 @@ declare global {
       [path: any]: string | Node | (string | Node)[];
     }
     $$__routeProvider: Element;
-    $$__commonRouteProvider: Element;
+    $$__commonRouteProvider: HTMLSpanElement;
+    
   }
   var window: Window;
 }

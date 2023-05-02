@@ -23,9 +23,32 @@ export function Link({children, to}) {
     handleLocation();
   }
   return (
+    // @ts-ignore
     Nixix.create('a', {href: to ? to : '/', 'on:click': changeLocation}, children)
   )
 };
+
+export const Router = {
+  push:
+  /**
+   * 
+   * @param {string} path 
+   */ 
+  (path) =>  {
+    function changeLocation() {
+      const currentLocation = window.location.pathname;
+      if (!window['$$__routeStore']['common']) {
+        window['$$__routeStore'][currentLocation] = Array.from(window.$$__routeProvider.childNodes);
+      } else {
+        window['$$__routeStore'][currentLocation] = Array.from(window['$$__commonRouteProvider'].childNodes);
+      }
+      window.history.pushState({}, "", path);
+      handleLocation();
+    }
+
+    changeLocation();
+  }
+} 
 
 /**
  * 
