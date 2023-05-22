@@ -6,7 +6,6 @@ declare global {
     }
     $$__routeProvider: Element;
     $$__commonRouteProvider: HTMLSpanElement;
-    
   }
   var window: Window;
 }

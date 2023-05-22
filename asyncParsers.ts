@@ -1,15 +1,7 @@
+import { nixixStore } from "./index";
 import { Signal, Store } from "./primitives/classes";
-/**
- * @typedef {import('./types').Root.Dependents} Dependents
- * @typedef {import('./types').SignalRoot} SignalRoot
- * @typedef {import('./types').MutableRefObject} MutableRefObject
- */
 
-/**
- * @param {(string | Element | Signal)[]} children
- * @param {HTMLElementTagNameMap[keyof HTMLElementTagNameMap]} element
- */
-export function addChildren(children, element) {
+export function addChildren(children: ChildrenType, element: HTMLElementTagNameMap[keyof HTMLElementTagNameMap]) {
   children.forEach((child, index) => {
 
     if (typeof child === 'string' || typeof child === 'number') {
@@ -21,7 +13,7 @@ export function addChildren(children, element) {
             element.append(document.createTextNode((fragChild).value));
             parseSignal((fragChild).$$__id, element, index, 'childTextNode');
           } else if (fragChild instanceof Store) {
-            element.append(document.createTextNode(eval(`window.Store['${fragChild.$$__id}'].value${fragChild.$$__name}`)));
+            element.append(document.createTextNode(eval(`window.$$__NixixStore.Store['${fragChild.$$__id}'].value${fragChild.$$__name}`)));
             // @ts-ignore
             parseStore(fragChild.$$__id, element, index, 'childTextNode', fragChild.$$__name);
           } else {
@@ -36,23 +28,22 @@ export function addChildren(children, element) {
         element.append(document.createTextNode((child).value));
         parseSignal((child).$$__id, element, index, 'childTextNode');
       } else if (child instanceof Store) {
-        element.append(document.createTextNode(eval(`window.Store['${child.$$__id}'].value${child.$$__name}`)));
+        element.append(document.createTextNode(eval(`window.$$__NixixStore.Store['${child.$$__id}'].value${child.$$__name}`)));
         // @ts-ignore
         parseStore(child.$$__id, element, index, 'childTextNode', child.$$__name);
       } else {
-        element.append(child);
+        element.append(child as unknown as string);
       }
     }
   })
 }
 
-/**
-   * 
-   * @param {string} bindtype string 'ref' or any other binding
-   * @param {{} & MutableRefObject} directiveValue value of the bind type
-   * @param {Element} element 
-   */
-export function handleDirectives_(bindtype, directiveValue, element) {
+const refHash = {
+  count: 0,
+  refs: []
+};
+
+export function handleDirectives_(bindtype: string, directiveValue: {} & MutableRefObject, element: Element) {
 
   if (bindtype === 'ref') {
     if (directiveValue instanceof Signal) {
@@ -61,50 +52,40 @@ export function handleDirectives_(bindtype, directiveValue, element) {
     if (directiveValue instanceof Store) {
       errorFunc(`The bind:ref directive's value cannot be reactive, it must be a MutableRefObject.`);
     }
-    /**
-     * @type {MutableRefObject} refObject
-     */
-    let refObject;
+  
+    let refObject: MutableRefObject;
 
     refObject = directiveValue;
     refObject['current'] = element;
-    window.addEventListener('DOMContentLoaded', () => {
-      parseRef(refObject);
-    })
+    refHash.refs.push(refObject);
+    if (refHash.count === 0) {
+      window.addEventListener('DOMContentLoaded', () => {
+        refHash.refs.forEach(refh => {
+          parseRef(refh);
+        })
+      })
+      ++refHash.count;
+    }
   }
 
 }
-/**
- * 
- * @param {MutableRefObject} refObject 
- * @returns 
- */
-export async function parseRef(refObject) {
-  await Promise.resolve();
+
+export function parseRef(refObject: MutableRefObject) {
   const current = refObject.current;
   refObject.nextElementSibling = current.nextElementSibling;
   refObject.parent = current.parentElement;
   refObject.prevElementSibling = current.previousElementSibling;
 }
 
-/**
- * 
- * @param {number} id 
- * @param {Element} element 
- * @param {any} property 
- * @param {Dependents['typeOf']} typeOf 
- * @param {EventListenerObject} [oldCallback] 
- * @returns 
- */
-export async function parseSignal(id, element, property, typeOf, oldCallback) {
+export async function parseSignal(id: number, element: Element, property: any, typeOf: Dependents['typeOf']) {
   await Promise.resolve();
   const key = `_${id}_`;
   if (typeOf === 'DOMProp') {
-    window.SignalStore[key].dependents.push(
-      { element, property, typeOf, oldCallback }
+    nixixStore.SignalStore[key].dependents.push(
+      { element, property, typeOf }
     )
   } else {
-    window.SignalStore[key].dependents.push(
+    nixixStore.SignalStore[key].dependents.push(
       { element, property, typeOf }
     );
   }
@@ -115,16 +96,13 @@ export async function parseSignal(id, element, property, typeOf, oldCallback) {
 }
 
 /**
- * @param {number} id is the id which diffSignal_ will use to get the Signal object in window.SignalStore
- * diffSignal_ is not async because it will be passed to window['diffSignal'], it is defined here for the sake of simplicity of index.ts
+ * @param {number} id is the id which diffSignal_ will use to get the Signal object in nixixStore.SignalStore
+ * diffSignal_ is not async because it will be passed to nixixStore['diffSignal'], it is defined here for the sake of simplicity of index.ts
  */
-export async function diffSignal_(id) {
+export async function diffSignal_(id: number) {
 
   await Promise.resolve();
-  /**
-   * @type {{value: any, dependents: Dependents[]}} 
-   */
-  const { value, dependents } = window.SignalStore[`_${id}_`];
+  const { value, dependents } = nixixStore.SignalStore[`_${id}_`];
   dependents.forEach((dependent) => {
     const { typeOf, element, property } = dependent;
     if (typeOf === 'AriaProp') {
@@ -145,11 +123,7 @@ export async function diffSignal_(id) {
 
 }
 
-/**
- * @param {Element} element
- * @param {CallableFunction} callback
- */
-async function onElementRemoved(element, callback) {
+async function onElementRemoved(element: Element, callback: CallableFunction) {
   await Promise.resolve();
   new MutationObserver(function(mutations) {
     if(!document.body.contains(element)) {
@@ -159,39 +133,24 @@ async function onElementRemoved(element, callback) {
   }).observe(element.parentElement, { childList: true });
 }
 
-/**
- * 
- * @param {Element} element 
- * @param {string} key
- * @param {'SignalStore' | 'Store'} reactiveProvider
- */
-function filterDependencies(element, key, reactiveProvider) {
+function filterDependencies(element: Element, key: string, reactiveProvider: 'SignalStore' | 'Store') {
   return async () => {
     await Promise.resolve();
-    window[reactiveProvider][key].dependents = window[reactiveProvider][key].dependents.filter((arr) => {
+    nixixStore[reactiveProvider][key].dependents = nixixStore[reactiveProvider][key].dependents.filter((arr) => {
       return arr.element !== element; 
     })
   }
 }
 
-/**
- * 
- * @param {number} id 
- * @param {Element} element 
- * @param {any} property 
- * @param {Dependents['typeOf']} typeOf 
- * @param {string} accessor
- * @returns 
- */
-export async function parseStore(id, element, property, typeOf, accessor) {
+export async function parseStore(id: number, element: Element, property: any, typeOf: Dependents['typeOf'], accessor: string) {
   await Promise.resolve();
   const key = `${id}`;
   if (typeOf === 'DOMProp') {
-    window.Store[key].dependents.push(
+    nixixStore.Store[key].dependents.push(
       { element, property, typeOf, accessor }
     )
   } else {
-    window.Store[key].dependents.push(
+    nixixStore.Store[key].dependents.push(
       { element, property, typeOf, accessor }
     );
   }
@@ -202,42 +161,37 @@ export async function parseStore(id, element, property, typeOf, accessor) {
 }
 
 /**
- * @param {number} id is the id which diffStore_ will use to get the Signal object in window.SignalStore
- * diffStore_ is not async because it will be passed to window['diffStore'], it is defined here for the sake of simplicity of index.ts
+ * @param {number} id is the id which diffStore_ will use to get the Signal object in nixixStore.SignalStore
+ * diffStore_ is not async because it will be passed to nixixStore['diffStore'], it is defined here for the sake of simplicity of index.ts
  */
-export async function diffStore_(id) {
+export async function diffStore_(id: number) {
 
   await Promise.resolve();
   const key = `_${id}_`;
   /**
    * @type {{value: any, dependents: Dependents[]}} 
    */
-  const { dependents } = window.Store[key];
+  const { dependents } = nixixStore.Store[key];
   dependents.forEach((dependent) => {
     const { typeOf, element, property, accessor } = dependent;
     if (typeOf === 'AriaProp') {
-      element.setAttribute(`aria-${property}`, eval(`window.Store['${key}'].value${accessor}`));
+      element.setAttribute(`aria-${property}`, eval(`window.$$__NixixStore.Store['${key}'].value${accessor}`));
     } else if (typeOf === 'className') {
-      element.setAttribute('class', eval(`window.Store['${key}'].value${accessor}`));
+      element.setAttribute('class', eval(`window.$$__NixixStore.Store['${key}'].value${accessor}`));
     } else if (typeOf === 'strokeProp') {
-      element.setAttribute(`stroke-${property}`, eval(`window.Store['${key}'].value${accessor}`));
+      element.setAttribute(`stroke-${property}`, eval(`window.$$__NixixStore.Store['${key}'].value${accessor}`));
     } else if (typeOf === 'regularAttribute') {
-      element.setAttribute(property, eval(`window.Store['${key}'].value${accessor}`));
+      element.setAttribute(property, eval(`window.$$__NixixStore.Store['${key}'].value${accessor}`));
     } else if (typeOf === 'styleProp') {
-      (element)['style'][property] = eval(`window.Store['${key}'].value${accessor}`);
+      (element)['style'][property] = eval(`window.$$__NixixStore.Store['${key}'].value${accessor}`);
     } else if (typeOf === 'childTextNode') {
-      element.childNodes[property].textContent = eval(`window.Store['${key}'].value${accessor}`);
+      element.childNodes[property].textContent = eval(`window.$$__NixixStore.Store['${key}'].value${accessor}`);
     }
 
   });
 
 }
 
-/**
- * 
- * @param {string} message 
- * @param {string | null} caller 
- */
-export function errorFunc(message, caller = 'Nixix.create.caller.name') {
-  throw(`${message} @${eval(caller)}`);
+export function errorFunc(message: string) {
+  throw(`${message}`);
 }
