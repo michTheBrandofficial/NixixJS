@@ -1,6 +1,6 @@
 {
   "name": "nixix",
-  "version": "1.4.13",
+  "version": "1.4.19",
   "description": "NixixJS is a lightweight JavaScript Library used for building reactive User Interfaces.",
   "main": "./index.ts",
   "module": "./index.ts",
@@ -19,7 +19,7 @@
   "author": "Ikechukwu Charles",
   "license": "MIT",
   "dependencies": {
-    "nixix-types": "^1.3.4",
+    "nixix-types": "^1.3.8",
     "vite": "^4.2.1",
     "vite-jsconfig-paths": "^2.0.1"
   }
