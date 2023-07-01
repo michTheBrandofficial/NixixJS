@@ -1,0 +1,11 @@
+{
+  "name": "nixix/types",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "types": ["./index.d.ts", "./jsx-dev-runtime.d.ts", "./jsx-runtime.d.ts"]
+}

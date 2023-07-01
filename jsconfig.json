@@ -1,16 +1,14 @@
 {
-  "configPath": "../jsconfig.json",
   "compilerOptions": {
     "lib": [
       "es2017",
       "dom"
     ],
-    "paths": {
-      "nixix/router": ["../nixix-types/router/"],
-      "@nixix": ["../nixix-types/"]
-    },
     "checkJs": true,
+    "baseUrl": ".",
     "jsx": "react-jsxdev",
-    "jsxImportSource": "nixix-types",
+    "jsxImportSource": "../types",
+    "types": ["./types"],
+    "moduleResolution": "node"
   }
 }

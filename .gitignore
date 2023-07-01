@@ -2,6 +2,7 @@ node_modules/
 jsdoc/
 signal/
 src/
+.vscode
 *.jsx
 *.tsx
 esbuild.config.js

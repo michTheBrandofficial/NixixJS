@@ -1,4 +1,4 @@
-import { nixixStore } from '../index';
+import { nixixStore } from '../dom';
 
 export default class NestedRoute {
   element: JSX.Element;

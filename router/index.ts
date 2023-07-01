@@ -1,11 +1,11 @@
-import { type MouseEvent } from 'nixix-types/eventhandlers';
-import Nixix, { nixixStore } from '../index.js';
-import { type HTMLAttributes } from 'nixix-types/index';
+import { type HTMLAttributes } from '../types/index';
+import { type MouseEvent } from '../types/eventhandlers';
+import Nixix, { nixixStore } from '../dom';
 import NestedRoute, {
   changeLocOnError,
   changeNestedRoute,
   changeRouteType,
-} from './helpers.js';
+} from './helpers';
 
 export function Link({ children, to }: { children: any; to: string }) {
   function changeLocation(event: MouseEvent<HTMLAnchorElement>) {

@@ -1,10 +1,10 @@
-# NixixJS - A JavaScript UI library or framework(any name goes) used for creating performan user interfaces.
+# NixixJS - A JavaScript UI library or framework used for creating performant user interfaces.
 
 ## Table of Contents
 
 - [Getting Started](#getting-started)
 - [Features](#features)
-- [New features](#new-features)
+- [Api List](#list-of-apis)
 - [Contributors](#contributors)
 
 ## Getting Started 
@@ -32,123 +32,154 @@ Now you are ready to code 😁!!!!
 - **NO** Virtual DOM: Nixix creates real DOM nodes and efficiently renders and updates the nodes.
 - 🚀 Blazingly fast reactive primitives for DOM updates with signals and stores.
 - Side effects with effect function.
+- Render once mental model - components render only once.
 - Component architecture.
+- ReactJS-like: Nixix has a really low learning curve for developers coming from ReactJS and SolidJS
 
-## New Features 
-  @version 1.2.0
+## List of Apis 
 
-  - Nixix supports client-side routing, with the nixix/router package.  
+- Signal : signals are reactive values that can change over time. They can be created with two functions - callSignal and callStore. 
 
-  @version 1.3.5 
-
-  - A callStore primitive has been added to the library. This primitive tracks reactive values in objects and arrays, no matter the size(defaults to deep tracking). How to use:
-  ```javascript
-    import { callStore } from 'nixix';
-
-    function App() {
-      const [userName, setUserName] = callStore({
-        firstName: 'Ikechukwu', 
-        lastName: 'Charles'
-      });
+- callSignal : function used to create reactive values with JavaScript primitives. It returns the value passed to it and a setter.
+  ```jsx
+    import { callSignal } from 'nixix/primitives';
+    
+    const App = () => {
+      const [value, setValue] = callSignal<string>('John');
 
       return (
         <>
-          <h1> { userName.firstName } { userName.lastName }</h1>
-          <button on:click={() => setUserName({firstName: 'Christopher'})} >ChangeName</button>
+          <div>{value}</div>
+          <button on:click={() => setValue('Jane')}>Click me</button>
         </>
       )
     }
   ```
 
-  Under the hood, the callStore function returns a proxy(not the real object). The properties are as follows:
-  - '$$__value': this property contains the actual object which was passed in as the initial value. 
-  - The other properties of the actual object passed to it. 
-  Example usage: 
-  ```javascript
-    const [username, setName] = callStore({name: 'Ike', job: 'Web Developer'});
-    console.log(username); // {$$__value: {username: 'Ike', job: 'Web Developer'}, username: {$$__name: '['username']'}}, job: {$$__name: '['job']'}}
-  ```
-  The property username in the object logged to the console is a instance of a class 'Store'. When the jsx factory function 'Nixix.create' encounters this property through dot or bracket notation. Nixix adds the element which it's childNode or attribute value is the property to an array of dependents on the window object so, when the value changes, the property of the element will also change. Using the reactive values above:
-  ```javascript
-    // tracking childNodes
-    Nixix.create('div', null, username.name) // username.name is an instance of a class 'Store' (Nixix will track this div's first childNode.)
-    // tracking attributes 
-    Nixix.create('div', {className: username.name}, 'Hello world') // also an instance of 'Store' class (Nixix will track this div's className property.)
-  ```
+- callStore : function used to create reactive values with JavaScript objects and arrays. It returns the value passed to it and a setter.
+  ```jsx
+    import { callStore } from 'nixix/primitives';
 
-  @version 1.4.0
+    type Username = { name: string };
 
-  - An effect function which takes a callback function for side effects when reactive values change (optional).
-  Using it with callSignal
-  ```javascript
-      import { callSignal, effect } from 'nixix';
-      function App() {
+    const App = () => {
+      const [username, setUserName] = callStore<Username>({ name: 'John' });
 
-        const [count, setCount] = callSignal(Math.random());
-        effect(() => {
-          console.log(count.value);
-        })
-        return (
-          <button on:click={() => setCount(Math.random())} >Click me</button>
-        )   
-      }
-
-  ```
-  Every single time the button is clicked, a random number gets logged to the console automatically. 
-  
-  This function can also be used with callStore. Like this:
-  ```javascript
-      import { callStore, effect } from 'nixix';
-      function App() {
-    
-        const [idCount, setCountId] = callStore({id: 5});
-        effect(() => {
-          console.log(idCount.$$__value.id);
-        }, 'store')
-        return (
-          <button on:click={() => setCountId({id: Math.random()})} >Click me</button>
-        )   
-      }
-  ```
-  The effect function has an optional second parameter called a reactionProvider. This can be a 'store' or a 'Signal'(default is 'Signal'). This parameter when passed the string 'store' works for reactive values which were provided by the callStore function. This parameter is only to be passed when you want to use it with stores.
-
-  @version 1.4.7 
-
-  - Async/Suspense - this function should be used to show placeholders while asynchronous tasks run in the background. It expects a fallback prop and a single child. It can be used like so: 
-  ```javascript
-    import { Suspense, asyncComponent } from 'nixix';
-
-    // First, let's simulate a delay to show this example. We will make a function that returns a Promise object.
-    const fakeApi = (): Promise<{id: string, productname: string}> => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({id: 'kdkadkEakf39i483Adfdkafk3', productname: 'Balenciaga Boots'})
-        }, 5000)
-      })
-    };
-
-    // when this function is called, after a timeout of 5 seconds it returns a Promise object which we will consume.
-    export const Product = asyncComponent(async () => {
-      const products = await fakeApi();
       return (
-        <div>
-          <button>Get products</button>
-          { products.id }
-          { products.productname }
-        </div>
+        <>
+          <div>{username.name}</div>
+          <button on:click={() => setUserName({ name: 'Jane' })}>Click me</button>
+        </>
       )
-    })
-    // now, we have a function that asynchronously returns JSX after 5 seconds.
+    }
 
-    // to use this function, you should wrap it in a Suspense component, like so:
-    <Suspense fallback={<div>Loading...</div>} >
-      <Product />
-    </Suspense>
-    // the fallback prop is shown while the async task runs, once the task is done, it renders the final component.
+    // usage with arrays.
 
-  ``` 
-  The asyncComponent function that we used simply returns the function passed to it. It should be used because IDEs throw errors when you make a functional component that returns JSX asynchronous. 
+    const App = () => {
+      const [username, setUserName] = callStore<Username>(['John']);
+
+      return (
+        <>
+          <div>{username[0]}</div>
+          <button on:click={() => setUserName(['Jane'])}>Click me</button>
+        </>
+      )
+    }
+  ```
+
+- callRef : This function is used to get the a dom element instance, to do some regular dom operations on them.
+  ```jsx
+    import { callRef, effect, callSignal } from 'nixix/primitives';
     
+    const App = () => {
+      const myDiv = callRef<HTMLDivElement>()
+      const [display, setDisplay] = callSignal(true);
+      effect(() => {
+          if (!display) {
+            myDiv.current.remove();
+          }
+        }
+      )
+
+      return (
+        <>
+          <div bind:ref={myDiv} >Hello Nixix</div>
+          <button on:click={() => setDisplay(false)} >Set Display</button>
+        </>
+      )
+    }
+
+    // refs have a current property whose value is the dom element which has its bind:ref prop's value as that ref.
+    // once the signal's value is set to false, the dom element is removed from the dom. 
+  ```
+
+- effect : This function is used to perform side effects when a reactive value changes. It subscribes to the latest created signal and calls the callback function passed to it after some time. It can also subscribe to other signals when passed an array of the signals to subscribe to and be called once and without subscribing to any signal.
+  ```jsx
+  import { callSignal, callStore, effect } from 'nixix/primitives';
+
+  const App = () => {
+    const [value, setValue] = callSignal(0);
+    effect(() => {
+        console.log(value.value)
+      },
+    )
+    // calls the function. Whenever the signal's value changes, it calls the function again. 
+    
+    return (
+      <button on:click={() => setValue(Math.random())} >Change Number</button>
+    )
+  };
+
+  // they can also be called once without subscribing to any signal by passing 'once' as the second argument
+  effect(() => {
+      console.log('Ran once')
+    },
+    'once'
+  )
+
+  // they can also subscribe to multiple signals by passing an array of signals as the third argument
+  const [count, setCount] = callSignal(0);
+  const [store, setStore] = callStore({name: 'John'});
+  effect(() => {
+      console.log('Multiple Signals');
+    },
+    null,
+    [count]
+  )  
+  ```
+- renderEffect : This function does everything the effect function does, but it calls the callback function immediately, unlike the effect function which does so after some time
+
+- asyncComponent : This function accepts an argument which is a function that should have a return type of 'Promise<JSX.Element>'. It is used to override the errors IDEs throw when a functional component has the a return type of 'Promise<JSX.Element>'.
+
+- Suspense : This is a higher order component that is used to show a loader while an asynchronous operation which will eventually return some JSX is ongoing. It requires two props: 
+  - fallback : This is the loader which the component will show until the async operation is completed.
+  - onError : This is the what the component will show if the async operation fails or rejects.
+
+  ```jsx
+    import { Suspense, asyncComponent } from 'nixix/hoc';
+
+    const AsyncToReturnJSX = asyncComponent(() => {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve(
+            <div>Returned JSX</div>
+          )
+        }, 2000);
+      })
+    });
+
+    const App = () => {
+
+      return (
+        <>
+          <div>Hello Nixix</div>
+          <Suspense fallback={<div>Loading...</div>} onError={`Couldn't return any JSX`} >
+            <AsyncToReturnJSX />
+          </Suspense>
+        </>
+      )
+    }
+  ```
 
 ## Contributors 
 

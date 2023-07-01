@@ -1,5 +1,7 @@
-import Nixix from 'nixix-types';
+import Nixix from './types';
+import { StoreObject as NixixStoreObject } from './primitives/types';
 
+// These global types are used for the development of this project.
 declare global {
   type target =
     | keyof HTMLElementTagNameMap
@@ -22,6 +24,12 @@ declare global {
     accessor?: string;
   }
 
+  interface WindowStoreObject {
+    value: any;
+    dependents: Dependents[];
+    effect?: CallableFunction[];
+    'cleanup'?: () => void;
+  }
   interface Window {
     $$__NixixStore?: {
       $$__lastReactionProvider?: 'signal' | 'store';
@@ -31,23 +39,22 @@ declare global {
       $$__routeProvider?: Element;
       $$__commonRouteProvider?: HTMLSpanElement;
       Store?: {
-        [index: string]: {
-          value: any;
-          dependents: Dependents[];
-          effect?: CallableFunction;
-        };
+        [index: string]: WindowStoreObject
       };
       SignalStore?: {
         [index: string]: {
           value: any;
           dependents: Dependents[];
-          effect?: CallableFunction;
+          effect?: CallableFunction[];
         };
       };
       storeCount?: number;
       diffStore?: (id: number) => Promise<void>;
       signalCount?: number;
       diffSignal?: (id: number) => Promise<void>;
+      $$__For?: {
+        [id: string]: string[] | Element[] | JSX.Element[];
+      }
 
       refCount?: number;
     };
@@ -65,9 +72,16 @@ declare global {
   type SetStoreDispatcher<S> = (newValue: S | (() => S)) => void;
 
   interface SuspenseProps {
-    fallback: string | Element | Nixix.Signal;
+    fallback: string | Element | Signal;
     children?: Promise<any>[];
-    onError?: string | Element | Nixix.Signal;
+    onError?: string | Element | Signal;
+  }
+
+  interface ForProps {
+    fallback: string | Element | Signal;
+    children?: ((value: any, index?: number) => JSX.Element)[];
+    parent?: JSX.Element | HTMLElement,
+    each: NixixStoreObject<any[]>
   }
 
   var window: Window & typeof globalThis;
