@@ -38,9 +38,8 @@ export interface MutableRefObject<T> {
  * @param initialValue initial value to be tracked: can be an object or an array.
  * @param config Do not use. Still Experimental.
  */
-export function callSignal<S, C extends Signal>(
-  initialValue: S,
-  config?: C
+export function callSignal<S>(
+  initialValue: S
 ): [SignalObject<S>, SetSignalDispatcher<S>];
 
 /**
@@ -58,7 +57,11 @@ export function callStore<O>(
  *
  * @param callbackFn callback function to be called once all the synchronous code has finished running.
  */
-export function effect(callbackFn: CallableFunction, config?: 'once', furtherDependents?: (SignalObject<any> | StoreObject<any>)[]): void;
+export function effect(
+  callbackFn: CallableFunction,
+  config?: 'once',
+  furtherDependents?: (SignalObject<any> | StoreObject<any>)[]
+): void;
 
 /**
  * Tracks the closest (signal or store) and calls the callback function whenever the (signal or store)'s value changes.
@@ -66,9 +69,18 @@ export function effect(callbackFn: CallableFunction, config?: 'once', furtherDep
  *
  * @param callbackFn callback function to be called once the DOM content has loaded.
  */
-export function renderEffect(callbackFn: CallableFunction, config?: 'once', furtherDependents?: (SignalObject<any> | StoreObject<any>)[]): void;
+export function renderEffect(
+  callbackFn: CallableFunction,
+  config?: 'once',
+  furtherDependents?: (SignalObject<any> | StoreObject<any>)[]
+): void;
 
-export function removeSignal(signals: Array<StoreObject<any> | SignalObject<any>> | StoreObject<any> | SignalObject<any>): void;
+export function removeSignal(
+  signals:
+    | Array<StoreObject<any> | SignalObject<any>>
+    | StoreObject<any>
+    | SignalObject<any>
+): void;
 
 /**
      * ```jsx
@@ -90,5 +102,3 @@ export function callRef<
     | any
     | HTMLElementTagNameMap[keyof HTMLElementTagNameMap]
 >(ref?: R): MutableRefObject<R | null>;
-
-
