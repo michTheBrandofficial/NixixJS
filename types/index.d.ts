@@ -13,35 +13,31 @@ export = Nixix;
 export as namespace Nixix;
 
 declare namespace Nixix {
-
   /**
    * @deprecated fragment - esbuild provides support for 'fragment' string
    */
   const Fragment: 'fragment';
 
-  type NixixNode<A> =
-    | (
-        | JSX.Element
-        | Promise<JSX.Element>
-        | string
-        | SignalObject<A>
-        | number
-        | boolean
-      )[]
-    | JSX.Element
-    | Promise<JSX.Element>
-    | string
-    | SignalObject<A>
-    | number
-    | boolean;
+  type Component = (props?: T) => JSX.Element
 
-    type ExoticComponent<P> = (props: P) => JSX.Element;
-    type RouteExoticCompoent<T> = T;
+  type NixixNode = | NixixElement
+  | string
+  | number
+  | Iterable<NixixNode>
+  | boolean
+  | null
+  | undefined
+  | Component
+  | CallableFunction
+  | SignalObject<string | number | boolean>
+
+  type ExoticComponent<P> = (props: P) => JSX.Element;
+  type RouteExoticComponent<T> = T;
 
   interface CSSProperties extends CSS.Properties<string, number> {}
 
   interface DOMAttributes<T> {
-    children?: NixixNode<any>;
+    children?: NixixNode;
 
     // clipboard events
     'on:copy'?: NativeEvents.ClipboardEventHandler<T>;
@@ -1355,7 +1351,7 @@ declare global {
     interface Element extends Nixix.NixixElement<any, any>, Node {}
 
     interface IntrinsicAttributes {
-      children?: Nixix.NixixNode<any>;
+      children?: Nixix.NixixNode;
     }
 
     interface IntrinsicElements {

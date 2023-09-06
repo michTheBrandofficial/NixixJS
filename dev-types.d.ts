@@ -5,6 +5,7 @@ import { StoreObject as NixixStoreObject } from './primitives/types';
 declare global {
   type target =
     | keyof HTMLElementTagNameMap
+    | keyof SVGElementTagNameMap
     | ((props?: {} | null) => Element)
     | 'fragment';
   type Proptype = { children?: any; [index: string]: any } | null | undefined;
@@ -28,18 +29,22 @@ declare global {
     value: any;
     dependents: Dependents[];
     effect?: CallableFunction[];
-    'cleanup'?: () => void;
+    cleanup?: () => void;
   }
   interface Window {
     $$__NixixStore?: {
       $$__lastReactionProvider?: 'signal' | 'store';
       $$__routeStore?: {
         [path: any]: string | Node | (string | Node)[];
+        errorPage?: {
+          errorRoute: string;
+        };
+        common?: boolean;
       };
       $$__routeProvider?: Element;
       $$__commonRouteProvider?: HTMLSpanElement;
       Store?: {
-        [index: string]: WindowStoreObject
+        [index: string]: WindowStoreObject;
       };
       SignalStore?: {
         [index: string]: {
@@ -54,7 +59,7 @@ declare global {
       diffSignal?: (id: number) => Promise<void>;
       $$__For?: {
         [id: string]: string[] | Element[] | JSX.Element[];
-      }
+      };
 
       refCount?: number;
     };
@@ -80,8 +85,8 @@ declare global {
   interface ForProps {
     fallback: string | Element | Signal;
     children?: ((value: any, index?: number) => JSX.Element)[];
-    parent?: JSX.Element | HTMLElement,
-    each: NixixStoreObject<any[]>
+    parent?: JSX.Element | HTMLElement;
+    each: NixixStoreObject<any[]>;
   }
 
   var window: Window & typeof globalThis;

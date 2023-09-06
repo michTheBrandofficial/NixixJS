@@ -18,6 +18,9 @@ function callRef<R extends Element | HTMLElement>(ref: R): MutableRefObject {
   };
 }
 
+/**
+ * takes an initialValue and returns an array of a object and a function to update that object.
+ */
 function callSignal<S>(
   initialValue: S
 ): [SignalObject<S>, SetSignalDispatcher<S>] {
@@ -65,6 +68,9 @@ function callSignal<S>(
   ];
 }
 
+/**
+ * takes an object or array as a argument and returns an object containing the first arg and a function to update that object.
+ */
 function callStore<S>(initialValue: S): any[] {
   incrementId('storeCount');
   const storeId = nixixStore.storeCount;

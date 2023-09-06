@@ -1,4 +1,9 @@
-import { ExoticComponent, ImgHTMLAttributes, HTMLAttributes, NixixNode } from '../../types/index';
+import {
+  ExoticComponent,
+  ImgHTMLAttributes,
+  HTMLAttributes,
+  type NixixNode,
+} from '../../types/index';
 import { StoreObject } from '../../primitives/types';
 
 // ExoticComponents
@@ -6,9 +11,11 @@ import { StoreObject } from '../../primitives/types';
  * @deprecated
  */
 export const Img: ExoticComponent<ImgHTMLAttributes<HTMLImageElement>>;
-interface SuspenseProps extends HTMLAttributes<HTMLSpanElement>, JSX.IntrinsicAttributes {
-  fallback: NixixNode<any>,
-  onError?: NixixNode<any>
+interface SuspenseProps
+  extends HTMLAttributes<HTMLSpanElement>,
+    JSX.IntrinsicAttributes {
+  fallback: NixixNode;
+  onError?: NixixNode;
 }
 /**
    * ```jsx
@@ -29,9 +36,11 @@ interface SuspenseProps extends HTMLAttributes<HTMLSpanElement>, JSX.IntrinsicAt
 export const Suspense: ExoticComponent<SuspenseProps>;
 
 type Props = {
-  [index: string]: any
-}
-type AsyncComponent<T extends Props> = (FC: ((props?: T) => Promise<JSX.Element>)) => ((props?: T) => JSX.Element);
+  [index: string]: any;
+};
+type AsyncComponent<T extends Props> = (
+  FC: (props?: T) => Promise<JSX.Element>
+) => (props?: T) => JSX.Element;
 /**
  *
  * ```jsx
@@ -62,15 +71,15 @@ type AsyncComponent<T extends Props> = (FC: ((props?: T) => Promise<JSX.Element>
  *
  * ```
  */
-export const asyncComponent: AsyncComponent;
+export const asyncComponent: AsyncComponent<Props>;
 
-interface ForProps {
-  fallback: string | JSX.Element | Signal;
-  children?: ((value: any, index?: number) => JSX.Element)[];
-  parent: JSX.Element | HTMLElement,
-  each: StoreObject<any[]>
+interface ForProps<T extends StoreObject<any[]>> {
+  fallback: NixixNode;
+  children?: (value: T['$$__value'][number], index?: number) => JSX.Element;
+  parent: JSX.Element | HTMLElement;
+  each: T;
 }
 
-export const For: ExoticComponent<ForProps>
+export const For: <T>(props?: ForProps<T>) => JSX.Element;
 
-export const lazy: AsyncComponent;
+export const lazy: AsyncComponent<Props>;

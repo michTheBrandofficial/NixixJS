@@ -5,6 +5,7 @@ import {
   errorFunc,
   addChildren,
   handleDirectives_,
+  svgElementsTags,
 } from './helpers';
 
 // Global store for the store class and signals.
@@ -12,16 +13,23 @@ window['$$__NixixStore'] = {};
 export const nixixStore = window.$$__NixixStore;
 
 const Nixix = {
+  /**
+   * jsx factory for create dom nodes.
+   */
   create: function (
     tagNameFC: target,
     props: Proptype,
     ...children: ChildrenType
   ): Element | Array<Element | string | Signal> | undefined {
+    // if arg 0 is a string, it makes a dom node, else it is a function, then return invoked function.
     if (typeof tagNameFC === 'string') {
+      // if the string is fragment, return the children, else make a dom node, set attrs and return the dom node.
       if (tagNameFC === 'fragment') {
         if (children != null) return children;
       } else {
-        const element = document.createElement(tagNameFC);
+        const element = !svgElementsTags.includes(tagNameFC)
+          ? document.createElement(tagNameFC)
+          : document.createElementNS('http://www.w3.org/2000/svg', tagNameFC);
         if (props != null || props != undefined) {
           for (const [k, v] of Object.entries(props)) {
             // check if it has a signal object
@@ -45,6 +53,7 @@ const Nixix = {
                 element.setAttribute('class', v);
               }
             } else if (k === 'style') {
+              if (!v) throw new Error('The style prop value must be an object');
               /**
                * @type {Array<[string, string | SignalObject<string>]>} styles
                */
@@ -129,6 +138,7 @@ const Nixix = {
         return element;
       }
     } else if (typeof tagNameFC === 'function') {
+      // if the function has props, return the function called with the props, else return it without passing props.
       if (props != null && props != undefined) {
         if (children.length !== 0) {
           props.children = children;
@@ -162,7 +172,11 @@ const Nixix = {
   },
 };
 
+/**
+ * function to display the UI.
+ */
 function render(element: NixixNode, root: HTMLElement) {
+  // if the element is an array, call the render function recursively to append the elements of the array, else just append the element to the root.
   if (!Array.isArray(element)) {
     root.append(element);
   } else {
@@ -173,6 +187,9 @@ function render(element: NixixNode, root: HTMLElement) {
   doBgWork(root);
 }
 
+/**
+ * make the routeProvider for use of the routing library.
+ */
 async function doBgWork(root: Element) {
   await Promise.resolve();
   nixixStore['$$__routeProvider'] = root;

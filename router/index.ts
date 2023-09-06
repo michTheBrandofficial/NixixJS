@@ -7,7 +7,9 @@ import NestedRoute, {
   changeRouteType,
 } from './helpers';
 
-export function Link({ children, to }: { children: any; to: string }) {
+// Fix the errorPage
+export function Link(props: {children: JSX.Element, to: string}) {
+  const { children, to, ...rest } = props
   function changeLocation(event: MouseEvent<HTMLAnchorElement>) {
     event.preventDefault();
     const currentLocation =
@@ -35,8 +37,8 @@ export function Link({ children, to }: { children: any; to: string }) {
   }
   return Nixix.create(
     'a',
-    { href: to ? to : '/', 'on:click': changeLocation },
-    children
+    { ...rest, href: to ? to : '/', 'on:click': changeLocation },
+    children ? children : ''
   );
 }
 
@@ -223,7 +225,6 @@ export function handleLocation() {
       routeElementObjWithoutElement[key] = routeElement[key];
     });
 
-    console.log(routeObjKeysWithoutElement);
 
     if (routeElement.element instanceof Array) {
       throw 'Nested Routes must have one parent element';

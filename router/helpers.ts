@@ -10,6 +10,7 @@ export default class NestedRoute {
   }
 }
 
+
 export function changeRouteType(route: any, common?: true | false) {
   if (common) {
     if (route instanceof NestedRoute) {
@@ -22,6 +23,16 @@ export function changeRouteType(route: any, common?: true | false) {
       if (route instanceof Array) {
         nixixStore.$$__commonRouteProvider.replaceChildren(...route);
       } else {
+        if (route === null || route === undefined) {
+          // if route equals to null, then show an errorPage.
+          const routeStore = nixixStore.$$__routeStore;
+          const errorPage = routeStore.errorPage;
+          const pageToShow = errorPage ? (routeStore[errorPage.errorRoute]) : '404 Not Found';
+          const commonProvider = nixixStore.$$__commonRouteProvider;
+
+          pageToShow instanceof Array ? commonProvider.replaceChildren(...pageToShow) : commonProvider.replaceChildren(pageToShow);
+          return 
+        }
         nixixStore.$$__commonRouteProvider.replaceChildren(route);
       }
     }
@@ -36,6 +47,16 @@ export function changeRouteType(route: any, common?: true | false) {
       if (route instanceof Array) {
         nixixStore.$$__routeProvider.replaceChildren(...route);
       } else {
+        if (route === null || route === undefined) {
+          // if route equals to null, then show an errorPage.
+          const routeStore = nixixStore.$$__routeStore;
+          const errorPage = routeStore.errorPage;
+          const pageToShow = errorPage ? (routeStore[errorPage.errorRoute]) : '404 Not Found';
+          const provider = nixixStore.$$__routeProvider;
+
+          pageToShow instanceof Array ? provider.replaceChildren(...pageToShow) : provider.replaceChildren(pageToShow);
+          return 
+        }
         nixixStore.$$__routeProvider.replaceChildren(route);
       }
     }

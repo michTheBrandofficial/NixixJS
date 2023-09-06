@@ -1,9 +1,78 @@
 import { nixixStore } from './index';
 import { Signal, Store } from '../primitives/classes';
 
+export const svgElementsTags = [
+  'a',
+  'animate',
+  'animateMotion',
+  'animateTransform',
+  'circle',
+  'clipPath',
+  'defs',
+  'desc',
+  'ellipse',
+  'feBlend',
+  'feColorMatrix',
+  'feComponentTransfer',
+  'feComposite',
+  'feConvolveMatrix',
+  'feDiffuseLighting',
+  'feDisplacementMap',
+  'feDistantLight',
+  'feDropShadow',
+  'feFlood',
+  'feFuncA',
+  'feFuncB',
+  'feFuncG',
+  'feFuncR',
+  'feGaussianBlur',
+  'feImage',
+  'feMerge',
+  'feMergeNode',
+  'feMorphology',
+  'feOffset',
+  'fePointLight',
+  'feSpecularLighting',
+  'feSpotLight',
+  'feTile',
+  'feTurbulence',
+  'filter',
+  'foreignObject',
+  'g',
+  'image',
+  'line',
+  'linearGradient',
+  'marker',
+  'mask',
+  'metadata',
+  'mpath',
+  'path',
+  'pattern',
+  'polygon',
+  'polyline',
+  'radialGradient',
+  'rect',
+  'script',
+  'set',
+  'stop',
+  'style',
+  'svg',
+  'switch',
+  'symbol',
+  'text',
+  'textPath',
+  'title',
+  'tspan',
+  'use',
+  'view',
+];
+
+/**
+ *
+ */
 export function addChildren(
   children: ChildrenType,
-  element: HTMLElementTagNameMap[keyof HTMLElementTagNameMap]
+  element: HTMLElement | SVGElement
 ) {
   children.forEach((child, index) => {
     if (typeof child === 'string' || typeof child === 'number') {
@@ -75,16 +144,10 @@ export function handleDirectives_(
   element: Element
 ) {
   if (bindtype === 'ref') {
-    if (directiveValue instanceof Signal) {
-      errorFunc(
+    if (directiveValue instanceof Signal || directiveValue instanceof Store)
+      throw new Error(
         `The bind:ref directive's value cannot be reactive, it must be a MutableRefObject.`
       );
-    }
-    if (directiveValue instanceof Store) {
-      errorFunc(
-        `The bind:ref directive's value cannot be reactive, it must be a MutableRefObject.`
-      );
-    }
 
     let refObject: MutableRefObject;
 
@@ -109,6 +172,9 @@ export function parseRef(refObject: MutableRefObject) {
   refObject.prevElementSibling = current.previousElementSibling;
 }
 
+/**
+ * adds an element to the dependents array in the global store object.
+ */
 export async function parseSignal(
   id: number,
   element: Element,
@@ -153,6 +219,9 @@ export async function diffSignal_(id: number) {
   });
 }
 
+/**
+ * used to add a listener to elements so that the get cleaned up after they are removed from the dom.
+ */
 async function onElementRemoved(element: Element, callback: CallableFunction) {
   await Promise.resolve();
   const observer = new MutationObserver(function (mutations) {
@@ -165,6 +234,9 @@ async function onElementRemoved(element: Element, callback: CallableFunction) {
   observer.observe(element.parentElement, { childList: true });
 }
 
+/**
+ * used to filter the dependency array in the global store object.
+ */
 function filterDependencies(
   element: Element,
   key: string,
@@ -180,6 +252,9 @@ function filterDependencies(
   };
 }
 
+/**
+ * used to add elements to the dependencies array in the global store object.
+ */
 export async function parseStore(
   id: number | string,
   element: Element,
