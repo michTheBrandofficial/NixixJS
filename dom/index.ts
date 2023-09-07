@@ -148,11 +148,12 @@ function setProps(props: Proptype | null, element: NixixElementType) {
     props = Object.entries(props);
     for (const [k, v] of props as [string, StyleValueType | ValueType][]) {
       if (k in PROP_ALIASES) {
+        const mayBeClass = PROP_ALIASES[k]['$'];
         setAttribute(
           element,
-          PROP_ALIASES[k]['$'],
+          mayBeClass === 'className' ? 'class' : mayBeClass,
           v as ValueType,
-          'propertyAttribute'
+          mayBeClass === 'className' ? 'regularAttribute' : 'propertyAttribute'
         );
       } else if (k === 'style') {
         setStyle(element, v as unknown as StyleValueType);
