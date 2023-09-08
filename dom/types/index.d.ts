@@ -7,8 +7,8 @@ declare const Nixix: {
     target: T | ((props: {}) => JSX.Element) | 'fragment',
     props: JSX.IntrinsicElements[T] | null,
     ...children: (string | Node)[]
-  ) => Element
-}
+  ) => Element;
+};
 /**
  * render function
  * @param element JSX.Element to render
