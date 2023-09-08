@@ -64,6 +64,17 @@ export function effect(
 ): void;
 
 /**
+ *
+ * @param callbackFn callback function to be executed
+ * @param furtherDependents furtherDependencies array to subscribe to
+ * This function doesn't work like the effect function that subscribes it's callback function to the last signal or store created.
+ */
+export function callEffect(
+  callbackFn: CallableFunction,
+  furtherDependents?: (SignalObject<any> | StoreObject<any>)[]
+): void;
+
+/**
  * Tracks the closest (signal or store) and calls the callback function whenever the (signal or store)'s value changes.
  * If there is no signal or store, it does no tracking.
  *

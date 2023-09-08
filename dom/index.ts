@@ -1,11 +1,13 @@
+import { callEffect } from 'primitives';
 import { Signal, Store } from '../primitives/classes';
 import {
-  parseSignal,
-  parseStore,
   raise,
   addChildren,
   handleDirectives_,
   warn,
+  getStoreValue,
+  getSignalValue,
+  checkDataType,
 } from './helpers';
 import { PROP_ALIASES, SVG_ELEMENTTAGS, SVG_NAMESPACE } from './utilVars';
 
@@ -39,21 +41,12 @@ const Nixix = {
     attrPrefix,
     attrName,
     attrValue,
-    type,
   }: DynamicAttrType) => {
     const attrSuffix = attrName.slice(attrPrefix.length);
     const newAttrName = `${attrPrefix.replace(':', '-')}${attrSuffix}`;
-    setAttribute(element, newAttrName, attrValue, type);
+    setAttribute(element, newAttrName, attrValue);
   },
 };
-
-function checkDataType(value: any) {
-  return (
-    typeof value === 'string' ||
-    typeof value === 'boolean' ||
-    typeof value === 'number'
-  );
-}
 
 function isNull(value: any) {
   return value === null || value === undefined;
@@ -63,9 +56,10 @@ function entries(obj: object) {
   return Object.entries(obj);
 }
 
-function noReactiveValue(value: Signal | Store, prop: string) {
+function isReactiveValue(value: Signal | Store, prop: string) {
   if (value instanceof Signal || value instanceof Store) {
     raise(`The ${prop} prop value cannot be reactive.`);
+    return true;
   }
 }
 
@@ -73,35 +67,24 @@ function setAttribute(
   element: NixixElementType,
   attrName: string,
   attrValue: ValueType,
-  type?: Dependents['typeOf']
+  type?: TypeOf
 ) {
   if (isNull(attrValue))
     return warn(
       `The ${attrName} prop cannot be null or undefined. Skipping attribute parsing.`
     );
   if (attrValue instanceof Signal) {
-    type === 'propertyAttribute'
-      ? (element[attrName] = attrValue.value)
-      : element.setAttribute(attrName, attrValue.value);
-    parseSignal(attrValue.$$__id, element, attrName, type);
+    callEffect(() => {
+      type === 'propertyAttribute'
+        ? (element[attrName] = getSignalValue(attrValue))
+        : element.setAttribute(attrName, getSignalValue(attrValue));
+    }, [attrValue]);
   } else if (attrValue instanceof Store) {
-    type === 'propertyAttribute'
-      ? (element[attrName] = eval(
-          `nixixStore.Store['${attrValue.$$__id}'].value${attrValue.$$__name}`
-        ))
-      : element.setAttribute(
-          attrName,
-          eval(
-            `nixixStore.Store['${attrValue.$$__id}'].value${attrValue.$$__name}`
-          )
-        );
-    parseStore(
-      attrValue.$$__id as number,
-      element,
-      attrName,
-      type,
-      attrValue.$$__name
-    );
+    callEffect(() => {
+      type === 'propertyAttribute'
+        ? (element[attrName] = getStoreValue(attrValue))
+        : element.setAttribute(attrName, getStoreValue(attrValue));
+    }, [attrValue]);
   } else if (checkDataType(attrValue)) {
     type === 'propertyAttribute'
       ? (element[attrName] = attrValue)
@@ -124,19 +107,13 @@ function setStyle(element: NixixElementType, styleValue: StyleValueType) {
     }
 
     if (value instanceof Signal) {
-      element['style'][property] = value.value;
-      parseSignal(value.$$__id, element, property, 'styleProp');
+      callEffect(() => {
+        element['style'][property] = getSignalValue(value as Signal);
+      }, [value]);
     } else if (value instanceof Store) {
-      element['style'][property] = eval(
-        `nixixStore.Store['${value.$$__id}'].value${value.$$__name}`
-      );
-      parseStore(
-        value.$$__id as number,
-        element,
-        property,
-        'styleProp',
-        value.$$__name
-      );
+      callEffect(() => {
+        element['style'][property] = getStoreValue(value as Store);
+      }, [value]);
     } else {
       element['style'][property] = value;
     }
@@ -162,8 +139,8 @@ function setProps(props: Proptype | null, element: NixixElementType) {
           return warn(
             `The ${k} prop cannot be null or undefined. Skipping prop parsing`
           );
+        isReactiveValue(v as any, k);
         const domAttribute = k.slice(3);
-        noReactiveValue(v as any, k);
         element.addEventListener(domAttribute, v as any);
       } else if (k.startsWith('aria:')) {
         Nixix.handleDynamicAttrs({
@@ -171,7 +148,6 @@ function setProps(props: Proptype | null, element: NixixElementType) {
           attrPrefix: 'aria:',
           attrName: k,
           attrValue: v as ValueType,
-          type: 'AriaProp',
         });
       } else if (k.startsWith('stroke:')) {
         Nixix.handleDynamicAttrs({
@@ -179,13 +155,13 @@ function setProps(props: Proptype | null, element: NixixElementType) {
           attrPrefix: 'stroke:',
           attrName: k,
           attrValue: v as ValueType,
-          type: 'strokeProp',
         });
       } else if (k.startsWith('bind:')) {
         if (isNull(v))
-          return warn(
+          return raise(
             `The ${k} directive value cannot be null or undefined. Skipping directive parsing`
           );
+        isReactiveValue(v as any, k);
         Nixix.handleDirectives(
           k.slice(5),
           v as unknown as MutableRefObject,

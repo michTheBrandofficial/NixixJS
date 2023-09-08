@@ -1,65 +1,49 @@
 import { nixixStore } from './index';
 import { Signal, Store } from '../primitives/classes';
+import { callEffect } from 'primitives';
+
+export function checkDataType(value: any) {
+  return (
+    typeof value === 'string' ||
+    typeof value === 'boolean' ||
+    typeof value === 'number'
+  );
+}
+
+function createText(string: string) {
+  return document.createTextNode(String(string));
+}
+
+function addText(element: HTMLElement | SVGElement) {
+  const text = createText('');
+  element.append(text);
+  return text;
+}
 
 /**
- *
+ * create('div', null, "name", create('p', null), create(App, {name: 'Ozor'}))
+ * if the child is a string, append a textNode, else if if is an array, append all of it, else if it is an object, the append it
  */
 export function addChildren(
   children: ChildrenType,
   element: HTMLElement | SVGElement
 ) {
-  children.forEach((child, index) => {
-    if (typeof child === 'string' || typeof child === 'number') {
-      element.append(document.createTextNode(String(child)));
+  children.forEach((child) => {
+    if (checkDataType(child)) {
+      element.append(createText(child));
     } else if (child instanceof Array) {
-      for (const fragChild of child) {
-        if (typeof fragChild === 'object') {
-          if (fragChild instanceof Signal) {
-            element.append(document.createTextNode(fragChild.value));
-            parseSignal(fragChild.$$__id, element, index, 'childTextNode');
-          } else if (fragChild instanceof Store) {
-            element.append(
-              document.createTextNode(
-                eval(
-                  `window.$$__NixixStore.Store['${fragChild.$$__id}'].value${fragChild.$$__name}`
-                )
-              )
-            );
-            // @ts-ignore
-            parseStore(
-              fragChild.$$__id,
-              element,
-              index,
-              'childTextNode',
-              fragChild.$$__name
-            );
-          } else {
-            element.append(fragChild);
-          }
-        } else {
-          element.append(document.createTextNode(fragChild));
-        }
-      }
+      addChildren(child, element);
     } else if (typeof child === 'object') {
       if (child instanceof Signal) {
-        element.append(document.createTextNode(child.value));
-        parseSignal(child.$$__id, element, index, 'childTextNode');
+        const text = addText(element);
+        callEffect(() => {
+          text.textContent = getSignalValue(child);
+        }, [child]);
       } else if (child instanceof Store) {
-        element.append(
-          document.createTextNode(
-            eval(
-              `window.$$__NixixStore.Store['${child.$$__id}'].value${child.$$__name}`
-            )
-          )
-        );
-        // @ts-ignore
-        parseStore(
-          child.$$__id,
-          element,
-          index,
-          'childTextNode',
-          child.$$__name
-        );
+        const text = addText(element);
+        callEffect(() => {
+          text.textContent = getStoreValue(child);
+        }, [child]);
       } else {
         element.append(child as unknown as string);
       }
@@ -106,57 +90,15 @@ export function parseRef(refObject: MutableRefObject) {
   refObject.prevElementSibling = current.previousElementSibling;
 }
 
-function updateProps(
-  element: HTMLElement | SVGElement,
-  property: string,
-  newValue: string,
-  typeOf: Dependents['typeOf']
-) {
-  if (typeOf === 'AriaProp') {
-    element.setAttribute(`${property}`, newValue);
-  } else if (typeOf === 'propertyAttribute') {
-    element[property] = newValue;
-  } else if (typeOf === 'strokeProp') {
-    element.setAttribute(`${property}`, newValue);
-  } else if (typeOf === 'regularAttribute') {
-    element.setAttribute(property, newValue);
-  } else if (typeOf === 'styleProp') {
-    element['style'][property] = newValue;
-  } else if (typeOf === 'childTextNode') {
-    element.childNodes[property].textContent = newValue;
-  }
+export function getStoreValue(store: Store) {
+  const storeEval = window['eval'];
+  return storeEval(
+    `window.$$__NixixStore.Store['${store.$$__id}'].value${store.$$__name}`
+  );
 }
 
-export async function parseSignal(
-  id: number,
-  element: Element,
-  property: any,
-  typeOf: Dependents['typeOf']
-) {
-  await Promise.resolve();
-  const key = `_${id}_`;
-  nixixStore.SignalStore[key].dependents.push({ element, property, typeOf });
-
-  onElementRemoved(element, filterDependencies(element, key, 'SignalStore'));
-
-  return 'Done!!!';
-}
-
-/**
- * @param {number} id is the id which diffSignal_ will use to get the Signal object in nixixStore.SignalStore
- * diffSignal_ is not async because it will be passed to nixixStore['diffSignal'], it is defined here for the sake of simplicity of index.ts
- */
-export function diffSignal_(id: number) {
-  const { value: newValue, dependents } = nixixStore.SignalStore[`_${id}_`];
-  dependents.forEach((dependent) => {
-    const { typeOf, element, property } = dependent;
-    updateProps(
-      element as HTMLElement | SVGElement,
-      property,
-      newValue,
-      typeOf
-    );
-  });
+export function getSignalValue(signal: Signal) {
+  return signal.value;
 }
 
 /**
@@ -172,64 +114,6 @@ async function onElementRemoved(element: Element, callback: CallableFunction) {
   });
 
   observer.observe(element.parentElement, { childList: true });
-}
-
-/**
- * used to filter the dependency array in the global store object.
- */
-function filterDependencies(
-  element: Element,
-  key: string,
-  reactiveProvider: 'SignalStore' | 'Store'
-) {
-  return async () => {
-    await Promise.resolve();
-    nixixStore[reactiveProvider][key].dependents = nixixStore[reactiveProvider][
-      key
-    ].dependents.filter((arr) => {
-      return arr.element !== element;
-    });
-  };
-}
-
-export async function parseStore(
-  id: number | string,
-  element: Element,
-  property: any,
-  typeOf: Dependents['typeOf'],
-  accessor: string
-) {
-  await Promise.resolve();
-  const key = `${id}`;
-  nixixStore.Store[key].dependents.push({
-    element,
-    property,
-    typeOf,
-    accessor,
-  });
-  onElementRemoved(element, filterDependencies(element, key, 'Store'));
-  return 'Done!!!';
-}
-
-/**
- * @param {number} id is the id which diffStore_ will use to get the Signal object in nixixStore.SignalStore
- * diffStore_ is not async because it will be passed to nixixStore['diffStore'], it is defined here for the sake of simplicity of index.ts
- */
-export function diffStore_(id: number) {
-  const key = `_${id}_`;
-  const { dependents } = nixixStore.Store[key];
-  dependents.forEach((dependent) => {
-    const { typeOf, element, property, accessor } = dependent;
-    const newValue = eval(
-      `window.$$__NixixStore.Store['${key}'].value${accessor}`
-    );
-    updateProps(
-      element as HTMLElement | SVGElement,
-      property,
-      newValue,
-      typeOf
-    );
-  });
 }
 
 export function raise(message: string) {
