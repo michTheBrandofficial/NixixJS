@@ -26,26 +26,16 @@ declare global {
     attrPrefix: string;
     attrName: string;
     attrValue: ValueType;
-    type: Dependents['typeOf'];
   };
 
-  interface Dependents {
-    element: Element;
-    typeOf:
-      | 'AriaProp'
-      | 'propertyAttribute'
-      | 'regularAttribute'
-      | 'styleProp'
-      | 'DOMProp'
-      | 'childTextNode'
-      | 'strokeProp';
-    property: any;
-    accessor?: string;
-  }
+  type TypeOf =
+    | 'propertyAttribute'
+    | 'regularAttribute'
+    | 'styleProp'
+    | 'childTextNode';
 
   interface WindowStoreObject {
     value: any;
-    dependents: Dependents[];
     effect?: CallableFunction[];
     cleanup?: () => void;
   }
@@ -67,7 +57,6 @@ declare global {
       SignalStore?: {
         [index: string]: {
           value: any;
-          dependents: Dependents[];
           effect?: CallableFunction[];
         };
       };

@@ -1,6 +1,5 @@
 import { Signal, Store } from './classes';
 import { nixixStore } from '../dom';
-import { diffSignal_, diffStore_ } from '../dom/helpers';
 import {
   incrementId,
   checkType,
@@ -25,7 +24,7 @@ function callRef<R extends Element | HTMLElement>(ref: R): MutableRefObject {
 }
 
 /**
- * takes an initialValue and returns an array of a object and a function to update that object.
+ * takes an initialValue(string, boolean or number) and returns an array of a object and a function to update that object.
  */
 function callSignal<S>(
   initialValue: S
@@ -36,8 +35,6 @@ function callSignal<S>(
 
   if (nixixStore.SignalStore === undefined) {
     nixixStore.SignalStore = {};
-
-    nixixStore.diffSignal = diffSignal_;
   }
   /**
    * value - in the worst case of it being an instance of object, throw an error.
@@ -45,7 +42,7 @@ function callSignal<S>(
   let value: string | number | boolean =
     typeof initialValue === 'function' ? initialValue() : initialValue;
 
-  nixixStore.SignalStore[`_${signalId}_`] = { value: value, dependents: [] };
+  nixixStore.SignalStore[`_${signalId}_`] = { value: value };
   let initValue = new Signal(checkType(value)(value), signalId);
   return [
     initValue,
@@ -61,10 +58,6 @@ function callSignal<S>(
           : newState;
       if (String(originalValue) !== String(newStatePassed)) {
         nixixStore.SignalStore[`_${id}_`].value = newStatePassed;
-
-        if (nixixStore.SignalStore[`_${id}_`].dependents.length !== 0) {
-          nixixStore.diffSignal(id);
-        }
         initValue.value = newStatePassed;
         const effect = nixixStore['SignalStore'][`_${id}_`].effect;
         if (effect) {
@@ -85,14 +78,12 @@ function callStore<S>(initialValue: S): any[] {
   nixixStore['$$__lastReactionProvider'] = 'store';
   if (nixixStore.Store === undefined) {
     nixixStore.Store = {};
-
-    nixixStore.diffStore = diffStore_;
   }
 
   let value: Array<any> | object =
     typeof initialValue === 'function' ? initialValue() : initialValue;
 
-  nixixStore.Store[`_${storeId}_`] = { value: value, dependents: [] };
+  nixixStore.Store[`_${storeId}_`] = { value: value };
   let initValue = new Store({ value: value, id: storeId, firstValue: 1 });
   nixixStore.Store[`_${storeId}_`].cleanup = () => {
     cleanup(initValue);
@@ -114,10 +105,6 @@ function callStore<S>(initialValue: S): any[] {
                 ...initValue.$$__value,
                 ...newValuePassed,
               };
-
-        if (store.dependents.length !== 0) {
-          nixixStore.diffStore(id);
-        }
         initValue.$$__value =
           initValue.$$__value instanceof Array
             ? [...store.value]
@@ -135,6 +122,35 @@ function callStore<S>(initialValue: S): any[] {
       }
     },
   ];
+}
+
+function pushFurtherDeps(
+  callbackFn: CallableFunction,
+  furtherDependents?: (Signal | Store)[]
+) {
+  if (furtherDependents) {
+    furtherDependents.forEach((furtherDep) => {
+      if (furtherDep instanceof Signal) {
+        let obj = nixixStore.SignalStore?.[`_${furtherDep.$$__id}_`];
+        obj
+          ? obj.effect
+            ? obj.effect.includes(callbackFn)
+              ? null
+              : obj.effect.push(callbackFn)
+            : (obj.effect = [callbackFn])
+          : null;
+      } else if (furtherDep instanceof Store) {
+        let obj = nixixStore.Store?.[`${furtherDep.$$__id}`];
+        obj
+          ? obj.effect
+            ? obj.effect.includes(callbackFn)
+              ? null
+              : obj.effect.push(callbackFn)
+            : (obj.effect = [callbackFn])
+          : null;
+      }
+    });
+  }
 }
 
 function dispatchEffect(
@@ -157,29 +173,7 @@ function dispatchEffect(
       }
     }
 
-    if (furtherDependents) {
-      furtherDependents.forEach((furtherDep) => {
-        if (furtherDep instanceof Signal) {
-          let obj = nixixStore.SignalStore?.[`_${furtherDep.$$__id}_`];
-          obj
-            ? obj.effect
-              ? obj.effect.includes(callbackFn)
-                ? null
-                : obj.effect.push(callbackFn)
-              : (obj.effect = [callbackFn])
-            : null;
-        } else {
-          let obj = nixixStore.Store?.[`_${furtherDep.$$__id}_`];
-          obj
-            ? obj.effect
-              ? obj.effect.includes(callbackFn)
-                ? null
-                : obj.effect.push(callbackFn)
-              : (obj.effect = [callbackFn])
-            : null;
-        }
-      });
-    }
+    pushFurtherDeps(callbackFn, furtherDependents);
   }
 }
 
@@ -192,6 +186,18 @@ function effect(
     : nixixStore['storeCount']
 ) {
   dispatchEffect(callbackFn, config, furtherDependents, id);
+
+  (async function (cb) {
+    await Promise.resolve();
+    cb();
+  })(callbackFn);
+}
+
+function callEffect(
+  callbackFn: CallableFunction,
+  furtherDependents?: (Signal | Store)[]
+) {
+  pushFurtherDeps(callbackFn, furtherDependents);
 
   (async function (cb) {
     await Promise.resolve();
@@ -239,6 +245,7 @@ export {
   callSignal,
   callStore,
   effect,
+  callEffect,
   renderEffect,
   Store,
   Signal,
