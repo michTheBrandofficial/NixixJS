@@ -1,7 +1,13 @@
 import { Signal, Store } from './classes';
 import { nixixStore } from '../dom';
 import { diffSignal_, diffStore_ } from '../dom/helpers';
-import { incrementId, checkType, cleanup } from './helpers';
+import {
+  incrementId,
+  checkType,
+  cleanup,
+  isNotEqualObject,
+  cloneObject,
+} from './helpers';
 
 function callRef<R extends Element | HTMLElement>(ref: R): MutableRefObject {
   if (nixixStore['refCount'] === undefined) {
@@ -50,7 +56,9 @@ function callSignal<S>(
       originalValue = nixixStore.SignalStore[`_${signalId}_`].value
     ) {
       let newStatePassed =
-        typeof newState === 'function' ? newState() : newState;
+        typeof newState === 'function'
+          ? (newState as Function)(originalValue)
+          : newState;
       if (String(originalValue) !== String(newStatePassed)) {
         nixixStore.SignalStore[`_${id}_`].value = newStatePassed;
 
@@ -88,24 +96,16 @@ function callStore<S>(initialValue: S): any[] {
   let initValue = new Store({ value: value, id: storeId, firstValue: 1 });
   nixixStore.Store[`_${storeId}_`].cleanup = () => {
     cleanup(initValue);
-  }
-  
+  };
+
   return [
     initValue,
-    (newValue: () => any, id = storeId) => {
+    (newValue: (prev?: any) => any, id = storeId) => {
       let newValuePassed =
-        typeof newValue === 'function' ? newValue() : newValue;
-      if (
-        JSON.stringify(initValue.$$__value) !==
-        JSON.stringify(
-          initValue.$$__value instanceof Array
-            ? newValuePassed
-            : {
-                ...initValue.$$__value,
-                ...newValuePassed,
-              }
-        )
-      ) {
+        typeof newValue === 'function'
+          ? newValue(cloneObject(nixixStore.Store[`_${storeId}_`].value))
+          : newValue;
+      if (isNotEqualObject(initValue, newValuePassed)) {
         const store = nixixStore.Store[`_${id}_`];
         store.value =
           initValue.$$__value instanceof Array
@@ -127,7 +127,7 @@ function callStore<S>(initialValue: S): any[] {
           effect.forEach((eff) => eff());
         }
 
-        // cleanup the store proxy on first call 
+        // cleanup the store proxy on first call
         if (store.cleanup) {
           store.cleanup();
           delete store.cleanup;
@@ -152,7 +152,7 @@ function dispatchEffect(
         let obj = nixixStore.SignalStore?.[`_${id}_`];
         obj ? (obj.effect ? null : (obj.effect = [callbackFn])) : null;
       } else {
-        let obj = (nixixStore.Store?.[`_${id}_`]);
+        let obj = nixixStore.Store?.[`_${id}_`];
         obj ? (obj.effect ? null : (obj.effect = [callbackFn])) : null;
       }
     }
@@ -169,7 +169,7 @@ function dispatchEffect(
               : (obj.effect = [callbackFn])
             : null;
         } else {
-          let obj = (nixixStore.Store?.[`_${furtherDep.$$__id}_`]);
+          let obj = nixixStore.Store?.[`_${furtherDep.$$__id}_`];
           obj
             ? obj.effect
               ? obj.effect.includes(callbackFn)

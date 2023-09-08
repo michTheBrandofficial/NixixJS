@@ -72,9 +72,9 @@ declare global {
         };
       };
       storeCount?: number;
-      diffStore?: (id: number) => Promise<void>;
+      diffStore?: (id: number) => void;
       signalCount?: number;
-      diffSignal?: (id: number) => Promise<void>;
+      diffSignal?: (id: number) => void;
       $$__For?: {
         [id: string]: string[] | Element[] | JSX.Element[];
       };
@@ -91,7 +91,7 @@ declare global {
     $$__name?: string;
   }
 
-  type SetSignalDispatcher<S> = (newValue: S) => void;
+  type SetSignalDispatcher<S> = (newValue: S | ((prev?: S) => S)) => void;
   type SetStoreDispatcher<S> = (newValue: S | (() => S)) => void;
 
   interface SuspenseProps {

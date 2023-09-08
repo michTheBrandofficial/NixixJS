@@ -1,5 +1,5 @@
-import { nixixStore } from "../dom";
-import { Store } from "./classes";
+import { nixixStore } from '../dom';
+import { Store } from './classes';
 
 function incrementId(prop: string) {
   if (nixixStore[prop] === undefined) {
@@ -9,6 +9,24 @@ function incrementId(prop: string) {
     // @ts-ignore
     nixixStore[prop] = nixixStore[prop] + 1;
   }
+}
+
+function cloneObject(object: any) {
+  return JSON.parse(JSON.stringify(object));
+}
+
+function isNotEqualObject(oldObject: StoreObject, newObject: StoreObject) {
+  return (
+    JSON.stringify(oldObject.$$__value) !==
+    JSON.stringify(
+      oldObject.$$__value instanceof Array
+        ? newObject
+        : {
+            ...oldObject.$$__value,
+            ...newObject,
+          }
+    )
+  );
 }
 
 function checkType(value: string | number | boolean) {
@@ -22,7 +40,6 @@ function checkType(value: string | number | boolean) {
   return type;
 }
 
-
 async function cleanup(store: Store) {
   await Promise.resolve();
   Object.keys(store).forEach((val) => {
@@ -32,9 +49,4 @@ async function cleanup(store: Store) {
   });
 }
 
-export {
-  incrementId,
-  checkType,
-  cleanup
-}
-
+export { incrementId, checkType, cleanup, isNotEqualObject, cloneObject };

@@ -1,8 +1,8 @@
 import '../types/index';
 
 // primitives
-export type SetSignalDispatcher<S> = (newValue: S | (() => S)) => void;
-export type SetStoreDispatcher<S> = (newValue: S | (() => S)) => void;
+export type SetSignalDispatcher<S> = (newValue: S | ((prev?: S) => S)) => void;
+export type SetStoreDispatcher<S> = (newValue: S | ((prev?: S) => S)) => void;
 
 export type SignalObject<S> = {
   value: S;
