@@ -1,10 +1,8 @@
 name: Release package
 on:
-  workflow_dispatch:
-    inputs:
-      release-type:
-        description: 'Release type (one of): patch, minor, major, prepatch, preminor, premajor, prerelease'
-        required: true
+  push:
+    branches: main
+
 jobs:
   release:
     runs-on: ubuntu-latest
