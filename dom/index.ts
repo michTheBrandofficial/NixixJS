@@ -2,181 +2,228 @@ import { Signal, Store } from '../primitives/classes';
 import {
   parseSignal,
   parseStore,
-  errorFunc,
+  raise,
   addChildren,
   handleDirectives_,
-  svgElementsTags,
+  warn,
 } from './helpers';
+import { PROP_ALIASES, SVG_ELEMENTTAGS, SVG_NAMESPACE } from './utilVars';
 
 // Global store for the store class and signals.
 window['$$__NixixStore'] = {};
 export const nixixStore = window.$$__NixixStore;
 
 const Nixix = {
-  /**
-   * jsx factory for create dom nodes.
-   */
   create: function (
     tagNameFC: target,
     props: Proptype,
     ...children: ChildrenType
   ): Element | Array<Element | string | Signal> | undefined {
-    // if arg 0 is a string, it makes a dom node, else it is a function, then return invoked function.
     if (typeof tagNameFC === 'string') {
-      // if the string is fragment, return the children, else make a dom node, set attrs and return the dom node.
       if (tagNameFC === 'fragment') {
-        if (children != null) return children;
+        if (children !== null) return children;
+        return [];
       } else {
-        const element = !svgElementsTags.includes(tagNameFC)
+        const element = !SVG_ELEMENTTAGS.includes(tagNameFC)
           ? document.createElement(tagNameFC)
-          : document.createElementNS('http://www.w3.org/2000/svg', tagNameFC);
-        if (props != null || props != undefined) {
-          for (const [k, v] of Object.entries(props)) {
-            // check if it has a signal object
-            if (k === 'className') {
-              if (v instanceof Signal) {
-                element.setAttribute('class', v.value);
-                parseSignal(v.$$__id, element, 'class', 'className');
-              } else if (v instanceof Store) {
-                element.setAttribute(
-                  'class',
-                  eval(`nixixStore.Store['${v.$$__id}'].value${v.$$__name}`)
-                );
-                parseStore(
-                  v.$$__id as number,
-                  element,
-                  k,
-                  'className',
-                  v.$$__name
-                );
-              } else {
-                element.setAttribute('class', v);
-              }
-            } else if (k === 'style') {
-              if (!v) throw new Error('The style prop value must be an object');
-              /**
-               * @type {Array<[string, string | SignalObject<string>]>} styles
-               */
-              const styles: Array<[string, string | SignalObject<string>]> =
-                Object.entries(v);
-              for (let [propname, value] of styles) {
-                if (value instanceof Signal) {
-                  element['style'][propname] = value.value;
-                  parseSignal(value.$$__id, element, propname, 'styleProp');
-                } else if (value instanceof Store) {
-                  element['style'][propname] = eval(
-                    `nixixStore.Store['${value.$$__id}'].value${value.$$__name}`
-                  );
-                  parseStore(
-                    value.$$__id as number,
-                    element,
-                    propname,
-                    'styleProp',
-                    value.$$__name
-                  );
-                } else {
-                  element['style'][propname] = value;
-                }
-              }
-            } else if (k.startsWith('on:')) {
-              const domAttribute = k.slice(3);
-
-              if (v instanceof Signal) {
-                errorFunc(
-                  'It seems you passed a reactive value to a DOM attribute. DOM attribute values cannot ge reactive.'
-                );
-              } else if (v instanceof Store) {
-                errorFunc('DOM attributes cannot reactive values.');
-              } else {
-                element.addEventListener(domAttribute, v);
-              }
-            } else if (k.startsWith('aria:')) {
-              Nixix.handleDynamicAttrs({
-                element,
-                s: 'aria:',
-                k,
-                v,
-                type: 'AriaProp',
-              });
-            } else if (k.startsWith('stroke:')) {
-              Nixix.handleDynamicAttrs({
-                element,
-                s: 'stroke:',
-                k,
-                v,
-                type: 'strokeProp',
-              });
-            } else if (k.startsWith('bind:')) {
-              Nixix.handleDirectives(k.slice(5), v, element);
-            } else {
-              if (v instanceof Signal) {
-                element.setAttribute(k, v.value);
-                parseSignal(v.$$__id, element, k, 'regularAttribute');
-              } else if (v instanceof Store) {
-                element.setAttribute(
-                  k,
-                  eval(`nixixStore.Store['${v.$$__id}'].value${v.$$__name}`)
-                );
-                parseStore(
-                  v.$$__id as number,
-                  element,
-                  k,
-                  'regularAttribute',
-                  v.$$__name
-                );
-              } else {
-                element.setAttribute(k, v);
-              }
-            }
-          }
-        }
-
-        if (children != undefined || children != null) {
-          addChildren(children, element);
-        }
-
+          : document.createElementNS(SVG_NAMESPACE, tagNameFC);
+        setProps(props, element);
+        setChildren(children, element);
         return element;
       }
-    } else if (typeof tagNameFC === 'function') {
-      // if the function has props, return the function called with the props, else return it without passing props.
-      if (props != null && props != undefined) {
-        if (children.length !== 0) {
-          props.children = children;
-          return tagNameFC(props);
-        }
-        return tagNameFC(props);
-      } else {
-        if (children.length !== 0) {
-          props = { children: children };
-          return tagNameFC(props);
-        }
-        return tagNameFC();
-      }
-    }
+    } else return buildComponent(tagNameFC, props, children);
   },
   handleDirectives: handleDirectives_,
-  handleDynamicAttrs: ({ element, s, k, v, type }) => {
-    const attr = k.slice(s.length);
-    if (v instanceof Signal) {
-      element.setAttribute(`${s.replace(':', '-')}${attr}`, v.value);
-      parseSignal(v.$$__id, element, attr, type);
-    } else if (v instanceof Store) {
-      element.setAttribute(
-        `${s.replace(':', '-')}${attr}`,
-        eval(`nixixStore.Store['${v.$$__id}'].value${v.$$__name}`)
-      );
-      parseStore(v.$$__id as number, element, attr, type, v.$$__name);
-    } else {
-      element.setAttribute(`${s.replace(':', '-')}${attr}`, v);
-    }
+  handleDynamicAttrs: ({
+    element,
+    attrPrefix,
+    attrName,
+    attrValue,
+    type,
+  }: DynamicAttrType) => {
+    const attrSuffix = attrName.slice(attrPrefix.length);
+    const newAttrName = `${attrPrefix.replace(':', '-')}${attrSuffix}`;
+    setAttribute(element, newAttrName, attrValue, type);
   },
 };
 
-/**
- * function to display the UI.
- */
+function checkDataType(value: any) {
+  return (
+    typeof value === 'string' ||
+    typeof value === 'boolean' ||
+    typeof value === 'number'
+  );
+}
+
+function isNull(value: any) {
+  return value === null || value === undefined;
+}
+
+function entries(obj: object) {
+  return Object.entries(obj);
+}
+
+function noReactiveValue(value: Signal | Store, prop: string) {
+  if (value instanceof Signal || value instanceof Store) {
+    raise(`The ${prop} prop value cannot be reactive.`);
+  }
+}
+
+function setAttribute(
+  element: NixixElementType,
+  attrName: string,
+  attrValue: ValueType,
+  type?: Dependents['typeOf']
+) {
+  if (isNull(attrValue))
+    return warn(
+      `The ${attrName} prop cannot be null or undefined. Skipping attribute parsing.`
+    );
+  if (attrValue instanceof Signal) {
+    type === 'propertyAttribute'
+      ? (element[attrName] = attrValue.value)
+      : element.setAttribute(attrName, attrValue.value);
+    parseSignal(attrValue.$$__id, element, attrName, type);
+  } else if (attrValue instanceof Store) {
+    type === 'propertyAttribute'
+      ? (element[attrName] = eval(
+          `nixixStore.Store['${attrValue.$$__id}'].value${attrValue.$$__name}`
+        ))
+      : element.setAttribute(
+          attrName,
+          eval(
+            `nixixStore.Store['${attrValue.$$__id}'].value${attrValue.$$__name}`
+          )
+        );
+    parseStore(
+      attrValue.$$__id as number,
+      element,
+      attrName,
+      type,
+      attrValue.$$__name
+    );
+  } else if (checkDataType(attrValue)) {
+    type === 'propertyAttribute'
+      ? (element[attrName] = attrValue)
+      : element.setAttribute(attrName, attrValue as any);
+  }
+}
+
+function setStyle(element: NixixElementType, styleValue: StyleValueType) {
+  if (isNull(styleValue))
+    return warn(
+      `The style prop cannot be null or undefined. Skipping attribute parsing.`
+    );
+  const cssStyleProperties = entries(styleValue) as [string, ValueType][];
+  for (let [property, value] of cssStyleProperties) {
+    if (isNull(value)) {
+      warn(
+        `The ${property} CSS property cannot be null or undefined. Skipping CSS property parsing.`
+      );
+      continue;
+    }
+
+    if (value instanceof Signal) {
+      element['style'][property] = value.value;
+      parseSignal(value.$$__id, element, property, 'styleProp');
+    } else if (value instanceof Store) {
+      element['style'][property] = eval(
+        `nixixStore.Store['${value.$$__id}'].value${value.$$__name}`
+      );
+      parseStore(
+        value.$$__id as number,
+        element,
+        property,
+        'styleProp',
+        value.$$__name
+      );
+    } else {
+      element['style'][property] = value;
+    }
+  }
+}
+
+function setProps(props: Proptype | null, element: NixixElementType) {
+  if (props) {
+    props = Object.entries(props);
+    for (const [k, v] of props as [string, StyleValueType | ValueType][]) {
+      if (k in PROP_ALIASES) {
+        setAttribute(
+          element,
+          PROP_ALIASES[k]['$'],
+          v as ValueType,
+          'propertyAttribute'
+        );
+      } else if (k === 'style') {
+        setStyle(element, v as unknown as StyleValueType);
+      } else if (k.startsWith('on:')) {
+        if (isNull(v))
+          return warn(
+            `The ${k} prop cannot be null or undefined. Skipping prop parsing`
+          );
+        const domAttribute = k.slice(3);
+        noReactiveValue(v as any, k);
+        element.addEventListener(domAttribute, v as any);
+      } else if (k.startsWith('aria:')) {
+        Nixix.handleDynamicAttrs({
+          element,
+          attrPrefix: 'aria:',
+          attrName: k,
+          attrValue: v as ValueType,
+          type: 'AriaProp',
+        });
+      } else if (k.startsWith('stroke:')) {
+        Nixix.handleDynamicAttrs({
+          element,
+          attrPrefix: 'stroke:',
+          attrName: k,
+          attrValue: v as ValueType,
+          type: 'strokeProp',
+        });
+      } else if (k.startsWith('bind:')) {
+        if (isNull(v))
+          return warn(
+            `The ${k} directive value cannot be null or undefined. Skipping directive parsing`
+          );
+        Nixix.handleDirectives(
+          k.slice(5),
+          v as unknown as MutableRefObject,
+          element
+        );
+      } else {
+        setAttribute(element, k, v as ValueType);
+      }
+    }
+  }
+}
+
+function setChildren(children: ChildrenType | null, element: NixixElementType) {
+  if (children != undefined || children != null) {
+    addChildren(children, element);
+  }
+}
+
+function buildComponent(
+  tagNameFC: target,
+  props: Proptype,
+  ...children: ChildrenType
+) {
+  if (typeof tagNameFC === 'function') {
+    if (props != null && props != undefined) {
+      if (children.length !== 0) {
+        props.children = children;
+        return tagNameFC(props);
+      }
+      return tagNameFC(props);
+    } else if (children.length !== 0) {
+      props = { children: children };
+      return tagNameFC(props);
+    }
+    return tagNameFC();
+  }
+}
+
 function render(element: NixixNode, root: HTMLElement) {
-  // if the element is an array, call the render function recursively to append the elements of the array, else just append the element to the root.
   if (!Array.isArray(element)) {
     root.append(element);
   } else {
@@ -187,9 +234,6 @@ function render(element: NixixNode, root: HTMLElement) {
   doBgWork(root);
 }
 
-/**
- * make the routeProvider for use of the routing library.
- */
 async function doBgWork(root: Element) {
   await Promise.resolve();
   nixixStore['$$__routeProvider'] = root;

@@ -4,14 +4,14 @@ import '../types/index';
 export type SetSignalDispatcher<S> = (newValue: S | (() => S)) => void;
 export type SetStoreDispatcher<S> = (newValue: S | (() => S)) => void;
 
-export interface SignalObject<S> {
+export type SignalObject<S> = {
   value: S;
-}
+} & S;
 
-export interface StoreObject<O> {
+export type StoreObject<O> = {
   readonly $$__value?: O;
   [index: string]: any;
-}
+} & O;
 
 export class Signal {
   'value': any;
@@ -49,7 +49,7 @@ export function callSignal<S>(
  */
 export function callStore<O>(
   initialValue: O
-): [O & StoreObject<O>, SetStoreDispatcher<O>];
+): [StoreObject<O>, SetStoreDispatcher<O>];
 
 /**
  * Tracks the closest (signal or store) and calls the callback function whenever the (signal or store)'s value changes.
@@ -59,7 +59,7 @@ export function callStore<O>(
  */
 export function effect(
   callbackFn: CallableFunction,
-  config?: 'once',
+  config?: 'once' | null,
   furtherDependents?: (SignalObject<any> | StoreObject<any>)[]
 ): void;
 
@@ -71,7 +71,7 @@ export function effect(
  */
 export function renderEffect(
   callbackFn: CallableFunction,
-  config?: 'once',
+  config?: 'once' | null,
   furtherDependents?: (SignalObject<any> | StoreObject<any>)[]
 ): void;
 

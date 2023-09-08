@@ -1,8 +1,14 @@
 import Nixix from './types';
-import { StoreObject as NixixStoreObject } from './primitives/types';
+import {
+  StoreObject as NixixStoreObject,
+  Signal,
+  Store,
+} from './primitives/types';
 
 // These global types are used for the development of this project.
 declare global {
+  type NixixElementType = HTMLElement | SVGElement;
+
   type target =
     | keyof HTMLElementTagNameMap
     | keyof SVGElementTagNameMap
@@ -11,11 +17,23 @@ declare global {
   type Proptype = { children?: any; [index: string]: any } | null | undefined;
   type ChildrenType = Array<Element | string | Nixix.Signal>;
 
+  type ValueType = Signal | Store | string;
+
+  type StyleValueType = { [key: string]: ValueType };
+
+  type DynamicAttrType = {
+    element: HTMLElement | SVGElement;
+    attrPrefix: string;
+    attrName: string;
+    attrValue: ValueType;
+    type: Dependents['typeOf'];
+  };
+
   interface Dependents {
     element: Element;
     typeOf:
       | 'AriaProp'
-      | 'className'
+      | 'propertyAttribute'
       | 'regularAttribute'
       | 'styleProp'
       | 'DOMProp'
@@ -65,7 +83,7 @@ declare global {
     };
   }
 
-  type SignalObject<S extends any> = { value: S; $$__id: number };
+  type SignalObject<S extends any> = { value: S; $$__id?: number };
 
   interface StoreObject {
     $$__id: string | number;

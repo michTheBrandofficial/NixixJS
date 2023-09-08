@@ -102,8 +102,6 @@ function asyncComponent(FC: () => Promise<JSX.Element>): any {
   return FC;
 }
 
-function lazy(FC: () => Promise<JSX.Element>) {
-  return FC;
-}
+const lazy = asyncComponent;
 
 export { Img, Suspense, asyncComponent, For, lazy };

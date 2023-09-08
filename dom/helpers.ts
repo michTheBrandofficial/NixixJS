@@ -1,72 +1,6 @@
 import { nixixStore } from './index';
 import { Signal, Store } from '../primitives/classes';
 
-export const svgElementsTags = [
-  'a',
-  'animate',
-  'animateMotion',
-  'animateTransform',
-  'circle',
-  'clipPath',
-  'defs',
-  'desc',
-  'ellipse',
-  'feBlend',
-  'feColorMatrix',
-  'feComponentTransfer',
-  'feComposite',
-  'feConvolveMatrix',
-  'feDiffuseLighting',
-  'feDisplacementMap',
-  'feDistantLight',
-  'feDropShadow',
-  'feFlood',
-  'feFuncA',
-  'feFuncB',
-  'feFuncG',
-  'feFuncR',
-  'feGaussianBlur',
-  'feImage',
-  'feMerge',
-  'feMergeNode',
-  'feMorphology',
-  'feOffset',
-  'fePointLight',
-  'feSpecularLighting',
-  'feSpotLight',
-  'feTile',
-  'feTurbulence',
-  'filter',
-  'foreignObject',
-  'g',
-  'image',
-  'line',
-  'linearGradient',
-  'marker',
-  'mask',
-  'metadata',
-  'mpath',
-  'path',
-  'pattern',
-  'polygon',
-  'polyline',
-  'radialGradient',
-  'rect',
-  'script',
-  'set',
-  'stop',
-  'style',
-  'svg',
-  'switch',
-  'symbol',
-  'text',
-  'textPath',
-  'title',
-  'tspan',
-  'use',
-  'view',
-];
-
 /**
  *
  */
@@ -172,9 +106,27 @@ export function parseRef(refObject: MutableRefObject) {
   refObject.prevElementSibling = current.previousElementSibling;
 }
 
-/**
- * adds an element to the dependents array in the global store object.
- */
+function updateProps(
+  element: HTMLElement | SVGElement,
+  property: string,
+  newValue: string,
+  typeOf: Dependents['typeOf']
+) {
+  if (typeOf === 'AriaProp') {
+    element.setAttribute(`${property}`, newValue);
+  } else if (typeOf === 'propertyAttribute') {
+    element[property] = newValue;
+  } else if (typeOf === 'strokeProp') {
+    element.setAttribute(`${property}`, newValue);
+  } else if (typeOf === 'regularAttribute') {
+    element.setAttribute(property, newValue);
+  } else if (typeOf === 'styleProp') {
+    element['style'][property] = newValue;
+  } else if (typeOf === 'childTextNode') {
+    element.childNodes[property].textContent = newValue;
+  }
+}
+
 export async function parseSignal(
   id: number,
   element: Element,
@@ -183,11 +135,7 @@ export async function parseSignal(
 ) {
   await Promise.resolve();
   const key = `_${id}_`;
-  if (typeOf === 'DOMProp') {
-    nixixStore.SignalStore[key].dependents.push({ element, property, typeOf });
-  } else {
-    nixixStore.SignalStore[key].dependents.push({ element, property, typeOf });
-  }
+  nixixStore.SignalStore[key].dependents.push({ element, property, typeOf });
 
   onElementRemoved(element, filterDependencies(element, key, 'SignalStore'));
 
@@ -198,24 +146,16 @@ export async function parseSignal(
  * @param {number} id is the id which diffSignal_ will use to get the Signal object in nixixStore.SignalStore
  * diffSignal_ is not async because it will be passed to nixixStore['diffSignal'], it is defined here for the sake of simplicity of index.ts
  */
-export async function diffSignal_(id: number) {
-  await Promise.resolve();
-  const { value, dependents } = nixixStore.SignalStore[`_${id}_`];
+export function diffSignal_(id: number) {
+  const { value: newValue, dependents } = nixixStore.SignalStore[`_${id}_`];
   dependents.forEach((dependent) => {
     const { typeOf, element, property } = dependent;
-    if (typeOf === 'AriaProp') {
-      element.setAttribute(`aria-${property}`, value);
-    } else if (typeOf === 'className') {
-      element.setAttribute('class', value);
-    } else if (typeOf === 'strokeProp') {
-      element.setAttribute(`stroke-${property}`, value);
-    } else if (typeOf === 'regularAttribute') {
-      element.setAttribute(property, value);
-    } else if (typeOf === 'styleProp') {
-      element['style'][property] = value;
-    } else if (typeOf === 'childTextNode') {
-      element.childNodes[property].textContent = value;
-    }
+    updateProps(
+      element as HTMLElement | SVGElement,
+      property,
+      newValue,
+      typeOf
+    );
   });
 }
 
@@ -252,9 +192,6 @@ function filterDependencies(
   };
 }
 
-/**
- * used to add elements to the dependencies array in the global store object.
- */
 export async function parseStore(
   id: number | string,
   element: Element,
@@ -264,24 +201,13 @@ export async function parseStore(
 ) {
   await Promise.resolve();
   const key = `${id}`;
-  if (typeOf === 'DOMProp') {
-    nixixStore.Store[key].dependents.push({
-      element,
-      property,
-      typeOf,
-      accessor,
-    });
-  } else {
-    nixixStore.Store[key].dependents.push({
-      element,
-      property,
-      typeOf,
-      accessor,
-    });
-  }
-
+  nixixStore.Store[key].dependents.push({
+    element,
+    property,
+    typeOf,
+    accessor,
+  });
   onElementRemoved(element, filterDependencies(element, key, 'Store'));
-
   return 'Done!!!';
 }
 
@@ -289,47 +215,27 @@ export async function parseStore(
  * @param {number} id is the id which diffStore_ will use to get the Signal object in nixixStore.SignalStore
  * diffStore_ is not async because it will be passed to nixixStore['diffStore'], it is defined here for the sake of simplicity of index.ts
  */
-export async function diffStore_(id: number) {
-  await Promise.resolve();
+export function diffStore_(id: number) {
   const key = `_${id}_`;
-  /**
-   * @type {{value: any, dependents: Dependents[]}}
-   */
   const { dependents } = nixixStore.Store[key];
   dependents.forEach((dependent) => {
     const { typeOf, element, property, accessor } = dependent;
-    if (typeOf === 'AriaProp') {
-      element.setAttribute(
-        `aria-${property}`,
-        eval(`window.$$__NixixStore.Store['${key}'].value${accessor}`)
-      );
-    } else if (typeOf === 'className') {
-      element.setAttribute(
-        'class',
-        eval(`window.$$__NixixStore.Store['${key}'].value${accessor}`)
-      );
-    } else if (typeOf === 'strokeProp') {
-      element.setAttribute(
-        `stroke-${property}`,
-        eval(`window.$$__NixixStore.Store['${key}'].value${accessor}`)
-      );
-    } else if (typeOf === 'regularAttribute') {
-      element.setAttribute(
-        property,
-        eval(`window.$$__NixixStore.Store['${key}'].value${accessor}`)
-      );
-    } else if (typeOf === 'styleProp') {
-      element['style'][property] = eval(
-        `window.$$__NixixStore.Store['${key}'].value${accessor}`
-      );
-    } else if (typeOf === 'childTextNode') {
-      element.childNodes[property].textContent = eval(
-        `window.$$__NixixStore.Store['${key}'].value${accessor}`
-      );
-    }
+    const newValue = eval(
+      `window.$$__NixixStore.Store['${key}'].value${accessor}`
+    );
+    updateProps(
+      element as HTMLElement | SVGElement,
+      property,
+      newValue,
+      typeOf
+    );
   });
 }
 
-export function errorFunc(message: string) {
+export function raise(message: string) {
   throw `${message}`;
+}
+
+export function warn(message: string) {
+  console.warn(message);
 }
