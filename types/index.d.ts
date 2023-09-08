@@ -37,8 +37,7 @@ declare namespace Nixix {
 
   type ValueType<T> = T | SignalObject<T>;
 
-  interface CSSProperties
-    extends CSS.Properties<ValueType<string>, ValueType<number>> {}
+  interface CSSProperties extends CSS.Properties<string, number> {}
 
   interface DOMAttributes<T> {
     children?: NixixNode;
@@ -336,7 +335,7 @@ declare namespace Nixix {
      * Indicates the entered value does not conform to the format expected by the application.
      * @see aria-errormessage.
      */
-    'aria:invalid'?: Booleanish | 'grammar' | 'spelling';
+    'aria:invalid'?: ValueType<Booleanish | 'grammar' | 'spelling'>;
     /** Indicates keyboard shortcuts that an author has implemented to activate or give focus to an element. */
     'aria:keyshortcuts'?: ValueType<string>;
     /**
@@ -360,7 +359,7 @@ declare namespace Nixix {
     /** Indicates that the user may select more than one item from the current selectable descendants. */
     'aria:multiselectable'?: ValueType<Booleanish>;
     /** Indicates whether the element's orientation is horizontal, vertical, or unknown/ambiguous. */
-    'aria:orientation'?: 'horizontal' | 'vertical';
+    'aria:orientation'?: ValueType<'horizontal' | 'vertical'>;
     /**
      * Identifies an element (or elements) in order to define a visual, functional, or contextual parent/child relationship
      * between DOM elements where the DOM hierarchy cannot be used to represent the relationship.
@@ -381,7 +380,7 @@ declare namespace Nixix {
      * Indicates the current "pressed" Signal of toggle buttons.
      * @see aria-checked @see aria-selected.
      */
-    'aria:pressed'?: boolean | 'false' | 'mixed' | 'true';
+    'aria:pressed'?: ValueType<Booleanish | 'mixed'>;
     /**
      * Indicates that the element is not editable, but is otherwise operable.
      * @see aria-disabled.
@@ -391,7 +390,7 @@ declare namespace Nixix {
      * Indicates what notifications the user agent will trigger when the accessibility tree within a live region is modified.
      * @see aria-atomic.
      */
-    'aria:relevant'?:
+    'aria:relevant'?: ValueType<
       | 'additions'
       | 'additions removals'
       | 'additions text'
@@ -401,7 +400,8 @@ declare namespace Nixix {
       | 'removals text'
       | 'text'
       | 'text additions'
-      | 'text removals';
+      | 'text removals'
+    >;
     /** Indicates that user input is required on the element before a form may be submitted. */
     'aria:required'?: ValueType<Booleanish>;
     /** Defines a human-readable, author-localized description for the role of an element. */
@@ -432,7 +432,7 @@ declare namespace Nixix {
      */
     'aria:setsize'?: ValueType<number>;
     /** Indicates if items in a table or grid are sorted in ascending or descending order. */
-    'aria:sort'?: 'none' | 'ascending' | 'descending' | 'other';
+    'aria:sort'?: ValueType<'none' | 'ascending' | 'descending' | 'other'>;
     /** Defines the maximum allowed value for a range widget. */
     'aria:valuemax'?: ValueType<number>;
     /** Defines the minimum allowed value for a range widget. */
@@ -454,36 +454,31 @@ declare namespace Nixix {
     accesskey?: ValueType<string>;
     autofocus?: ValueType<boolean>;
     className?: ValueType<string>;
-    contenteditable?: boolean | 'true' | 'false' | 'inherit';
+    contenteditable?: ValueType<boolean | 'true' | 'false' | 'inherit'>;
     contextmenu?: ValueType<string>;
     dir?: ValueType<string>;
-    draggable?: boolean | 'true' | 'false';
-    enterkeyhint?:
-      | 'enter'
-      | 'done'
-      | 'go'
-      | 'next'
-      | 'previous'
-      | 'search'
-      | 'send';
+    draggable?: ValueType<Booleanish>;
+    enterkeyhint?: ValueType<
+      'enter' | 'done' | 'go' | 'next' | 'previous' | 'search' | 'send'
+    >;
     hidden?: ValueType<boolean>;
     id?: ValueType<string>;
     lang?: ValueType<string>;
     part?: ValueType<string>;
     placeholder?: ValueType<string>;
     slot?: ValueType<string>;
-    spellcheck?: boolean | 'true' | 'false';
+    spellcheck?: ValueType<Booleanish>;
     style?: CSSProperties;
     tabindex?: ValueType<number>;
     title?: ValueType<string>;
-    translate?: 'yes' | 'no' | '';
+    translate?: ValueType<'yes' | 'no' | ''>;
     inert?: ValueType<boolean>;
 
     // Unknown
     radiogroup?: ValueType<string>; // <command>, <menuitem>
 
     // WAI-ARIA
-    role?: AriaRole;
+    role?: ValueType<AriaRole>;
 
     // RDFa Attributes
     about?: ValueType<string>;
@@ -499,7 +494,7 @@ declare namespace Nixix {
     autocapitalize?: ValueType<string>;
     autocorrect?: ValueType<string>;
     autosave?: ValueType<string>;
-    color?: CSSProperties['color'];
+    color?: ValueType<CSSProperties['color']>;
     itemprop?: ValueType<string>;
     itemscope?: ValueType<boolean>;
     itemtype?: ValueType<string>;
@@ -507,14 +502,14 @@ declare namespace Nixix {
     itemref?: ValueType<string>;
     results?: ValueType<number>;
     security?: ValueType<string>;
-    unselectable?: 'on' | 'off';
+    unselectable?: ValueType<'on' | 'off'>;
 
     // Living Standard
     /**
      * Hints at the type of data that might be entered by the user while editing the element or its contents
      * @see https://html.spec.whatwg.org/multipage/interaction.html#input-modalities:-the-inputmode-attribute
      */
-    inputmode?:
+    inputmode?: ValueType<
       | 'none'
       | 'text'
       | 'tel'
@@ -522,7 +517,8 @@ declare namespace Nixix {
       | 'email'
       | 'numeric'
       | 'decimal'
-      | 'search';
+      | 'search'
+    >;
     /**
      * Specify that a standard HTML element should behave like a defined custom built-in element
      * @see https://html.spec.whatwg.org/multipage/custom-elements.html#attr-is
@@ -553,7 +549,7 @@ declare namespace Nixix {
     media?: ValueType<string>;
     ping?: ValueType<string>;
     rel?: ValueType<string>;
-    target?: '_self' | '_blank' | '_parent' | '_top';
+    target?: HTMLAttributeAnchorTarget;
     type?: ValueType<string>;
     referrerpolicy?: ReferrerPolicy;
   }
@@ -784,9 +780,7 @@ declare namespace Nixix {
 
   interface LinkHTMLAttributes<T> extends HTMLAttributes<T> {
     as?: ValueType<string | undefined>;
-    crossorigin?: ValueType<
-      ValueType<'anonymous' | 'use-credentials' | '' | undefined>
-    >;
+    crossorigin?: ValueType<'anonymous' | 'use-credentials' | '' | undefined>;
     href?: ValueType<string | undefined>;
     'href-lang'?: ValueType<string | undefined>;
     integrity?: ValueType<string | undefined>;
@@ -965,7 +959,7 @@ declare namespace Nixix {
   }
 
   interface TdHTMLAttributes<T> extends HTMLAttributes<T> {
-    align?: ValueType<'left' | 'center' | 'right'> | 'justify' | 'char';
+    align?: ValueType<'left' | 'center' | 'right' | 'justify' | 'char'>;
     colspan?: ValueType<number>;
     headers?: ValueType<string>;
     rowspan?: ValueType<number>;
@@ -973,11 +967,11 @@ declare namespace Nixix {
     abbr?: ValueType<string>;
     height?: ValueType<number | string>;
     width?: ValueType<number | string>;
-    valign?: 'top' | 'middle' | 'bottom' | 'baseline';
+    valign?: ValueType<'top' | 'middle' | 'bottom' | 'baseline'>;
   }
 
   interface ThHTMLAttributes<T> extends HTMLAttributes<T> {
-    align?: ValueType<'left' | 'center' | 'right'> | 'justify' | 'char';
+    align?: ValueType<'left' | 'center' | 'right' | 'justify' | 'char'>;
     colspan?: ValueType<number>;
     headers?: ValueType<string>;
     rowspan?: ValueType<number>;
@@ -1011,32 +1005,32 @@ declare namespace Nixix {
       DOMAttributes<T>,
       NixixAttributes<T> {
     // Attributes which also defined in HTMLAttributes
-    className?: string | undefined | null;
-    class?: string | undefined | null;
-    color?: CSSProperties['color'];
-    height?: number | string | undefined | null;
-    id?: string | undefined | null;
-    lang?: string | undefined | null;
-    max?: number | string | undefined | null;
-    media?: string | undefined | null;
-    method?: string | undefined | null;
-    min?: number | string | undefined | null;
-    name?: string | undefined | null;
+    className?: ValueType<string | undefined | null>;
+    class?: ValueType<string | undefined | null>;
+    color?: ValueType<CSSProperties['color']>;
+    height?: ValueType<number | string | undefined | null>;
+    id?: ValueType<string | undefined | null>;
+    lang?: ValueType<string | undefined | null>;
+    max?: ValueType<number | string | undefined | null>;
+    media?: ValueType<string | undefined | null>;
+    method?: ValueType<string | undefined | null>;
+    min?: ValueType<number | string | undefined | null>;
+    name?: ValueType<string | undefined | null>;
     style?: HtmlHTMLAttributes<SVGSVGElement>['style'];
-    target?: string | undefined | null;
-    type?: string | undefined | null;
-    width?: number | string | undefined | null;
+    target?: ValueType<string | undefined | null>;
+    type?: ValueType<string | undefined | null>;
+    width?: ValueType<number | string | undefined | null>;
 
     // Other HTML properties supported by SVG elements in browsers
-    role?: AriaRole | undefined | null;
-    tabindex?: number | undefined | null;
+    role?: ValueType<AriaRole | undefined | null>;
+    tabindex?: ValueType<number | undefined | null>;
     crossorigin?: ValueType<'anonymous' | 'use-credentials' | '' | undefined>;
 
     // SVG Specific attributes
-    'accent-height'?: number | string | undefined | null;
-    accumulate?: 'none' | 'sum' | undefined | null;
-    additive?: 'replace' | 'sum' | undefined | null;
-    'alignment-baseline'?:
+    'accent-height'?: ValueType<number | string | undefined | null>;
+    accumulate?: ValueType<'none' | 'sum' | undefined | null>;
+    additive?: ValueType<'replace' | 'sum' | undefined | null>;
+    'alignment-baseline'?: ValueType<
       | 'auto'
       | 'baseline'
       | 'before-edge'
@@ -1051,268 +1045,259 @@ declare namespace Nixix {
       | 'mathematical'
       | 'inherit'
       | undefined
-      | null;
-    allowReorder?: 'no' | 'yes' | undefined | null;
-    alphabetic?: number | string | undefined | null;
-    amplitude?: number | string | undefined | null;
-    'arabic-form'?:
-      | 'initial'
-      | 'medial'
-      | 'terminal'
-      | 'isolated'
-      | undefined
-      | null;
-    ascent?: number | string | undefined | null;
-    attributeName?: string | undefined | null;
-    attributeType?: string | undefined | null;
-    autoReverse?: number | string | undefined | null;
-    azimuth?: number | string | undefined | null;
-    baseFrequency?: number | string | undefined | null;
-    'baseline-shift'?: number | string | undefined | null;
-    baseProfile?: number | string | undefined | null;
-    bbox?: number | string | undefined | null;
-    begin?: number | string | undefined | null;
-    bias?: number | string | undefined | null;
-    by?: number | string | undefined | null;
-    calcMode?: number | string | undefined | null;
-    'cap-height'?: number | string | undefined | null;
-    clip?: number | string | undefined | null;
-    'clip-path'?: string | undefined | null;
-    clipPathUnits?: number | string | undefined | null;
-    'clip-rule'?: number | string | undefined | null;
-    'color-interpolation'?: CSSProperties['colorInterpolation'];
-    'color-interpolation-filters'?:
-      | 'auto'
-      | 'sRGB'
-      | 'linearRGB'
-      | 'inherit'
-      | undefined
-      | null;
-    'color-profile'?: number | string | undefined | null;
-    'color-rendering'?: CSSProperties['colorRendering'];
-    contentScriptType?: number | string | undefined | null;
-    contentStyleType?: number | string | undefined | null;
-    cursor?: number | string | undefined | null;
-    cx?: number | string | undefined | null;
-    cy?: number | string | undefined | null;
-    d?: string | undefined | null;
-    decelerate?: number | string | undefined | null;
-    descent?: number | string | undefined | null;
-    diffuseConstant?: number | string | undefined | null;
-    direction?: number | string | undefined | null;
-    display?: number | string | undefined | null;
-    divisor?: number | string | undefined | null;
-    'dominant-baseline'?: number | string | undefined | null;
-    dur?: number | string | undefined | null;
-    dx?: number | string | undefined | null;
-    dy?: number | string | undefined | null;
-    edgeMode?: number | string | undefined | null;
-    elevation?: number | string | undefined | null;
-    'enable-background'?: number | string | undefined | null;
-    end?: number | string | undefined | null;
-    exponent?: number | string | undefined | null;
-    externalResourcesRequired?: number | string | undefined | null;
-    fill?: CSSProperties['fill'];
-    'fill-opacity'?: CSSProperties['fillOpacity'];
-    'fill-rule'?: 'nonzero' | 'evenodd' | 'inherit' | undefined | null;
-    filter?: string | undefined | null;
-    filterRes?: number | string | undefined | null;
-    filterUnits?: number | string | undefined | null;
-    'flood-color'?: CSSProperties['floodColor'];
-    'flood-opacity'?: number | string | undefined | null;
-    focusable?: number | string | undefined | null;
-    'font-family'?: CSSProperties['fontFamily'];
-    'font-size'?: number | string | undefined | null;
-    'font-size-adjust'?: number | string | undefined | null;
-    'font-stretch'?: number | string | undefined | null;
-    'font-style'?: number | string | undefined | null;
-    'font-variant'?: number | string | undefined | null;
-    'font-weight'?: number | string | undefined | null;
-    format?: number | string | undefined | null;
-    from?: number | string | undefined | null;
-    fx?: number | string | undefined | null;
-    fy?: number | string | undefined | null;
-    g1?: number | string | undefined | null;
-    g2?: number | string | undefined | null;
-    'glyph-name'?: number | string | undefined | null;
-    'glyph-orientation-horizontal'?: number | string | undefined | null;
-    'glyph-orientation-vertical'?: number | string | undefined | null;
-    glyphRef?: number | string | undefined | null;
-    gradientTransform?: string | undefined | null;
-    gradientUnits?: string | undefined | null;
-    hanging?: number | string | undefined | null;
-    href?: string | undefined | null;
-    'horiz-adv-x'?: number | string | undefined | null;
-    'horiz-origin-x'?: number | string | undefined | null;
-    ideographic?: number | string | undefined | null;
-    'image-rendering'?: number | string | undefined | null;
-    in2?: number | string | undefined | null;
-    in?: string | undefined | null;
-    intercept?: number | string | undefined | null;
-    k1?: number | string | undefined | null;
-    k2?: number | string | undefined | null;
-    k3?: number | string | undefined | null;
-    k4?: number | string | undefined | null;
-    k?: number | string | undefined | null;
-    kernelMatrix?: number | string | undefined | null;
-    kernelUnitLength?: number | string | undefined | null;
-    kerning?: number | string | undefined | null;
-    keyPoints?: number | string | undefined | null;
-    keySplines?: number | string | undefined | null;
-    keyTimes?: number | string | undefined | null;
-    lengthAdjust?: number | string | undefined | null;
-    'letter-spacing'?: number | string | undefined | null;
-    'lighting-color'?: CSSProperties['lightingColor'];
-    limitingConeAngle?: number | string | undefined | null;
-    local?: number | string | undefined | null;
-    'marker-end'?: string | undefined | null;
-    markerHeight?: number | string | undefined | null;
-    'marker-mid'?: string | undefined | null;
-    'marker-start'?: string | undefined | null;
-    markerUnits?: number | string | undefined | null;
-    markerWidth?: number | string | undefined | null;
-    mask?: string | undefined | null;
-    maskContentUnits?: number | string | undefined | null;
-    maskUnits?: number | string | undefined | null;
-    mathematical?: number | string | undefined | null;
-    mode?: number | string | undefined | null;
-    numOctaves?: number | string | undefined | null;
-    offset?: number | string | undefined | null;
-    opacity?: number | string | undefined | null;
-    operator?: number | string | undefined | null;
-    order?: number | string | undefined | null;
-    orient?: number | string | undefined | null;
-    orientation?: number | string | undefined | null;
-    origin?: number | string | undefined | null;
-    overflow?: number | string | undefined | null;
-    'overline-position'?: number | string | undefined | null;
-    'overline-thickness'?: number | string | undefined | null;
-    'paint-order'?: number | string | undefined | null;
-    'panose-1'?: number | string | undefined | null;
-    path?: string | undefined | null;
-    pathLength?: number | string | undefined | null;
-    patternContentUnits?: string | undefined | null;
-    patternTransform?: number | string | undefined | null;
-    patternUnits?: string | undefined | null;
-    'pointer-events'?: number | string | undefined | null;
-    points?: string | undefined | null;
-    pointsAtX?: number | string | undefined | null;
-    pointsAtY?: number | string | undefined | null;
-    pointsAtZ?: number | string | undefined | null;
-    preserveAlpha?: number | string | undefined | null;
-    preserveAspectRatio?: string | undefined | null;
-    primitiveUnits?: number | string | undefined | null;
-    r?: number | string | undefined | null;
-    radius?: number | string | undefined | null;
-    refX?: number | string | undefined | null;
-    refY?: number | string | undefined | null;
-    'rendering-intent'?: number | string | undefined | null;
-    repeatCount?: number | string | undefined | null;
-    repeatDur?: number | string | undefined | null;
-    requiredExtensions?: number | string | undefined | null;
-    requiredFeatures?: number | string | undefined | null;
-    restart?: number | string | undefined | null;
-    result?: string | undefined | null;
-    rotate?: number | string | undefined | null;
-    rx?: number | string | undefined | null;
-    ry?: number | string | undefined | null;
-    scale?: number | string | undefined | null;
-    seed?: number | string | undefined | null;
-    'shape-rendering'?: number | string | undefined | null;
-    slope?: number | string | undefined | null;
-    spacing?: number | string | undefined | null;
-    specularConstant?: number | string | undefined | null;
-    specularExponent?: number | string | undefined | null;
-    speed?: number | string | undefined | null;
-    spreadMethod?: string | undefined | null;
-    startOffset?: number | string | undefined | null;
-    stdDeviation?: number | string | undefined | null;
-    stemh?: number | string | undefined | null;
-    stemv?: number | string | undefined | null;
-    stitchTiles?: number | string | undefined | null;
-    'stop-color'?: CSSProperties['stopColor'];
-    'stop-opacity'?: number | string | undefined | null;
-    'strikethrough-position'?: number | string | undefined | null;
-    'strikethrough-thickness'?: number | string | undefined | null;
-    string?: number | string | undefined | null;
-    stroke?: string | undefined | null;
-    'stroke:dasharray'?: string | number | undefined | null;
-    'stroke:dashoffset'?: string | number | undefined | null;
-    'stroke:linecap'?:
-      | 'butt'
-      | 'round'
-      | 'square'
-      | 'inherit'
-      | undefined
-      | null;
-    'stroke:linejoin'?:
-      | 'miter'
-      | 'round'
-      | 'bevel'
-      | 'inherit'
-      | undefined
-      | null;
-    'stroke:miterlimit'?: string | undefined | null;
-    'stroke:opacity'?: number | string | undefined | null;
-    'stroke:width'?: number | string | undefined | null;
-    surfaceScale?: number | string | undefined | null;
-    systemLanguage?: number | string | undefined | null;
-    tableValues?: number | string | undefined | null;
-    targetX?: number | string | undefined | null;
-    targetY?: number | string | undefined | null;
-    'text-anchor'?: string | undefined | null;
-    'text-decoration'?: number | string | undefined | null;
-    textLength?: number | string | undefined | null;
-    'text-rendering'?: number | string | undefined | null;
-    to?: number | string | undefined | null;
-    transform?: string | undefined | null;
-    u1?: number | string | undefined | null;
-    u2?: number | string | undefined | null;
-    'underline-position'?: number | string | undefined | null;
-    'underline-thickness'?: number | string | undefined | null;
-    unicode?: number | string | undefined | null;
-    'unicode-bidi'?: number | string | undefined | null;
-    'unicode-range'?: number | string | undefined | null;
-    'units-per-em'?: number | string | undefined | null;
-    'v-alphabetic'?: number | string | undefined | null;
-    values?: string | undefined | null;
-    'vector-effect'?: number | string | undefined | null;
-    version?: string | undefined | null;
-    'vert-adv-y'?: number | string | undefined | null;
-    'vert-origin-x'?: number | string | undefined | null;
-    'vert-origin-y'?: number | string | undefined | null;
-    'v-hanging'?: number | string | undefined | null;
-    'v-ideographic'?: number | string | undefined | null;
-    viewBox?: string | undefined | null;
-    viewTarget?: number | string | undefined | null;
-    visibility?: number | string | undefined | null;
-    'v-mathematical'?: number | string | undefined | null;
-    widths?: number | string | undefined | null;
-    'word-spacing'?: number | string | undefined | null;
-    'writing-mode'?: number | string | undefined | null;
-    x1?: number | string | undefined | null;
-    x2?: number | string | undefined | null;
-    x?: number | string | undefined | null;
-    xChannelSelector?: string | undefined | null;
-    'x-height'?: number | string | undefined | null;
-    'xlink:actuate'?: string | undefined | null;
-    'xlink:arcrole'?: string | undefined | null;
-    'xlink:href'?: string | undefined | null;
-    'xlink:role'?: string | undefined | null;
-    'xlink:show'?: string | undefined | null;
-    'xlink:title'?: string | undefined | null;
-    'xlink:type'?: string | undefined | null;
-    'xml:base'?: string | undefined | null;
-    'xml:lang'?: string | undefined | null;
-    xmlns?: string | undefined | null;
-    'xmlns:xlink'?: string | undefined | null;
-    'xml:space'?: string | undefined | null;
-    y1?: number | string | undefined | null;
-    y2?: number | string | undefined | null;
-    y?: number | string | undefined | null;
-    yChannelSelector?: string | undefined | null;
-    z?: number | string | undefined | null;
-    zoomAndPan?: string | undefined | null;
+      | null
+    >;
+    allowReorder?: ValueType<'no' | 'yes' | undefined | null>;
+    alphabetic?: ValueType<number | string | undefined | null>;
+    amplitude?: ValueType<number | string | undefined | null>;
+    'arabic-form'?: ValueType<
+      'initial' | 'medial' | 'terminal' | 'isolated' | undefined | null
+    >;
+    ascent?: ValueType<number | string | undefined | null>;
+    attributeName?: ValueType<string | undefined | null>;
+    attributeType?: ValueType<string | undefined | null>;
+    autoReverse?: ValueType<number | string | undefined | null>;
+    azimuth?: ValueType<number | string | undefined | null>;
+    baseFrequency?: ValueType<number | string | undefined | null>;
+    'baseline-shift'?: ValueType<number | string | undefined | null>;
+    baseProfile?: ValueType<number | string | undefined | null>;
+    bbox?: ValueType<number | string | undefined | null>;
+    begin?: ValueType<number | string | undefined | null>;
+    bias?: ValueType<number | string | undefined | null>;
+    by?: ValueType<number | string | undefined | null>;
+    calcMode?: ValueType<number | string | undefined | null>;
+    'cap-height'?: ValueType<number | string | undefined | null>;
+    clip?: ValueType<number | string | undefined | null>;
+    'clip-path'?: ValueType<string | undefined | null>;
+    clipPathUnits?: ValueType<number | string | undefined | null>;
+    'clip-rule'?: ValueType<number | string | undefined | null>;
+    'color-interpolation'?: ValueType<CSSProperties['colorInterpolation']>;
+    'color-interpolation-filters'?: ValueType<
+      'auto' | 'sRGB' | 'linearRGB' | 'inherit' | undefined | null
+    >;
+    'color-profile'?: ValueType<number | string | undefined | null>;
+    'color-rendering'?: ValueType<CSSProperties['colorRendering']>;
+    contentScriptType?: ValueType<number | string | undefined | null>;
+    contentStyleType?: ValueType<number | string | undefined | null>;
+    cursor?: ValueType<number | string | undefined | null>;
+    cx?: ValueType<number | string | undefined | null>;
+    cy?: ValueType<number | string | undefined | null>;
+    d?: ValueType<string | undefined | null>;
+    decelerate?: ValueType<number | string | undefined | null>;
+    descent?: ValueType<number | string | undefined | null>;
+    diffuseConstant?: ValueType<number | string | undefined | null>;
+    direction?: ValueType<number | string | undefined | null>;
+    display?: ValueType<number | string | undefined | null>;
+    divisor?: ValueType<number | string | undefined | null>;
+    'dominant-baseline'?: ValueType<number | string | undefined | null>;
+    dur?: ValueType<number | string | undefined | null>;
+    dx?: ValueType<number | string | undefined | null>;
+    dy?: ValueType<number | string | undefined | null>;
+    edgeMode?: ValueType<number | string | undefined | null>;
+    elevation?: ValueType<number | string | undefined | null>;
+    'enable-background'?: ValueType<number | string | undefined | null>;
+    end?: ValueType<number | string | undefined | null>;
+    exponent?: ValueType<number | string | undefined | null>;
+    externalResourcesRequired?: ValueType<number | string | undefined | null>;
+    fill?: ValueType<CSSProperties['fill']>;
+    'fill-opacity'?: ValueType<CSSProperties['fillOpacity']>;
+    'fill-rule'?: ValueType<
+      'nonzero' | 'evenodd' | 'inherit' | undefined | null
+    >;
+    filter?: ValueType<string | undefined | null>;
+    filterRes?: ValueType<number | string | undefined | null>;
+    filterUnits?: ValueType<number | string | undefined | null>;
+    'flood-color'?: ValueType<CSSProperties['floodColor']>;
+    'flood-opacity'?: ValueType<number | string | undefined | null>;
+    focusable?: ValueType<number | string | undefined | null>;
+    'font-family'?: ValueType<CSSProperties['fontFamily']>;
+    'font-size'?: ValueType<number | string | undefined | null>;
+    'font-size-adjust'?: ValueType<number | string | undefined | null>;
+    'font-stretch'?: ValueType<number | string | undefined | null>;
+    'font-style'?: ValueType<number | string | undefined | null>;
+    'font-variant'?: ValueType<number | string | undefined | null>;
+    'font-weight'?: ValueType<number | string | undefined | null>;
+    format?: ValueType<number | string | undefined | null>;
+    from?: ValueType<number | string | undefined | null>;
+    fx?: ValueType<number | string | undefined | null>;
+    fy?: ValueType<number | string | undefined | null>;
+    g1?: ValueType<number | string | undefined | null>;
+    g2?: ValueType<number | string | undefined | null>;
+    'glyph-name'?: ValueType<number | string | undefined | null>;
+    'glyph-orientation-horizontal'?: ValueType<
+      number | string | undefined | null
+    >;
+    'glyph-orientation-vertical'?: ValueType<
+      number | string | undefined | null
+    >;
+    glyphRef?: ValueType<number | string | undefined | null>;
+    gradientTransform?: ValueType<string | undefined | null>;
+    gradientUnits?: ValueType<string | undefined | null>;
+    hanging?: ValueType<number | string | undefined | null>;
+    href?: ValueType<string | undefined | null>;
+    'horiz-adv-x'?: ValueType<number | string | undefined | null>;
+    'horiz-origin-x'?: ValueType<number | string | undefined | null>;
+    ideographic?: ValueType<number | string | undefined | null>;
+    'image-rendering'?: ValueType<number | string | undefined | null>;
+    in2?: ValueType<number | string | undefined | null>;
+    in?: ValueType<string | undefined | null>;
+    intercept?: ValueType<number | string | undefined | null>;
+    k1?: ValueType<number | string | undefined | null>;
+    k2?: ValueType<number | string | undefined | null>;
+    k3?: ValueType<number | string | undefined | null>;
+    k4?: ValueType<number | string | undefined | null>;
+    k?: ValueType<number | string | undefined | null>;
+    kernelMatrix?: ValueType<number | string | undefined | null>;
+    kernelUnitLength?: ValueType<number | string | undefined | null>;
+    kerning?: ValueType<number | string | undefined | null>;
+    keyPoints?: ValueType<number | string | undefined | null>;
+    keySplines?: ValueType<number | string | undefined | null>;
+    keyTimes?: ValueType<number | string | undefined | null>;
+    lengthAdjust?: ValueType<number | string | undefined | null>;
+    'letter-spacing'?: ValueType<number | string | undefined | null>;
+    'lighting-color'?: ValueType<CSSProperties['lightingColor']>;
+    limitingConeAngle?: ValueType<number | string | undefined | null>;
+    local?: ValueType<number | string | undefined | null>;
+    'marker-end'?: ValueType<string | undefined | null>;
+    markerHeight?: ValueType<number | string | undefined | null>;
+    'marker-mid'?: ValueType<string | undefined | null>;
+    'marker-start'?: ValueType<string | undefined | null>;
+    markerUnits?: ValueType<number | string | undefined | null>;
+    markerWidth?: ValueType<number | string | undefined | null>;
+    mask?: ValueType<string | undefined | null>;
+    maskContentUnits?: ValueType<number | string | undefined | null>;
+    maskUnits?: ValueType<number | string | undefined | null>;
+    mathematical?: ValueType<number | string | undefined | null>;
+    mode?: ValueType<number | string | undefined | null>;
+    numOctaves?: ValueType<number | string | undefined | null>;
+    offset?: ValueType<number | string | undefined | null>;
+    opacity?: ValueType<number | string | undefined | null>;
+    operator?: ValueType<number | string | undefined | null>;
+    order?: ValueType<number | string | undefined | null>;
+    orient?: ValueType<number | string | undefined | null>;
+    orientation?: ValueType<number | string | undefined | null>;
+    origin?: ValueType<number | string | undefined | null>;
+    overflow?: ValueType<number | string | undefined | null>;
+    'overline-position'?: ValueType<number | string | undefined | null>;
+    'overline-thickness'?: ValueType<number | string | undefined | null>;
+    'paint-order'?: ValueType<number | string | undefined | null>;
+    'panose-1'?: ValueType<number | string | undefined | null>;
+    path?: ValueType<string | undefined | null>;
+    pathLength?: ValueType<number | string | undefined | null>;
+    patternContentUnits?: ValueType<string | undefined | null>;
+    patternTransform?: ValueType<number | string | undefined | null>;
+    patternUnits?: ValueType<string | undefined | null>;
+    'pointer-events'?: ValueType<number | string | undefined | null>;
+    points?: ValueType<string | undefined | null>;
+    pointsAtX?: ValueType<number | string | undefined | null>;
+    pointsAtY?: ValueType<number | string | undefined | null>;
+    pointsAtZ?: ValueType<number | string | undefined | null>;
+    preserveAlpha?: ValueType<number | string | undefined | null>;
+    preserveAspectRatio?: ValueType<string | undefined | null>;
+    primitiveUnits?: ValueType<number | string | undefined | null>;
+    r?: ValueType<number | string | undefined | null>;
+    radius?: ValueType<number | string | undefined | null>;
+    refX?: ValueType<number | string | undefined | null>;
+    refY?: ValueType<number | string | undefined | null>;
+    'rendering-intent'?: ValueType<number | string | undefined | null>;
+    repeatCount?: ValueType<number | string | undefined | null>;
+    repeatDur?: ValueType<number | string | undefined | null>;
+    requiredExtensions?: ValueType<number | string | undefined | null>;
+    requiredFeatures?: ValueType<number | string | undefined | null>;
+    restart?: ValueType<number | string | undefined | null>;
+    result?: ValueType<string | undefined | null>;
+    rotate?: ValueType<number | string | undefined | null>;
+    rx?: ValueType<number | string | undefined | null>;
+    ry?: ValueType<number | string | undefined | null>;
+    scale?: ValueType<number | string | undefined | null>;
+    seed?: ValueType<number | string | undefined | null>;
+    'shape-rendering'?: ValueType<number | string | undefined | null>;
+    slope?: ValueType<number | string | undefined | null>;
+    spacing?: ValueType<number | string | undefined | null>;
+    specularConstant?: ValueType<number | string | undefined | null>;
+    specularExponent?: ValueType<number | string | undefined | null>;
+    speed?: ValueType<number | string | undefined | null>;
+    spreadMethod?: ValueType<string | undefined | null>;
+    startOffset?: ValueType<number | string | undefined | null>;
+    stdDeviation?: ValueType<number | string | undefined | null>;
+    stemh?: ValueType<number | string | undefined | null>;
+    stemv?: ValueType<number | string | undefined | null>;
+    stitchTiles?: ValueType<number | string | undefined | null>;
+    'stop-color'?: ValueType<CSSProperties['stopColor']>;
+    'stop-opacity'?: ValueType<number | string | undefined | null>;
+    'strikethrough-position'?: ValueType<number | string | undefined | null>;
+    'strikethrough-thickness'?: ValueType<number | string | undefined | null>;
+    string?: ValueType<number | string | undefined | null>;
+    stroke?: ValueType<string | undefined | null>;
+    'stroke:dasharray'?: ValueType<string | number | undefined | null>;
+    'stroke:dashoffset'?: ValueType<string | number | undefined | null>;
+    'stroke:linecap'?: ValueType<
+      'butt' | 'round' | 'square' | 'inherit' | undefined | null
+    >;
+    'stroke:linejoin'?: ValueType<
+      'miter' | 'round' | 'bevel' | 'inherit' | undefined | null
+    >;
+    'stroke:miterlimit'?: ValueType<string | undefined | null>;
+    'stroke:opacity'?: ValueType<number | string | undefined | null>;
+    'stroke:width'?: ValueType<number | string | undefined | null>;
+    surfaceScale?: ValueType<number | string | undefined | null>;
+    systemLanguage?: ValueType<number | string | undefined | null>;
+    tableValues?: ValueType<number | string | undefined | null>;
+    targetX?: ValueType<number | string | undefined | null>;
+    targetY?: ValueType<number | string | undefined | null>;
+    'text-anchor'?: ValueType<string | undefined | null>;
+    'text-decoration'?: ValueType<number | string | undefined | null>;
+    textLength?: ValueType<number | string | undefined | null>;
+    'text-rendering'?: ValueType<number | string | undefined | null>;
+    to?: ValueType<number | string | undefined | null>;
+    transform?: ValueType<string | undefined | null>;
+    u1?: ValueType<number | string | undefined | null>;
+    u2?: ValueType<number | string | undefined | null>;
+    'underline-position'?: ValueType<number | string | undefined | null>;
+    'underline-thickness'?: ValueType<number | string | undefined | null>;
+    unicode?: ValueType<number | string | undefined | null>;
+    'unicode-bidi'?: ValueType<number | string | undefined | null>;
+    'unicode-range'?: ValueType<number | string | undefined | null>;
+    'units-per-em'?: ValueType<number | string | undefined | null>;
+    'v-alphabetic'?: ValueType<number | string | undefined | null>;
+    values?: ValueType<string | undefined | null>;
+    'vector-effect'?: ValueType<number | string | undefined | null>;
+    version?: ValueType<string | undefined | null>;
+    'vert-adv-y'?: ValueType<number | string | undefined | null>;
+    'vert-origin-x'?: ValueType<number | string | undefined | null>;
+    'vert-origin-y'?: ValueType<number | string | undefined | null>;
+    'v-hanging'?: ValueType<number | string | undefined | null>;
+    'v-ideographic'?: ValueType<number | string | undefined | null>;
+    viewBox?: ValueType<string | undefined | null>;
+    viewTarget?: ValueType<number | string | undefined | null>;
+    visibility?: ValueType<number | string | undefined | null>;
+    'v-mathematical'?: ValueType<number | string | undefined | null>;
+    widths?: ValueType<number | string | undefined | null>;
+    'word-spacing'?: ValueType<number | string | undefined | null>;
+    'writing-mode'?: ValueType<number | string | undefined | null>;
+    x1?: ValueType<number | string | undefined | null>;
+    x2?: ValueType<number | string | undefined | null>;
+    x?: ValueType<number | string | undefined | null>;
+    xChannelSelector?: ValueType<string | undefined | null>;
+    'x-height'?: ValueType<number | string | undefined | null>;
+    'xlink:actuate'?: ValueType<string | undefined | null>;
+    'xlink:arcrole'?: ValueType<string | undefined | null>;
+    'xlink:href'?: ValueType<string | undefined | null>;
+    'xlink:role'?: ValueType<string | undefined | null>;
+    'xlink:show'?: ValueType<string | undefined | null>;
+    'xlink:title'?: ValueType<string | undefined | null>;
+    'xlink:type'?: ValueType<string | undefined | null>;
+    'xml:base'?: ValueType<string | undefined | null>;
+    'xml:lang'?: ValueType<string | undefined | null>;
+    xmlns?: ValueType<string | undefined | null>;
+    'xmlns:xlink'?: ValueType<string | undefined | null>;
+    'xml:space'?: ValueType<string | undefined | null>;
+    y1?: ValueType<number | string | undefined | null>;
+    y2?: ValueType<number | string | undefined | null>;
+    y?: ValueType<number | string | undefined | null>;
+    yChannelSelector?: ValueType<string | undefined | null>;
+    z?: ValueType<number | string | undefined | null>;
+    zoomAndPan?: ValueType<string | undefined | null>;
   }
 
   interface WebViewHTMLAttributes<T> extends HTMLAttributes<T> {
