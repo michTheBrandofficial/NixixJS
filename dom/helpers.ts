@@ -1,6 +1,6 @@
 import { nixixStore } from './index';
 import { Signal, Store } from '../primitives/classes';
-import { callEffect } from 'primitives';
+import { callEffect } from '../primitives';
 
 export function checkDataType(value: any) {
   return (
