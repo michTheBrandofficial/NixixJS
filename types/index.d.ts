@@ -20,22 +20,14 @@ declare namespace Nixix {
 
   type Component = (props?: T) => JSX.Element;
 
-  type NixixNode =
-    | NixixElement
-    | string
-    | number
-    | Iterable<NixixNode>
-    | boolean
-    | null
-    | undefined
-    | Component
-    | CallableFunction
-    | SignalObject<string | number | boolean>;
+  type NixixNode = any;
 
   type ExoticComponent<P> = (props: P) => JSX.Element;
   type RouteExoticComponent<T> = T;
 
-  type ValueType<T> = T | SignalObject<T>;
+  type SignalObject<S extends any> = { value: S; $$__id?: number };
+
+  type ValueType<T> = T | (string & SignalObject<T>);
 
   interface CSSProperties extends CSS.Properties<string, number> {}
 
