@@ -1,4 +1,4 @@
-import { callEffect } from 'primitives';
+import { callEffect } from '../primitives';
 import { Signal, Store } from '../primitives/classes';
 import {
   raise,
