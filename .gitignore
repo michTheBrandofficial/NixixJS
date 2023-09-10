@@ -9,4 +9,3 @@ esbuild.config.js
 out.js
 *.html
 vite.config.js
-publish.sh
