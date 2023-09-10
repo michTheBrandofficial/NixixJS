@@ -155,4 +155,8 @@ export const PROP_ALIASES: {
   innerHTML: {
     $: 'innerHTML',
   },
+  value: {
+    $: 'value',
+    INPUT: 1,
+  },
 } as const;
