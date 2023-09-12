@@ -1,44 +1,42 @@
 import {
-  callRef,
   callSignal,
   effect,
+  callReaction,
   removeSignal,
   renderEffect,
 } from '../primitives';
 import type { ImgHTMLAttributes } from '../types/index';
 import Nixix, { nixixStore } from '../dom';
+import { createFragment, isArray, raise, warn } from '../dom/helpers';
 
 function Img(props: ImgHTMLAttributes<HTMLImageElement>) {
   return Nixix.create('img', { src: './' + props.src, ...props });
 }
 
 function Suspense(props: SuspenseProps) {
-  const { children, onError, fallback, ...rest } = props;
+  let { children, onError, fallback } = props;
   const [isWaiting, setIsWaiting] = callSignal(true);
-  const span = callRef(null);
-  let finalModule = null;
-  effect(() => {
+  const fragment = createFragment(isArray(fallback));
+
+  let resolveJSX = null;
+  callReaction(() => {
     if (isWaiting.value === false) {
-      if (finalModule instanceof Array) {
-        span.current.replaceWith(...finalModule);
-      } else {
-        span.current.replaceWith(finalModule);
-      }
+      fragment.replaceChildren(...isArray(resolveJSX));
       removeSignal(isWaiting);
     }
-  });
+  }, [isWaiting]);
   children[0]
     .then((value) => {
-      finalModule = value;
+      resolveJSX = value;
       setIsWaiting(false);
     })
     .catch(() => {
       if (onError !== undefined && onError !== null) {
-        finalModule = onError;
+        resolveJSX = onError;
         setIsWaiting(false);
       }
     });
-  return Nixix.create('span', { ...rest, 'bind:ref': span }, fallback);
+  return fragment;
 }
 
 let forCount = 0;
@@ -47,15 +45,37 @@ function checkLength(array: any[]) {
   return array.length === 0 ? false : array;
 }
 
-// finish this component tomorrow
+function createElements(
+  each: any,
+  callback: CallableFunction
+): Array<JSX.Element> {
+  const arrayOfJSX = each.$$__value?.map?.(callback);
+  arrayOfJSX?.forEach?.((e: any, i) => {
+    if (e instanceof Array)
+      return raise(
+        `Each item of the For component array must have one parent element.`
+      );
+  });
+  return arrayOfJSX;
+}
+
 function For(props: ForProps) {
   const { parent, each, fallback, children } = props;
-  if (!parent) throw new Error('Please pass a parent element.');
-
-  if (parent instanceof Array) {
-    throw new Error(`Parent element must be a single element.`);
+  if (each.$$__value instanceof Array !== true) {
+    warn(`Please pass a reactive array as the each prop value.`);
+    return [];
   }
+  const callback = children[0];
+  let arrayOfJSX = createElements(each, callback);
+  callReaction(() => {
+    const parent = arrayOfJSX[0]?.parentElement;
+    const newArrayOfJsx = createElements(each, callback);
+    newArrayOfJsx.forEach((e, i) => {
+      parent.replaceChild(e, arrayOfJSX[i]);
+    });
+  }, [each]);
 
+  return arrayOfJSX;
   if (!nixixStore.$$__For) {
     nixixStore.$$__For = {};
   }

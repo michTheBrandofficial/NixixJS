@@ -84,7 +84,7 @@ declare global {
   type SetStoreDispatcher<S> = (newValue: S | (() => S)) => void;
 
   interface SuspenseProps {
-    fallback: string | Element | Signal;
+    fallback: string | Element | Signal | (string | Element | Signal)[];
     children?: Promise<any>[];
     onError?: string | Element | Signal;
   }

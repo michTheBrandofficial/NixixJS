@@ -1,4 +1,3 @@
-import { nixixStore } from './index';
 import { Signal, Store } from '../primitives/classes';
 import { callEffect } from '../primitives/index';
 
@@ -12,6 +11,17 @@ export function checkDataType(value: any) {
 
 function createText(string: string) {
   return document.createTextNode(String(string));
+}
+
+export function createFragment(children?: any[]) {
+  const fragment = document.createDocumentFragment();
+  if (children) fragment.append(...children);
+  return fragment;
+}
+
+export function isArray(object: any): any[] {
+  object instanceof Array ? null : (object = [object]);
+  return object;
 }
 
 function addText(element: HTMLElement | SVGElement) {
@@ -28,27 +38,30 @@ export function addChildren(
   children: ChildrenType,
   element: HTMLElement | SVGElement
 ) {
-  children.forEach((child) => {
-    if (checkDataType(child)) {
-      element.append(createText(child));
-    } else if (child instanceof Array) {
-      addChildren(child, element);
-    } else if (typeof child === 'object') {
-      if (child instanceof Signal) {
-        const text = addText(element);
-        callEffect(() => {
-          text.textContent = getSignalValue(child);
-        }, [child]);
-      } else if (child instanceof Store) {
-        const text = addText(element);
-        callEffect(() => {
-          text.textContent = getStoreValue(child);
-        }, [child]);
-      } else {
-        element.append(child as unknown as string);
-      }
-    }
-  });
+  children instanceof Array
+    ? children.forEach((child) => {
+        if (checkDataType(child)) {
+          element.append(createText(child));
+        } else if (child instanceof Array) {
+          const fragment = createFragment(child) as any;
+          addChildren(fragment, element);
+        } else if (typeof child === 'object') {
+          if (child instanceof Signal) {
+            const text = addText(element);
+            callEffect(() => {
+              text.textContent = getSignalValue(child);
+            }, [child]);
+          } else if (child instanceof Store) {
+            const text = addText(element);
+            callEffect(() => {
+              text.textContent = getStoreValue(child);
+            }, [child]);
+          } else {
+            element.append(child as unknown as string);
+          }
+        }
+      })
+    : element.append(children);
 }
 
 const refHash = {
