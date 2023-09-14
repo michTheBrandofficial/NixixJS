@@ -12,7 +12,10 @@ type Null<T> = T | null | undefined;
 type NodeFragment = Node & TBaseFragment;
 
 declare class BaseFragment implements TBaseFragment {
-  constructor(parentNode?: ParentNode | Array<Node>, nextSibling?: Node);
+  constructor(
+    parentNode?: ParentNode | Array<Node> | Node | string,
+    nextSibling?: Node
+  );
   _parentNode: Null<ParentNode>;
   _childNodes: any;
   _previousSibling: any;

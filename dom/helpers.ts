@@ -9,7 +9,7 @@ export function checkDataType(value: any) {
   );
 }
 
-function createText(string: string) {
+export function createText(string: string) {
   return document.createTextNode(String(string));
 }
 

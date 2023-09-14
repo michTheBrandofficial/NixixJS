@@ -206,8 +206,10 @@ export class LiveFragment extends BaseFragment {
   }
 
   /* Append node inside fragment */
-  append(node: NodeFragment) {
-    this.appendChild(node);
+  append(...node: NodeFragment[]) {
+    node.forEach((childNode) => {
+      this.appendChild(childNode);
+    });
   }
 
   /* Insert node outside and before fragment */

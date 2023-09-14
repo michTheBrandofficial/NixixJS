@@ -1,12 +1,15 @@
+import Nixix, { nixixStore } from '../dom';
+import { raise } from '../dom/helpers';
+import { LiveFragment } from '../live-fragment';
 import {
-  callSignal,
   callReaction,
+  callStore,
   removeSignal,
   renderEffect,
 } from '../primitives';
+import type { Booleanish } from '../types/eventhandlers';
 import type { ImgHTMLAttributes } from '../types/index';
-import Nixix, { nixixStore } from '../dom';
-import { createFragment, isArray, raise, warn } from '../dom/helpers';
+import { createBoundary, flatten, indexes } from './helpers';
 
 function Img(props: ImgHTMLAttributes<HTMLImageElement>) {
   return Nixix.create('img', { src: './' + props.src, ...props });
@@ -14,28 +17,44 @@ function Img(props: ImgHTMLAttributes<HTMLImageElement>) {
 
 function Suspense(props: SuspenseProps) {
   let { children, onError, fallback } = props;
-  const [isWaiting, setIsWaiting] = callSignal(true);
-  const fragment = createFragment(isArray(fallback));
-
-  let resolveJSX = null;
+  const [loading, setLoading] = callStore<{ rejected: Booleanish }>({
+    rejected: 'true',
+  });
+  if (!children) {
+    raise(`The Suspense component must have children that return a promise.`);
+  }
+  const commentBoundary = createBoundary(
+    fallback instanceof Array ? fallback : [fallback],
+    'suspense'
+  );
+  let liveFragment: LiveFragment = null;
+  let resolvedJSX: typeof fallback = null;
   callReaction(() => {
-    if (isWaiting.value === false) {
-      fragment.replaceChildren(...isArray(resolveJSX));
-      removeSignal(isWaiting);
+    if (liveFragment === null) {
+      liveFragment = new LiveFragment(...indexes(commentBoundary));
     }
-  }, [isWaiting]);
-  children[0]
-    .then((value) => {
-      resolveJSX = value;
-      setIsWaiting(false);
+    liveFragment.replace(resolvedJSX as any);
+    !loading.$$__value.rejected && removeSignal(loading);
+  }, [loading]);
+
+  Promise.all(children)
+    ?.then((value) => {
+      const valueArray = flatten(value);
+      resolvedJSX = isArrayToDF(valueArray) as any;
+      setLoading({
+        rejected: false,
+      });
     })
-    .catch(() => {
-      if (onError !== undefined && onError !== null) {
-        resolveJSX = onError;
-        setIsWaiting(false);
-      }
+    ?.catch(() => {
+      resolvedJSX = onError ? (isArrayToDF(onError) as any) : '';
+      onError &&
+        setLoading((prev) => {
+          prev.rejected =
+            prev.rejected === false || prev.rejected === true ? 'true' : true;
+          return prev;
+        });
     });
-  return fragment;
+  return commentBoundary;
 }
 
 let forCount = 0;
@@ -44,37 +63,20 @@ function checkLength(array: any[]) {
   return array.length === 0 ? false : array;
 }
 
-function createElements(
-  each: any,
-  callback: CallableFunction
-): Array<JSX.Element> {
-  const arrayOfJSX = each.$$__value?.map?.(callback);
-  arrayOfJSX?.forEach?.((e: any, i) => {
-    if (e instanceof Array)
-      return raise(
-        `Each item of the For component array must have one parent element.`
-      );
-  });
-  return arrayOfJSX;
+function isArrayToDF(element: SuspenseProps['fallback']) {
+  if (element instanceof Array) {
+    const DF = new DocumentFragment();
+    DF.append(...(element as any));
+    return DF;
+  } else {
+    return element;
+  }
 }
 
 function For(props: ForProps) {
   const { parent, each, fallback, children } = props;
-  if (each.$$__value instanceof Array !== true) {
-    warn(`Please pass a reactive array as the each prop value.`);
-    return [];
-  }
-  const callback = children[0];
-  let arrayOfJSX = createElements(each, callback);
-  callReaction(() => {
-    const parent = arrayOfJSX[0]?.parentElement;
-    const newArrayOfJsx = createElements(each, callback);
-    newArrayOfJsx.forEach((e, i) => {
-      parent.replaceChild(e, arrayOfJSX[i]);
-    });
-  }, [each]);
 
-  return arrayOfJSX;
+  return;
   if (!nixixStore.$$__For) {
     nixixStore.$$__For = {};
   }
@@ -123,4 +125,4 @@ function asyncComponent(FC: () => Promise<JSX.Element>): any {
 
 const lazy = asyncComponent;
 
-export { Img, Suspense, asyncComponent, For, lazy };
+export { For, Img, Suspense, asyncComponent, lazy };

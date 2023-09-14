@@ -1,7 +1,6 @@
 import {
   ExoticComponent,
   ImgHTMLAttributes,
-  HTMLAttributes,
   type NixixNode,
 } from '../../types/index';
 import { StoreObject } from '../../primitives/types';
@@ -11,9 +10,7 @@ import { StoreObject } from '../../primitives/types';
  * @deprecated
  */
 export const Img: ExoticComponent<ImgHTMLAttributes<HTMLImageElement>>;
-interface SuspenseProps
-  extends HTMLAttributes<HTMLSpanElement>,
-    JSX.IntrinsicAttributes {
+interface SuspenseProps extends JSX.IntrinsicAttributes {
   fallback: NixixNode;
   onError?: NixixNode;
 }
