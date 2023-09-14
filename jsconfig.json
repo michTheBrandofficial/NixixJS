@@ -1,14 +1,12 @@
 {
   "compilerOptions": {
-    "lib": [
-      "es2017",
-      "dom"
-    ],
+    "lib": ["es2017", "dom"],
     "checkJs": true,
     "baseUrl": ".",
     "jsx": "react-jsxdev",
     "jsxImportSource": "../types",
     "types": ["./types"],
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "skipLibCheck": false
   }
 }

@@ -1,10 +1,4 @@
-import {
-  callRef,
-  callSignal,
-  effect,
-  removeSignal,
-  renderEffect,
-} from '../primitives';
+import { callRef, callSignal, removeSignal, renderEffect } from '../primitives';
 import type { ImgHTMLAttributes } from '../types/index';
 import Nixix, { nixixStore } from '../dom';
 
@@ -13,32 +7,13 @@ function Img(props: ImgHTMLAttributes<HTMLImageElement>) {
 }
 
 function Suspense(props: SuspenseProps) {
-  const { children, onError, fallback, ...rest } = props;
+  const { children, onError, fallback } = props;
   const [isWaiting, setIsWaiting] = callSignal(true);
+
   const span = callRef(null);
   let finalModule = null;
-  effect(() => {
-    if (isWaiting.value === false) {
-      if (finalModule instanceof Array) {
-        span.current.replaceWith(...finalModule);
-      } else {
-        span.current.replaceWith(finalModule);
-      }
-      removeSignal(isWaiting);
-    }
-  });
-  children[0]
-    .then((value) => {
-      finalModule = value;
-      setIsWaiting(false);
-    })
-    .catch(() => {
-      if (onError !== undefined && onError !== null) {
-        finalModule = onError;
-        setIsWaiting(false);
-      }
-    });
-  return Nixix.create('span', { ...rest, 'bind:ref': span }, fallback);
+  callReaction(() => {});
+  return fallback;
 }
 
 let forCount = 0;
