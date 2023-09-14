@@ -81,4 +81,15 @@ export const For: <T extends StoreObject<any[]>>(
   props?: ForProps<T>
 ) => JSX.Element;
 
+interface ShowProps<T extends SignalObject<any> | StoreObject<any>>
+  extends JSX.IntrinsicAttributes {
+  when: () => boolean;
+  switch: T;
+  fallback?: NixixNode;
+}
+
+export const Show: <T extends SignalObject<any> | StoreObject<any>>(
+  props?: ShowProps<T>
+) => JSX.Element;
+
 export const lazy: AsyncComponent<Props>;

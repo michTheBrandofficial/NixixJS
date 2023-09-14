@@ -1,5 +1,5 @@
 import Nixix, { nixixStore } from '../dom';
-import { raise } from '../dom/helpers';
+import { isArray, raise } from '../dom/helpers';
 import { LiveFragment } from '../live-fragment';
 import {
   callReaction,
@@ -9,7 +9,15 @@ import {
 } from '../primitives';
 import type { Booleanish } from '../types/eventhandlers';
 import type { ImgHTMLAttributes } from '../types/index';
-import { createBoundary, flatten, indexes } from './helpers';
+import {
+  checkLength,
+  createBoundary,
+  flatten,
+  getShow,
+  indexes,
+  isArrayToDF,
+  isNotArray,
+} from './helpers';
 
 function Img(props: ImgHTMLAttributes<HTMLImageElement>) {
   return Nixix.create('img', { src: './' + props.src, ...props });
@@ -59,20 +67,6 @@ function Suspense(props: SuspenseProps) {
 
 let forCount = 0;
 
-function checkLength(array: any[]) {
-  return array.length === 0 ? false : array;
-}
-
-function isArrayToDF(element: SuspenseProps['fallback']) {
-  if (element instanceof Array) {
-    const DF = new DocumentFragment();
-    DF.append(...(element as any));
-    return DF;
-  } else {
-    return element;
-  }
-}
-
 function For(props: ForProps) {
   const { parent, each, fallback, children } = props;
 
@@ -119,10 +113,31 @@ function For(props: ForProps) {
   return parent;
 }
 
+function Show(props: ShowProps) {
+  let { children, when, switch: signalSwitch, fallback } = props;
+  fallback && isNotArray(fallback);
+  children = flatten(children);
+  const show = getShow(when, children, fallback);
+  const commentBoundary = createBoundary(show, 'show');
+  let liveFragment: LiveFragment = null;
+  callReaction(() => {
+    if (!liveFragment) {
+      liveFragment = new LiveFragment(...indexes(commentBoundary));
+    }
+    if (when()) {
+      liveFragment.replace(isArrayToDF(children) as any);
+    } else {
+      liveFragment.replace(isArrayToDF(fallback) as any);
+    }
+  }, [signalSwitch]);
+
+  return commentBoundary;
+}
+
 function asyncComponent(FC: () => Promise<JSX.Element>): any {
   return FC;
 }
 
 const lazy = asyncComponent;
 
-export { For, Img, Suspense, asyncComponent, lazy };
+export { For, Img, Suspense, Show, asyncComponent, lazy };

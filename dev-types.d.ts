@@ -15,7 +15,7 @@ declare global {
     | ((props?: {} | null) => Element)
     | 'fragment';
   type Proptype = { children?: any; [index: string]: any } | null | undefined;
-  type ChildrenType = Array<Element | string | Nixix.Signal>;
+  type ChildrenType = Array<Element | string | Signal>;
 
   type ValueType = Signal | Store | string;
 
@@ -43,11 +43,11 @@ declare global {
     $$__NixixStore?: {
       $$__lastReactionProvider?: 'signal' | 'store';
       $$__routeStore?: {
-        [path: any]: string | Node | (string | Node)[];
         errorPage?: {
           errorRoute: string;
         };
         common?: boolean;
+        [path: string]: string | Node | (string | Node)[] | any;
       };
       $$__routeProvider?: Element;
       $$__commonRouteProvider?: HTMLSpanElement;
@@ -96,6 +96,13 @@ declare global {
     each: NixixStoreObject<any[]>;
   }
 
+  interface ShowProps {
+    when: () => boolean;
+    switch: NixixStoreObject<any> | SignalObject<any>;
+    children: any;
+    fallback: any;
+  }
+
   var window: Window & typeof globalThis;
 
   interface Current extends Element {}
@@ -108,5 +115,6 @@ declare global {
     parent: Element['parentElement'] | null;
   }
 
+  // @ts-ignore
   interface NixixNode extends Node, String, JSX.Element {}
 }
