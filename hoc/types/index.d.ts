@@ -73,13 +73,15 @@ type AsyncComponent<T extends Props> = (
  */
 export const asyncComponent: AsyncComponent<Props>;
 
-interface ForProps<T extends StoreObject<any[]>> {
-  fallback: NixixNode;
+interface ForProps<T extends StoreObject<any[]> = StoreObject<any[]>> {
+  fallback?: NixixNode;
   children?: (value: T['$$__value'][number], index?: number) => JSX.Element;
-  parent: JSX.Element | HTMLElement;
+  parent?: JSX.Element | HTMLElement;
   each: T;
 }
 
-export const For: <T>(props?: ForProps<T>) => JSX.Element;
+export const For: <T extends StoreObject<any[]>>(
+  props?: ForProps<T>
+) => JSX.Element;
 
 export const lazy: AsyncComponent<Props>;

@@ -6,6 +6,7 @@ import {
   cleanup,
   isNotEqualObject,
   cloneObject,
+  removeChars,
 } from './helpers';
 
 function callRef<R extends Element | HTMLElement>(ref: R): MutableRefObject {
@@ -140,7 +141,7 @@ function pushFurtherDeps(
             : (obj.effect = [callbackFn])
           : null;
       } else if (furtherDep instanceof Store) {
-        let obj = nixixStore.Store?.[`${furtherDep.$$__id}`];
+        let obj = nixixStore.Store?.[`_${removeChars(furtherDep.$$__id)}_`];
         obj
           ? obj.effect
             ? obj.effect.includes(callbackFn)
@@ -205,6 +206,13 @@ function callEffect(
   })(callbackFn);
 }
 
+function callReaction(
+  callbackFn: CallableFunction,
+  furtherDependents?: (Signal | Store)[]
+) {
+  pushFurtherDeps(callbackFn, furtherDependents);
+}
+
 function renderEffect(
   callbackFn: CallableFunction,
   config?: 'once',
@@ -247,6 +255,7 @@ export {
   effect,
   callEffect,
   renderEffect,
+  callReaction,
   Store,
   Signal,
   removeSignal,
