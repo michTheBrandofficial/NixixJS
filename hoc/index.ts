@@ -1,6 +1,5 @@
 import {
   callSignal,
-  effect,
   callReaction,
   removeSignal,
   renderEffect,
