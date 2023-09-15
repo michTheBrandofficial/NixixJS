@@ -183,7 +183,7 @@ function setChildren(children: ChildrenType | null, element: NixixElementType) {
 function buildComponent(
   tagNameFC: target,
   props: Proptype,
-  ...children: ChildrenType
+  children: ChildrenType
 ) {
   if (typeof tagNameFC === 'function') {
     if (props != null && props != undefined) {
@@ -217,4 +217,4 @@ async function doBgWork(root: Element) {
 }
 
 export default Nixix;
-export { render };
+export { render, setAttribute };

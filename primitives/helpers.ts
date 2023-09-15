@@ -29,6 +29,10 @@ function isNotEqualObject(oldObject: StoreObject, newObject: StoreObject) {
   );
 }
 
+function removeChars(str: string | number) {
+  return String(str).replace(/_/g, '');
+}
+
 function checkType(value: string | number | boolean) {
   const types = {
     boolean: Boolean,
@@ -49,4 +53,11 @@ async function cleanup(store: Store) {
   });
 }
 
-export { incrementId, checkType, cleanup, isNotEqualObject, cloneObject };
+export {
+  incrementId,
+  checkType,
+  removeChars,
+  cleanup,
+  isNotEqualObject,
+  cloneObject,
+};

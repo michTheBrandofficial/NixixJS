@@ -6,6 +6,7 @@
 import * as CSS from 'csstype';
 import { AriaRole } from './aria';
 import * as NativeEvents from './eventhandlers';
+import { MutableRefObject } from '../primitives/types';
 
 type Booleanish = boolean | 'true' | 'false';
 
@@ -18,7 +19,7 @@ declare namespace Nixix {
    */
   const Fragment: 'fragment';
 
-  type Component = (props?: T) => JSX.Element;
+  type Component = <T>(props?: T) => JSX.Element;
 
   type NixixNode = any;
 
@@ -232,6 +233,7 @@ declare namespace Nixix {
 
   interface NixixAttributes<T> {
     'bind:ref'?: MutableRefObject<T>;
+    key?: number;
   }
 
   interface AriaAttributes {
@@ -1319,9 +1321,7 @@ declare namespace Nixix {
       | string
       | JSXElementConstructor<any>
   > {
-    type: T;
-    props: P;
-    key: null;
+    key?: number;
   }
 }
 
@@ -1331,6 +1331,7 @@ declare global {
 
     interface IntrinsicAttributes {
       children?: Nixix.NixixNode;
+      key?: number;
     }
 
     interface IntrinsicElements {

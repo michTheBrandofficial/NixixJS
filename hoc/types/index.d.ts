@@ -1,7 +1,6 @@
 import {
   ExoticComponent,
   ImgHTMLAttributes,
-  HTMLAttributes,
   type NixixNode,
 } from '../../types/index';
 import { StoreObject } from '../../primitives/types';
@@ -11,10 +10,8 @@ import { StoreObject } from '../../primitives/types';
  * @deprecated
  */
 export const Img: ExoticComponent<ImgHTMLAttributes<HTMLImageElement>>;
-interface SuspenseProps
-  extends HTMLAttributes<HTMLSpanElement>,
-    JSX.IntrinsicAttributes {
-  fallback: NixixNode;
+interface SuspenseProps extends JSX.IntrinsicAttributes {
+  fallback?: NixixNode;
   onError?: NixixNode;
 }
 /**
@@ -73,13 +70,21 @@ type AsyncComponent<T extends Props> = (
  */
 export const asyncComponent: AsyncComponent<Props>;
 
-interface ForProps<T extends StoreObject<any[]>> {
-  fallback: NixixNode;
-  children?: (value: T['$$__value'][number], index?: number) => JSX.Element;
-  parent: JSX.Element | HTMLElement;
+export declare function For<T extends StoreObject<any[]>>(props?: {
+  fallback?: NixixNode;
   each: T;
+  children?: (item: T, i: number) => JSX.Element;
+}): JSX.Element;
+
+interface ShowProps<T extends SignalObject<any> | StoreObject<any>>
+  extends JSX.IntrinsicAttributes {
+  when: () => boolean;
+  switch: T;
+  fallback?: NixixNode;
 }
 
-export const For: <T>(props?: ForProps<T>) => JSX.Element;
+export const Show: <T extends SignalObject<any> | StoreObject<any>>(
+  props?: ShowProps<T>
+) => JSX.Element;
 
 export const lazy: AsyncComponent<Props>;
