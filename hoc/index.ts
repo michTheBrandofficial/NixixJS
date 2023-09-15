@@ -1,22 +1,22 @@
 import Nixix, { nixixStore } from '../dom';
-import { isArray, raise } from '../dom/helpers';
+import { raise } from '../dom/helpers';
 import { LiveFragment } from '../live-fragment';
-import {
-  callReaction,
-  callStore,
-  removeSignal,
-  renderEffect,
-} from '../primitives';
+import { callReaction, callStore, removeSignal } from '../primitives';
+import { Store } from '../primitives/classes';
 import type { Booleanish } from '../types/eventhandlers';
 import type { ImgHTMLAttributes } from '../types/index';
 import {
-  checkLength,
+  arrayOfJSX,
+  comment,
   createBoundary,
   flatten,
   getShow,
   indexes,
-  isArrayToDF,
-  isNotArray,
+  arrayToDF,
+  numArray,
+  isArray,
+  removeNodes,
+  getIncrementalNodes,
 } from './helpers';
 
 function Img(props: ImgHTMLAttributes<HTMLImageElement>) {
@@ -25,18 +25,20 @@ function Img(props: ImgHTMLAttributes<HTMLImageElement>) {
 
 function Suspense(props: SuspenseProps) {
   let { children, onError, fallback } = props;
-  const [loading, setLoading] = callStore<{ rejected: Booleanish }>({
-    rejected: 'true',
-  });
   if (!children) {
     raise(`The Suspense component must have children that return a promise.`);
   }
-  const commentBoundary = createBoundary(
-    fallback instanceof Array ? fallback : [fallback],
-    'suspense'
-  );
-  let liveFragment: LiveFragment = null;
+  const [loading, setLoading] = callStore<{ rejected: Booleanish }>({
+    rejected: 'true',
+  });
+  fallback = fallback
+    ? fallback instanceof Array
+      ? fallback
+      : [fallback]
+    : ([comment('nixix-fallback')] as any);
+  const commentBoundary = createBoundary(fallback as any, 'suspense');
   let resolvedJSX: typeof fallback = null;
+  let liveFragment: LiveFragment = null;
   callReaction(() => {
     if (liveFragment === null) {
       liveFragment = new LiveFragment(...indexes(commentBoundary));
@@ -48,13 +50,13 @@ function Suspense(props: SuspenseProps) {
   Promise.all(children)
     ?.then((value) => {
       const valueArray = flatten(value);
-      resolvedJSX = isArrayToDF(valueArray) as any;
+      resolvedJSX = arrayToDF(valueArray) as any;
       setLoading({
         rejected: false,
       });
     })
     ?.catch(() => {
-      resolvedJSX = onError ? (isArrayToDF(onError) as any) : '';
+      resolvedJSX = onError ? (arrayToDF(onError) as any) : fallback;
       onError &&
         setLoading((prev) => {
           prev.rejected =
@@ -65,69 +67,88 @@ function Suspense(props: SuspenseProps) {
   return commentBoundary;
 }
 
-let forCount = 0;
-
 function For(props: ForProps) {
-  const { parent, each, fallback, children } = props;
-
-  return;
-  if (!nixixStore.$$__For) {
-    nixixStore.$$__For = {};
-  }
-
-  // unique id
-  const forKey = `_${forCount}_`;
-
-  renderEffect(
-    () => {
-      // if the $$__For var exists, check if the first el is equal to the first el of the mapped values.
-      if (nixixStore.$$__For) {
-        const forArray = nixixStore.$$__For[forKey];
-        if (forArray) {
-          const mappedArray = each?.$$__value?.map(children?.[0]);
-
-          const arrayOfJSX =
-            checkLength(mappedArray) ||
-            (fallback instanceof Array ? fallback : [fallback]);
-
-          nixixStore.$$__For[`_${forCount}_`] = arrayOfJSX;
-
-          (parent as HTMLElement).replaceChildren(...arrayOfJSX);
-          return;
+  let { fallback, children, each } = props;
+  let callback = children[0];
+  let liveFragment: LiveFragment = null;
+  children = arrayOfJSX(each, callback);
+  fallback
+    ? isArray(fallback)
+      ? null
+      : (fallback = [fallback] as any)
+    : (fallback = [comment('nixix-fallback')] as any);
+  const commentBoundary = createBoundary(
+    children.length > 0 ? children : (fallback as any),
+    'for'
+  );
+  const removedNodes = [];
+  callReaction(() => {
+    if (!liveFragment) {
+      liveFragment = new LiveFragment(...indexes(commentBoundary));
+    }
+    const eachLen = each.$$__value.length;
+    if (eachLen === 0) {
+      removeNodes(eachLen, liveFragment, removedNodes);
+      return liveFragment.replace(arrayToDF(fallback) as any);
+    } else {
+      let childnodesLength = liveFragment.childNodes.length;
+      if (childnodesLength === eachLen && eachLen < removedNodes.length) {
+        const oldNodes = [];
+        for (let i = 0; i < eachLen; i++) {
+          oldNodes.push(removedNodes.shift());
+        }
+        liveFragment.replace(arrayToDF(oldNodes) as any);
+      } else if (childnodesLength > eachLen) {
+        removeNodes(eachLen, liveFragment, removedNodes);
+      } else if (childnodesLength < eachLen) {
+        if (removedNodes.length === 0) liveFragment.empty();
+        const targetLength =
+          removedNodes.length + liveFragment.childNodes.length;
+        if (targetLength === eachLen) {
+          liveFragment.replace(arrayToDF(removedNodes) as any);
+          removedNodes.length = 0;
+        } else if (targetLength < eachLen) {
+          !!removedNodes.length &&
+            liveFragment.appendChild(arrayToDF(removedNodes));
+          childnodesLength = liveFragment.childNodes.length; // 4
+          if (childnodesLength === eachLen) return;
+          const indexArray = numArray(childnodesLength, eachLen);
+          children = getIncrementalNodes(indexArray, Store, each, callback);
+          liveFragment.append(arrayToDF(children as any) as any);
+          nixixStore.Store[`_${each.$$__id}_`].cleanup?.();
+        } else if (targetLength > eachLen) {
+          const oldNodes = [];
+          for (let i = 0; i < eachLen - childnodesLength; i++) {
+            oldNodes.push(removedNodes.pop());
+          }
+          liveFragment.appendChild(arrayToDF(oldNodes));
         }
       }
-      const mappedArray = each?.$$__value?.map(children?.[0]);
+    }
+  }, [each]);
 
-      const arrayOfJSX =
-        checkLength(mappedArray) ||
-        (fallback instanceof Array ? fallback : [fallback]);
-      nixixStore.$$__For[`_${forCount}_`] = arrayOfJSX;
-
-      (parent as HTMLElement).replaceChildren(...arrayOfJSX);
-    },
-    null,
-    [each]
-  );
-
-  ++forCount;
-  return parent;
+  return commentBoundary;
 }
 
 function Show(props: ShowProps) {
   let { children, when, switch: signalSwitch, fallback } = props;
-  fallback && isNotArray(fallback);
+  fallback
+    ? isArray(fallback)
+      ? null
+      : (fallback = [fallback])
+    : (fallback = [comment('nixix-fallback')]);
   children = flatten(children);
+  let liveFragment: LiveFragment = null;
   const show = getShow(when, children, fallback);
   const commentBoundary = createBoundary(show, 'show');
-  let liveFragment: LiveFragment = null;
   callReaction(() => {
     if (!liveFragment) {
       liveFragment = new LiveFragment(...indexes(commentBoundary));
     }
     if (when()) {
-      liveFragment.replace(isArrayToDF(children) as any);
+      liveFragment.replace(arrayToDF(children) as any);
     } else {
-      liveFragment.replace(isArrayToDF(fallback) as any);
+      liveFragment.replace(arrayToDF(fallback) as any);
     }
   }, [signalSwitch]);
 

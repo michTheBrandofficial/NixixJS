@@ -124,20 +124,6 @@ export class LiveFragment extends BaseFragment {
     return node;
   }
 
-  /* Replace node in fragment */
-  replaceChild(newNode: NodeFragment, oldNode: NodeFragment) {
-    var index = this._childNodes.indexOf(oldNode);
-
-    if (index === -1) {
-      throw makeDOMException(8);
-    }
-
-    this._parentNode?.replaceChild(newNode, oldNode);
-    this._childNodes.splice(index, 1, newNode);
-
-    return oldNode;
-  }
-
   /* Remove all nodes from fragment */
   empty() {
     this._childNodes.forEach((node: NodeFragment) => {
@@ -145,44 +131,6 @@ export class LiveFragment extends BaseFragment {
     }, this);
 
     this._childNodes = [];
-  }
-
-  /* Extend fragment to adjacent node */
-  extend(node: NodeFragment) {
-    if (node) {
-      if (node === this._nextSibling) {
-        this._childNodes.push(this._nextSibling);
-        this._nextSibling = this._nextSibling.nextSibling;
-        return;
-      }
-
-      if (node === this._previousSibling) {
-        this._childNodes.unshift(this._previousSibling);
-        this._previousSibling = this._previousSibling.previousSibling;
-        return;
-      }
-    }
-
-    throw makeDOMException(8);
-  }
-
-  /* Shrink fragment by removing extremal node */
-  shrink(node: NodeFragment) {
-    if (node) {
-      if (node === this.firstChild) {
-        this._childNodes.shift();
-        this._previousSibling = node;
-        return;
-      }
-
-      if (node === this.lastChild) {
-        this._childNodes.pop();
-        this._nextSibling = node;
-        return;
-      }
-    }
-
-    throw makeDOMException(8);
   }
 
   /* Empty LiveFragment and return a DocumentFragment with all nodes.
@@ -200,44 +148,11 @@ export class LiveFragment extends BaseFragment {
     return this._childNodes.length > 0;
   }
 
-  /* Prepend node inside frament */
-  prepend(node: NodeFragment) {
-    this.insertBefore(node, this.firstChild);
-  }
-
   /* Append node inside fragment */
   append(...node: NodeFragment[]) {
     node.forEach((childNode) => {
       this.appendChild(childNode);
     });
-  }
-
-  /* Insert node outside and before fragment */
-  before(node: NodeFragment) {
-    var newPrevious;
-
-    if (node.nodeType === DOCUMENT_FRAGMENT_NODE) {
-      newPrevious = node.lastChild;
-    } else {
-      newPrevious = node;
-    }
-
-    this.parentNode?.insertBefore(node, this.firstChild || this.nextSibling);
-    this._previousSibling = newPrevious;
-  }
-
-  /* Insert node outside and after fragment */
-  after(node: NodeFragment) {
-    let newNext;
-
-    if (node.nodeType === DOCUMENT_FRAGMENT_NODE) {
-      newNext = node.firstChild;
-    } else {
-      newNext = node;
-    }
-
-    this.parentNode?.insertBefore(node, this.nextSibling);
-    this._nextSibling = newNext;
   }
 
   /* Replace nodes in this fragment */
@@ -254,11 +169,6 @@ export class LiveFragment extends BaseFragment {
     this.empty();
 
     this._childNodes = newChildren;
-  }
-
-  /* Remove nodes in this fragment */
-  remove() {
-    this.empty();
   }
 
   /* Check for child existence */

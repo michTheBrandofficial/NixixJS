@@ -92,7 +92,6 @@ declare global {
   interface ForProps {
     fallback: string | Element | Signal;
     children?: ((value: any, index?: number) => JSX.Element)[];
-    parent?: JSX.Element | HTMLElement;
     each: NixixStoreObject<any[]>;
   }
 

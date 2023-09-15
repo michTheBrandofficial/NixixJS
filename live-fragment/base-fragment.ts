@@ -8,9 +8,7 @@ export class BaseFragment implements TBaseFragment {
       children: Null<Node[]> = null,
       prev: Null<Node> = null,
       next: Null<Node> = null,
-      node: Null<Node> = null,
-      i: Null<number> = null,
-      len: Null<number>;
+      node: Null<Node> = null;
 
     if (args.length === 2) {
       prev = args[0];
@@ -30,25 +28,6 @@ export class BaseFragment implements TBaseFragment {
           valid = true;
         }
       }
-    } else if (args.length == 1) {
-      // handle contiguous slice of childNodes or children
-      if (
-        typeof (args?.[0] as any)?.length === 'number' &&
-        (args?.[0] as any)?.length > 0
-      ) {
-        children = [].slice.call(args[0]);
-        parent = children[0].parentNode;
-        len = children.length;
-        node = prev = children[0].previousSibling;
-        next = children[len - 1].nextSibling;
-        valid = true;
-      } else if (typeof args?.[0]?.nodeType === 'number') {
-        // handle parent passed as argument
-        parent = args[0] as ParentNode;
-        children = [].slice.call(parent.childNodes);
-        prev = next = null;
-        valid = true;
-      }
     }
 
     this._parentNode = parent;
@@ -64,14 +43,6 @@ export class BaseFragment implements TBaseFragment {
   _nextSibling: any;
   _ownerDocument: Null<Document>;
   _nodeType: any;
-
-  get firstChild() {
-    return this._childNodes[0] || null;
-  }
-
-  get lastChild() {
-    return this._childNodes[this._childNodes.length - 1] || null;
-  }
 
   get childNodes() {
     return this._childNodes;

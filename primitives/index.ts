@@ -110,15 +110,10 @@ function callStore<S>(initialValue: S): any[] {
           initValue.$$__value instanceof Array
             ? [...store.value]
             : { ...store.value };
+        store.cleanup?.();
         let effect = store.effect;
         if (effect !== undefined && effect !== null) {
           effect.forEach((eff) => eff());
-        }
-
-        // cleanup the store proxy on first call
-        if (store.cleanup) {
-          store.cleanup();
-          delete store.cleanup;
         }
       }
     },
