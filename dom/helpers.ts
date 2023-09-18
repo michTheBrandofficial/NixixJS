@@ -31,6 +31,7 @@ function addText(element: HTMLElement | SVGElement) {
 }
 
 /**
+ * issue of passing [['nee']] as a store and reading it
  * create('div', null, "name", create('p', null), create(App, {name: 'Ozor'}))
  * if the child is a string, append a textNode, else if if is an array, append all of it, else if it is an object, the append it
  */
@@ -41,7 +42,7 @@ export function addChildren(
   children instanceof Array
     ? children.forEach((child) => {
         if (checkDataType(child)) {
-          element.append(createText(child));
+          element.append(createText(child as any));
         } else if (child instanceof Array) {
           const fragment = createFragment(child) as any;
           addChildren(fragment, element);
@@ -105,8 +106,9 @@ export function parseRef(refObject: MutableRefObject) {
 
 export function getStoreValue(store: Store) {
   const storeEval = window['eval'];
+  const id = String(store.$$__id).replace(/_/g, '');
   return storeEval(
-    `window.$$__NixixStore.Store['${store.$$__id}'].value${store.$$__name}`
+    `window.$$__NixixStore.Store['_${id}_'].value${store.$$__name}`
   );
 }
 
