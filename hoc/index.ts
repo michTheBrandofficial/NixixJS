@@ -91,24 +91,22 @@ function For(props: ForProps) {
       removeNodes(eachLen, liveFragment, removedNodes);
       return liveFragment.replace(arrayToDF(fallback) as any);
     } else {
+      if (fallback?.[0]?.isConnected || (fallback as Element)?.isConnected) {
+        liveFragment.empty();
+      }
       let childnodesLength = liveFragment.childNodes.length;
-      if (childnodesLength === eachLen && eachLen < removedNodes.length) {
-        const oldNodes = [];
-        for (let i = 0; i < eachLen; i++) {
-          oldNodes.push(removedNodes.shift());
-        }
-        liveFragment.replace(arrayToDF(oldNodes) as any);
-      } else if (childnodesLength > eachLen) {
+      if (childnodesLength === eachLen) return;
+      if (childnodesLength > eachLen) {
         removeNodes(eachLen, liveFragment, removedNodes);
       } else if (childnodesLength < eachLen) {
-        if (removedNodes.length === 0) liveFragment.empty();
         const targetLength =
           removedNodes.length + liveFragment.childNodes.length;
         if (targetLength === eachLen) {
-          liveFragment.replace(arrayToDF(removedNodes) as any);
+          !!removedNodes.length &&
+            liveFragment.appendChild(arrayToDF(removedNodes));
           removedNodes.length = 0;
         } else if (targetLength < eachLen) {
-          !!removedNodes.length &&
+          Boolean(removedNodes.length) &&
             liveFragment.appendChild(arrayToDF(removedNodes));
           childnodesLength = liveFragment.childNodes.length; // 4
           if (childnodesLength === eachLen) return;
