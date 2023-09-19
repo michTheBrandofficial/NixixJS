@@ -232,7 +232,7 @@ declare namespace Nixix {
   }
 
   interface NixixAttributes<T> {
-    'bind:ref'?: MutableRefObject<T>;
+    'bind:ref'?: MutableRefObject<T | null>;
     key?: number;
   }
 

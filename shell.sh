@@ -1,4 +1,4 @@
 git add .
-git commit -m  "[fixed] issue of making the childnodes on the fly with a fragment in the DOM."
+git commit -m  "[fixed] issue of bind:ref prop type showing an error."
 git push -u origin main
 npm publish
