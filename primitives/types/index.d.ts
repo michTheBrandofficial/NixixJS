@@ -9,7 +9,7 @@ export type SignalObject<S> = {
 } & S;
 
 export type StoreObject<O> = {
-  readonly $$__value?: O;
+  readonly $$__value: O;
   [index: string]: any;
 } & O;
 

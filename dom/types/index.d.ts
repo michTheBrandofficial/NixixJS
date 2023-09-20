@@ -18,4 +18,6 @@ export function render(element: JSX.Element, root: HTMLElement): void;
 
 export const nixixStore = window.$$__NixixStore;
 
+export function getStoreValue(store: any): any;
+
 export default Nixix;

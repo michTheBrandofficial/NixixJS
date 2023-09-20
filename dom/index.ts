@@ -217,4 +217,4 @@ async function doBgWork(root: Element) {
 }
 
 export default Nixix;
-export { render, setAttribute };
+export { render, setAttribute, getStoreValue };

@@ -106,9 +106,10 @@ export function parseRef(refObject: MutableRefObject) {
 
 export function getStoreValue(store: Store) {
   const storeEval = window['eval'];
-  const id = String(store.$$__id).replace(/_/g, '');
-  return storeEval(
-    `window.$$__NixixStore.Store['_${id}_'].value${store.$$__name}`
+  const id = String(store?.$$__id)?.replace(/_/g, '');
+  return (
+    id &&
+    storeEval(`window.$$__NixixStore.Store['_${id}_'].value${store.$$__name}`)
   );
 }
 
