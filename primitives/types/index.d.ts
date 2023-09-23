@@ -36,19 +36,26 @@ export interface MutableRefObject<T> {
  * Returns a tuple of the initial value and a setter function to update the values.
  *
  * @param initialValue initial value to be tracked: can be an object or an array.
- * @param config Do not use. Still Experimental.
+ * @param config this object is optional, it requires an equals property of type 'boolean'. If equals is 'true', it will skip comparing the two objects for sameness else it will check for sameness before updating the signal
  */
 export function callSignal<S>(
-  initialValue: S
+  initialValue: S,
+  config?: {
+    equals: boolean;
+  }
 ): [SignalObject<S>, SetSignalDispatcher<S>];
 
 /**
  * Returns a tuple of the initial value and a setter function to update the values.
  *
  * @param initialValue initial value to be tracked: can be an object or an array.
+ * @param config this object is optional, it requires an equals property of type 'boolean'. If equals is 'true', it will skip comparing the two objects for sameness else it will check for sameness before updating the store
  */
 export function callStore<O>(
-  initialValue: O
+  initialValue: O,
+  config?: {
+    equals: boolean;
+  }
 ): [StoreObject<O>, SetStoreDispatcher<O>];
 
 /**

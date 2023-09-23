@@ -1,4 +1,4 @@
 git add .
-git commit -m  "[updated] getStoreValue function to get a store's value."
+git commit -m  "[added] optional no comparison for signals and stores "
 git push -u origin main
 npm publish

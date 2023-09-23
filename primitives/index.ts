@@ -28,7 +28,10 @@ function callRef<R extends Element | HTMLElement>(ref: R): MutableRefObject {
  * takes an initialValue(string, boolean or number) and returns an array of a object and a function to update that object.
  */
 function callSignal<S>(
-  initialValue: S
+  initialValue: S,
+  config?: {
+    equals: boolean;
+  }
 ): [SignalObject<S>, SetSignalDispatcher<S>] {
   incrementId('signalCount');
   const signalId = nixixStore.signalCount;
@@ -57,7 +60,15 @@ function callSignal<S>(
         typeof newState === 'function'
           ? (newState as Function)(originalValue)
           : newState;
-      if (String(originalValue) !== String(newStatePassed)) {
+      if (config?.equals) {
+        nixixStore.SignalStore[`_${id}_`].value = newStatePassed;
+        initValue.value = newStatePassed;
+        const effect = nixixStore['SignalStore'][`_${id}_`].effect;
+        if (effect) {
+          effect.forEach((eff) => eff());
+        }
+        return;
+      } else if (String(originalValue) !== String(newStatePassed)) {
         nixixStore.SignalStore[`_${id}_`].value = newStatePassed;
         initValue.value = newStatePassed;
         const effect = nixixStore['SignalStore'][`_${id}_`].effect;
@@ -73,7 +84,12 @@ function callSignal<S>(
 /**
  * takes an object or array as a argument and returns an object containing the first arg and a function to update that object.
  */
-function callStore<S>(initialValue: S): any[] {
+function callStore<S>(
+  initialValue: S,
+  config?: {
+    equals: boolean;
+  }
+): any[] {
   incrementId('storeCount');
   const storeId = nixixStore.storeCount;
   nixixStore['$$__lastReactionProvider'] = 'store';
@@ -97,7 +113,25 @@ function callStore<S>(initialValue: S): any[] {
         typeof newValue === 'function'
           ? newValue(cloneObject(nixixStore.Store[`_${storeId}_`].value))
           : newValue;
-      if (isNotEqualObject(initValue, newValuePassed)) {
+      if (config?.equals) {
+        const store = nixixStore.Store[`_${id}_`];
+        store.value =
+          initValue.$$__value instanceof Array
+            ? newValuePassed
+            : {
+                ...initValue.$$__value,
+                ...newValuePassed,
+              };
+        initValue.$$__value =
+          initValue.$$__value instanceof Array
+            ? [...store.value]
+            : { ...store.value };
+        store.cleanup?.();
+        let effect = store.effect;
+        if (effect !== undefined && effect !== null) {
+          effect.forEach((eff) => eff());
+        }
+      } else if (isNotEqualObject(initValue, newValuePassed)) {
         const store = nixixStore.Store[`_${id}_`];
         store.value =
           initValue.$$__value instanceof Array
