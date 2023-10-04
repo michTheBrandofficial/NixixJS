@@ -49,6 +49,7 @@ export function isArray(el: any) {
 }
 
 export function flatten(arr: Array<any>) {
+  // @ts-ignore
   return arr.flat(1);
 }
 
@@ -56,16 +57,27 @@ export function getShow(when: ShowProps['when'], children: any, fallback: any) {
   return when() ? children : fallback;
 }
 
+// childNodes = 7;
+// eachLen = 4;
+// divArray = [<div>, <div>, <div>, <div>, <div class="bg-blue-300" >, <div>, <div>]; length = 7;
+// toRemove = divArray.slice(4) = [<div class="bg-blue-300" >, <div>, <div>]
+// <<<DONE>>>;
+// divArray = [<div>, <div>, <div>, <div>]; length = 4;
+// childNodes = 4;
+// eachLen = 2;
+// anotherToRemove = divArray.slice(2) = [<div>, <div>]
+// removedNodes = first batch in + second batch in + n batches...
+// removedNodes =  [<div>, <div>, <div class="bg-blue-300" >, <div>, <div>, <div>]
 export function removeNodes(
   eachLen: number,
   liveFragment: LiveFragment,
   removedNodes: any[]
 ) {
-  liveFragment?.childNodes
-    ?.slice?.(eachLen)
-    ?.forEach((element: HTMLElement) => {
-      removedNodes.unshift(liveFragment.removeChild(element as any));
-    });
+  const cachedNodes = liveFragment?.childNodes?.slice(eachLen) as any[];
+  removedNodes.unshift(...cachedNodes);
+  cachedNodes.forEach((node) => {
+    liveFragment.removeChild(node);
+  });
 }
 
 export function getIncrementalNodes(

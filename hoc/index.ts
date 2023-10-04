@@ -102,7 +102,7 @@ function For(props: ForProps) {
         const targetLength =
           removedNodes.length + liveFragment.childNodes.length;
         if (targetLength === eachLen) {
-          !!removedNodes.length &&
+          Boolean(removedNodes.length) &&
             liveFragment.appendChild(arrayToDF(removedNodes));
           removedNodes.length = 0;
         } else if (targetLength < eachLen) {
@@ -115,11 +115,13 @@ function For(props: ForProps) {
           liveFragment.append(arrayToDF(children as any) as any);
           nixixStore.Store[`_${each.$$__id}_`].cleanup?.();
         } else if (targetLength > eachLen) {
-          const oldNodes = [];
-          for (let i = 0; i < eachLen - childnodesLength; i++) {
-            oldNodes.push(removedNodes.pop());
-          }
-          liveFragment.appendChild(arrayToDF(oldNodes));
+          // [<div class="text-blue-200" >, <div>, <div>, <div>]
+          // [<div class="text-blue-200" >, <div>, ]
+          const restoredNodes = removedNodes.splice(
+            0,
+            eachLen - childnodesLength
+          );
+          liveFragment.appendChild(arrayToDF(restoredNodes));
         }
       }
     }
