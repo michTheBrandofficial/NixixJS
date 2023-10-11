@@ -44,8 +44,7 @@ export function addChildren(
         if (checkDataType(child)) {
           element.append(createText(child as any));
         } else if (child instanceof Array) {
-          const fragment = createFragment(child) as any;
-          addChildren(fragment, element);
+          addChildren(child, element);
         } else if (typeof child === 'object') {
           if (child instanceof Signal) {
             const text = addText(element);
