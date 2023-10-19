@@ -13,6 +13,10 @@ export type StoreObject<O> = {
   [index: string]: any;
 } & O;
 
+export type MemoSignal<S> = SignalObject<S>;
+
+export type MemoStore<O> = StoreObject<O>;
+
 export class Signal {
   'value': any;
   '$$__id': number;
@@ -59,6 +63,33 @@ export function callStore<O>(
 ): [StoreObject<O>, SetStoreDispatcher<O>];
 
 /**
+ * Creates a read-only signal or store which depends on other signals or stores.
+ *
+ * @param fn callback function to return the initialValue
+ * @param deps array of signals or stores to which when changed re-runs and updates the memo's value;
+ */
+export function memo<S extends string>(
+  fn: () => S,
+  deps: (SignalObject<any> | StoreObject<any>)[]
+): MemoSignal<S>;
+export function memo<S extends boolean>(
+  fn: () => S,
+  deps: (SignalObject<any> | StoreObject<any>)[]
+): MemoSignal<S>;
+export function memo<S extends number>(
+  fn: () => S,
+  deps: (SignalObject<any> | StoreObject<any>)[]
+): MemoSignal<S>;
+export function memo<S extends object>(
+  fn: () => S,
+  deps: (SignalObject<any> | StoreObject<any>)[]
+): MemoStore<S>;
+export function memo<S extends any[]>(
+  fn: () => S,
+  deps: (SignalObject<any> | StoreObject<any>)[]
+): MemoStore<S>;
+
+/**
  * Tracks the closest (signal or store) and calls the callback function whenever the (signal or store)'s value changes.
  * If there is no signal or store, it does no tracking.
  *
@@ -67,29 +98,29 @@ export function callStore<O>(
 export function effect(
   callbackFn: CallableFunction,
   config?: 'once' | null,
-  furtherDependents?: (SignalObject<any> | StoreObject<any>)[]
+  deps?: (SignalObject<any> | StoreObject<any>)[]
 ): void;
 
 /**
  *
  * @param callbackFn callback function to be executed
- * @param furtherDependents furtherDependencies array to subscribe to
+ * @param deps furtherDependencies array to subscribe to
  * This function doesn't work like the effect function that subscribes it's callback function to the last signal or store created.
  */
 export function callEffect(
   callbackFn: CallableFunction,
-  furtherDependents?: (SignalObject<any> | StoreObject<any>)[]
+  deps?: (SignalObject<any> | StoreObject<any>)[]
 ): void;
 
 /**
  *
  * @param callbackFn callback function to be executed
- * @param furtherDependents furtherDependencies array to subscribe to
+ * @param deps furtherDependencies array to subscribe to
  * This function doesn't work like the effect function that subscribes it's callback function to the last signal or store created. It does not call the callback else just subscribes to all of the signals or stores in the dependencies array
  */
 export function callReaction(
   callbackFn: CallableFunction,
-  furtherDependents?: (SignalObject<any> | StoreObject<any>)[]
+  deps?: (SignalObject<any> | StoreObject<any>)[]
 ): void;
 
 /**
@@ -101,7 +132,7 @@ export function callReaction(
 export function renderEffect(
   callbackFn: CallableFunction,
   config?: 'once' | null,
-  furtherDependents?: (SignalObject<any> | StoreObject<any>)[]
+  deps?: (SignalObject<any> | StoreObject<any>)[]
 ): void;
 
 export function removeSignal(

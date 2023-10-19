@@ -53,8 +53,8 @@ export function flatten(arr: Array<any>) {
   return arr.flat(1);
 }
 
-export function getShow(when: ShowProps['when'], children: any, fallback: any) {
-  return when() ? children : fallback;
+export function getShow(bool: boolean, children: any, fallback: any) {
+  return bool ? children : fallback;
 }
 
 // childNodes = 7;

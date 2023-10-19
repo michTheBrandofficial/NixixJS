@@ -5,14 +5,18 @@ import {
 } from '../../types/index';
 import { StoreObject } from '../../primitives/types';
 
-// ExoticComponents
+interface ComponentFallback {
+  fallback?: JSX.Element | null | undefined;
+}
+
 /**
  * @deprecated
  */
 export const Img: ExoticComponent<ImgHTMLAttributes<HTMLImageElement>>;
-interface SuspenseProps extends JSX.IntrinsicAttributes {
-  fallback?: NixixNode;
+
+interface SuspenseProps extends ComponentFallback {
   onError?: NixixNode;
+  children: JSX.Element;
 }
 /**
    * ```jsx
@@ -36,9 +40,10 @@ type Props = {
   [index: string]: any;
 };
 type AsyncComponent<T extends Props> = (
-  FC: (props?: T) => Promise<JSX.Element>
-) => (props?: T) => JSX.Element;
+  FC: (props?: T) => Promise<someView>
+) => (props?: T) => someView;
 /**
+ * @deprecated
  *
  * ```jsx
  * For IDEs not to show errors when you use a component that has the return type 'Promise<JSX.Element>', you should use this function.
@@ -70,21 +75,24 @@ type AsyncComponent<T extends Props> = (
  */
 export const asyncComponent: AsyncComponent<Props>;
 
-export declare function For<T extends StoreObject<any[]>>(props?: {
-  fallback?: NixixNode;
-  each: T;
-  children?: (item: T, i: number) => JSX.Element;
-}): JSX.Element;
-
-interface ShowProps<T extends SignalObject<any> | StoreObject<any>>
-  extends JSX.IntrinsicAttributes {
-  when: () => boolean;
-  switch: T;
-  fallback?: NixixNode;
+interface ForProps<T extends any[]> extends ComponentFallback {
+  each: StoreObject<T>;
+  children: (item: StoreObject<T>, i: number) => someView;
 }
 
-export const Show: <T extends SignalObject<any> | StoreObject<any>>(
+export declare function For<T extends any[]>(props?: ForProps<T>): someView;
+
+interface ShowProps<T> extends ComponentFallback {
+  when: () => boolean;
+  switch: T;
+  children: NixixNode;
+}
+
+export declare function Show<T extends SignalObject<string | number | boolean>>(
   props?: ShowProps<T>
-) => JSX.Element;
+): someView;
+export declare function Show<T extends StoreObject<object | any[]>>(
+  props?: ShowProps<T>
+): someView;
 
 export const lazy: AsyncComponent<Props>;

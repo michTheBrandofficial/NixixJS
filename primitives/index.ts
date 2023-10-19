@@ -8,6 +8,7 @@ import {
   cloneObject,
   removeChars,
 } from './helpers';
+import { raise } from '../dom/helpers';
 
 function callRef<R extends Element | HTMLElement>(ref: R): MutableRefObject {
   if (nixixStore['refCount'] === undefined) {
@@ -154,6 +155,25 @@ function callStore<S>(
   ];
 }
 
+function getValueType<T>(value: any) {
+  if (typeof value === 'function')
+    raise(`Cannot pass a function as a reactive value.`);
+  if (['boolean', 'number', 'string'].includes(typeof value))
+    return callSignal<T>(value);
+  if (typeof value === 'object') return callStore<T>(value);
+}
+
+function memo<T>(fn: () => T, deps: any[]) {
+  const value = fn();
+  if (value === null || value === undefined)
+    raise(`Memoized value cannot be null or undefined`);
+  const [state, setState] = getValueType<T>(value)!;
+  callReaction(() => {
+    setState(fn());
+  }, deps);
+  return state;
+}
+
 function pushFurtherDeps(
   callbackFn: CallableFunction,
   furtherDependents?: (Signal | Store)[]
@@ -281,6 +301,7 @@ export {
   callRef,
   callSignal,
   callStore,
+  memo,
   effect,
   callEffect,
   renderEffect,

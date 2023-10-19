@@ -139,16 +139,22 @@ function Show(props: ShowProps) {
     : (fallback = [comment('nixix-fallback')]);
   children = flatten(children);
   let liveFragment: LiveFragment = null;
-  const show = getShow(when, children, fallback);
+  let bool = when();
+  const show = getShow(bool, children, fallback);
   const commentBoundary = createBoundary(show, 'show');
   callReaction(() => {
     if (!liveFragment) {
       liveFragment = new LiveFragment(...indexes(commentBoundary));
     }
-    if (when()) {
+    const newBool = when();
+    if (newBool === true) {
+      if (bool === true) return;
       liveFragment.replace(arrayToDF(children) as any);
-    } else {
+      bool = newBool;
+    } else if (newBool === false) {
+      if (bool === false) return;
       liveFragment.replace(arrayToDF(fallback) as any);
+      bool = newBool;
     }
   }, [signalSwitch]);
 

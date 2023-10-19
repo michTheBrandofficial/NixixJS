@@ -19,11 +19,11 @@ declare namespace Nixix {
    */
   const Fragment: 'fragment';
 
-  type Component = <T>(props?: T) => JSX.Element;
+  type Component = <T>(props?: T) => someView;
 
-  type NixixNode = any;
+  type NixixNode = JSX.ElementType | Iterable<JSX.ElementType>;
 
-  type ExoticComponent<P> = (props: P) => JSX.Element;
+  type ExoticComponent<P> = (props: P) => someView;
   type RouteExoticComponent<T> = T;
 
   type SignalObject<S extends any> = { value: S; $$__id?: number };
@@ -34,7 +34,7 @@ declare namespace Nixix {
 
   interface DOMAttributes<T> {
     children?: NixixNode;
-    innerHTML?: NixixNode;
+    innerHTML?: string;
 
     // clipboard events
     'on:copy'?: NativeEvents.ClipboardEventHandler<T>;
@@ -1313,28 +1313,40 @@ declare namespace Nixix {
     webpreferences?: ValueType<string>;
   }
 
-  type JSXElementConstructor<P> = (props: P) => NixixElement<any, any> | null;
+  type JSXElementConstructor<P> = (props?: P) => someView | Promise<someView>;
 
   interface NixixElement<
     P = any,
-    T extends string | JSXElementConstructor<any> =
+    T extends string | JSXElementConstructor<P> =
       | string
-      | JSXElementConstructor<any>
+      | JSXElementConstructor<P>
   > {
     key?: number;
   }
 }
 
 declare global {
-  export namespace JSX {
+  type someView = JSX.ElementType;
+
+  namespace JSX {
+    type ElementType =
+      | string
+      | number
+      | boolean
+      | Nixix.JSXElementConstructor<any>
+      | JSX.Element;
+
     interface Element extends Nixix.NixixElement<any, any>, Node {}
 
+    interface ElementChildrenAttribute {
+      children: {};
+    }
+
     interface IntrinsicAttributes {
-      children?: Nixix.NixixNode;
       key?: number;
     }
 
-    interface IntrinsicElements {
+    interface HTMLElementTags {
       // HTML
       a: Nixix.AnchorHTMLAttributes<HTMLAnchorElement>;
       abbr: Nixix.HTMLAttributes<HTMLElement>;
@@ -1454,13 +1466,13 @@ declare global {
       video: Nixix.VideoHTMLAttributes<HTMLVideoElement>;
       wbr: Nixix.HTMLAttributes<HTMLElement>;
       webview: Nixix.WebViewHTMLAttributes<HTMLWebViewElement>;
+    }
 
-      // SVG
+    interface SVGElementTags {
       svg: Nixix.SVGAttributes<SVGSVGElement>;
-
-      animate: Nixix.SVGAttributes<SVGElement>; // TODO: It is SVGAnimateElement but is not in TypeScript's lib.dom.d.ts for now.
+      animate: Nixix.SVGAttributes<SVGElement>;
       animateMotion: Nixix.SVGAttributes<SVGElement>;
-      animateTransform: Nixix.SVGAttributes<SVGElement>; // TODO: It is SVGAnimateTransformElement but is not in TypeScript's lib.dom.d.ts for now.
+      animateTransform: Nixix.SVGAttributes<SVGElement>;
       circle: Nixix.SVGAttributes<SVGCircleElement>;
       clipPath: Nixix.SVGAttributes<SVGClipPathElement>;
       defs: Nixix.SVGAttributes<SVGDefsElement>;
@@ -1516,5 +1528,7 @@ declare global {
       use: Nixix.SVGAttributes<SVGUseElement>;
       view: Nixix.SVGAttributes<SVGViewElement>;
     }
+
+    interface IntrinsicElements extends HTMLElementTags, SVGElementTags {}
   }
 }
