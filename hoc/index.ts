@@ -1,22 +1,22 @@
 import Nixix, { nixixStore } from '../dom';
 import { raise } from '../dom/helpers';
 import { LiveFragment } from '../live-fragment';
-import { callReaction, callStore, removeSignal } from '../primitives';
+import { callReaction, callStore, effect, removeSignal } from '../primitives';
 import { Store } from '../primitives/classes';
 import type { Booleanish } from '../types/eventhandlers';
 import type { ImgHTMLAttributes } from '../types/index';
 import {
   arrayOfJSX,
+  arrayToDF,
   comment,
   createBoundary,
   flatten,
+  getIncrementalNodes,
   getShow,
   indexes,
-  arrayToDF,
-  numArray,
   isArray,
+  numArray,
   removeNodes,
-  getIncrementalNodes,
 } from './helpers';
 
 function Img(props: ImgHTMLAttributes<HTMLImageElement>) {
@@ -28,9 +28,12 @@ function Suspense(props: SuspenseProps) {
   if (!children) {
     raise(`The Suspense component must have children that return a promise.`);
   }
-  const [loading, setLoading] = callStore<{ rejected: Booleanish }>({
-    rejected: 'true',
-  });
+  const [loading, setLoading] = callStore<{ rejected: Booleanish }>(
+    {
+      rejected: true,
+    },
+    { equals: true }
+  );
   fallback = fallback
     ? fallback instanceof Array
       ? fallback
@@ -38,14 +41,16 @@ function Suspense(props: SuspenseProps) {
     : ([comment('nixix-fallback')] as any);
   const commentBoundary = createBoundary(fallback as any, 'suspense');
   let resolvedJSX: typeof fallback = null;
-  let liveFragment: LiveFragment = null;
-  callReaction(() => {
-    if (liveFragment === null) {
-      liveFragment = new LiveFragment(...indexes(commentBoundary));
-    }
-    liveFragment.replace(resolvedJSX as any);
-    !loading.$$__value.rejected && removeSignal(loading);
-  }, [loading]);
+  let liveFragment: LiveFragment;
+  effect(() => {
+    liveFragment = new LiveFragment(...indexes(commentBoundary));
+  }, 'once');
+  callReaction(
+    function SuspenseEff() {
+      liveFragment.replace(resolvedJSX as any);
+    },
+    [loading]
+  );
 
   Promise.all(children)
     ?.then((value) => {
@@ -167,4 +172,4 @@ function asyncComponent(FC: () => Promise<JSX.Element>): any {
 
 const lazy = asyncComponent;
 
-export { For, Img, Suspense, Show, asyncComponent, lazy };
+export { For, Img, Show, Suspense, asyncComponent, lazy };

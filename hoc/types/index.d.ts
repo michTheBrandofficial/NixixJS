@@ -16,7 +16,7 @@ export const Img: ExoticComponent<ImgHTMLAttributes<HTMLImageElement>>;
 
 interface SuspenseProps extends ComponentFallback {
   onError?: NixixNode;
-  children: JSX.Element;
+  children: JSX.Element[] | JSX.Element;
 }
 /**
    * ```jsx

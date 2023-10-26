@@ -1,15 +1,8 @@
-import type { ESBuildOptions } from 'vite';
-import { Plugin as Plugin_2 } from 'vite';
 import { join, normalize } from 'path';
-
-export default function NixixHMR(
-  projectRoot?: `${'src' | (string & {})}/${'index.tsx' | (string & {})}`,
-  dev?: boolean
-): Plugin_2[] {
-  const plugin: Plugin_2 = {
+export default function NixixHMR(projectRoot, dev) {
+  const plugin = {
     name: 'nixix-vite-hmr',
     apply: 'serve',
-
     async transform(code, id) {
       // if file extension is not ts | js | jsx | tsx.
       if (/node_modules/.test(id) || !/\.(t|j)sx?$/.test(id)) return;
@@ -31,11 +24,9 @@ export default function NixixHMR(
       }
     },
   };
-
   return [plugin];
 }
-
-const esbuildOptions: ESBuildOptions = {
+const esbuildOptions = {
   jsxFactory: 'Nixix.create',
   jsxFragment: '"fragment"',
   jsxImportSource: 'nixix',
@@ -44,12 +35,10 @@ const esbuildOptions: ESBuildOptions = {
   jsxInject: "import Nixix from 'nixix/dom';",
   minifyIdentifiers: true,
 };
-
 const devEsbuildOptions = {
   jsxFactory: 'Nixix.create',
   jsxFragment: "'fragment'",
   jsxImportSource: './index.js',
   jsxInject: 'import Nixix from "dom"',
 };
-
 export { devEsbuildOptions, esbuildOptions };

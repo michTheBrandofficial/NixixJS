@@ -1,6 +1,6 @@
 {
   "name": "nixix/vite-plugin",
-  "main": "./index.ts",
+  "main": "./index.mjs",
   "module": "./index.mts",
   "types": "./types.d.ts",
   "scripts": {

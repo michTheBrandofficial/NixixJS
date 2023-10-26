@@ -11,9 +11,40 @@ import {
 } from './helpers';
 import { PROP_ALIASES, SVG_ELEMENTTAGS, SVG_NAMESPACE } from './utilVars';
 
+type GlobalStore = {
+  $$__lastReactionProvider?: 'signal' | 'store';
+  $$__routeStore?: {
+    errorPage?: {
+      errorRoute: string;
+    };
+    common?: boolean;
+    [path: string]: string | Node | (string | Node)[] | any;
+  };
+  $$__routeProvider?: Element;
+  $$__commonRouteProvider?: HTMLSpanElement;
+  Store?: {
+    [index: string]: WindowStoreObject;
+  };
+  SignalStore?: {
+    [index: string]: {
+      value: any;
+      effect?: CallableFunction[];
+    };
+  };
+  storeCount?: number;
+  diffStore?: (id: number) => void;
+  signalCount?: number;
+  diffSignal?: (id: number) => void;
+  $$__For?: {
+    [id: string]: string[] | Element[] | JSX.Element[];
+  };
+
+  refCount?: number;
+};
+
 // Global store for the store class and signals.
 window['$$__NixixStore'] = {};
-export const nixixStore = window.$$__NixixStore;
+export const nixixStore = window.$$__NixixStore as GlobalStore;
 
 const Nixix = {
   create: function (
@@ -202,11 +233,9 @@ function buildComponent(
 
 function render(element: NixixNode, root: HTMLElement) {
   if (!Array.isArray(element)) {
-    root.append(element);
+    root?.append?.(element);
   } else {
-    element.forEach((el) => {
-      render(el, root);
-    });
+    root?.append?.(...(element as Array<NixixNode>).flat(Infinity));
   }
   doBgWork(root);
 }

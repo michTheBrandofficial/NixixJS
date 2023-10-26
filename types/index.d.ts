@@ -721,7 +721,7 @@ declare namespace Nixix {
   interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
     accept?: ValueType<string>;
     alt?: ValueType<string>;
-    autocomplete?: ValueType<string>;
+    autocomplete?: ValueType<'off' | 'on'>;
     capture?: ValueType<boolean | 'user' | 'environment'>; // https://www.w3.org/TR/html-media-capture/#the-capture-attribute
     checked?: ValueType<boolean>;
     crossorigin?: ValueType<string>;
@@ -1333,8 +1333,11 @@ declare global {
       | string
       | number
       | boolean
+      | null
+      | undefined
       | Nixix.JSXElementConstructor<any>
-      | JSX.Element;
+      | JSX.Element
+      | Iterable<ElementType>;
 
     interface Element extends Nixix.NixixElement<any, any>, Node {}
 

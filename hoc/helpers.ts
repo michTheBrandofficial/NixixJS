@@ -49,8 +49,8 @@ export function isArray(el: any) {
 }
 
 export function flatten(arr: Array<any>) {
-  // @ts-ignore
-  return arr.flat(1);
+  if (Array.isArray(arr)) return arr.flat(Infinity);
+  else return [arr];
 }
 
 export function getShow(bool: boolean, children: any, fallback: any) {
