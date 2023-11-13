@@ -19,6 +19,14 @@ declare namespace Nixix {
    */
   const Fragment: 'fragment';
 
+  type EmptyObject = {
+    [index: string | number | symbol]: any
+  }
+
+  type Children<T = NixixNode> = {
+    children?: T  
+  }
+
   type Component = <T>(props?: T) => someView;
 
   type NixixNode = JSX.ElementType | Iterable<JSX.ElementType>;

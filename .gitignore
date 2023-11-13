@@ -5,6 +5,7 @@ src/
 .vscode
 *.jsx
 *.tsx
+*.sh
 esbuild.config.js
 out.js
 *.html

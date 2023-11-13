@@ -4,6 +4,7 @@
     "checkJs": true,
     "baseUrl": ".",
     "jsx": "react-jsxdev",
+    "strict": true,
     "jsxImportSource": "../types",
     "types": ["./types"],
     "moduleResolution": "node",
