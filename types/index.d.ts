@@ -454,7 +454,7 @@ declare namespace Nixix {
       NixixAttributes<T> {
     // Standard HTML Attributes
     accesskey?: ValueType<string>;
-    autofocus?: ValueType<boolean>;
+    autofocus?: ValueType<boolean | undefined>;
     className?: ValueType<string>;
     contenteditable?: ValueType<boolean | 'true' | 'false' | 'inherit'>;
     contextmenu?: ValueType<string>;

@@ -3,8 +3,6 @@ jsdoc/
 signal/
 src/
 .vscode
-*.jsx
-*.tsx
 *.sh
 esbuild.config.js
 out.js
