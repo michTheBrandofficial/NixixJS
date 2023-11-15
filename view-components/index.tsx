@@ -168,8 +168,8 @@ export const Main = (
   return <main {...props}>{children}</main>;
 };
 
-type TextNodeProps = {
-  children?: ValueType<string> | ValueType<string>[]
+type TextNodeProps<T = string | number | boolean> = {
+  children?: ValueType<T> | ValueType<T>[]
 }
 /**
  * Returns a textnode 
