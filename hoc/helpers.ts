@@ -28,7 +28,7 @@ export function numArray(start: number, end: number) {
 }
 
 export function arrayOfJSX(each: any, callback: any) {
-  const array = each.$$__value;
+  const array = each.$$__value as [];
   return array.map((_, i) => {
     return callback(each, i) as any;
   });
@@ -84,7 +84,7 @@ export function getIncrementalNodes(
   indexArray: any[],
   Store: any,
   each: any,
-  callback: ForProps['children'][number]
+  callback: Required<ForProps>['children'][number]
 ) {
   return indexArray.map((nIndex) => {
     const freshStore = new Store({

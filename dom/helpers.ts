@@ -13,9 +13,9 @@ export function createText(string: string) {
   return document.createTextNode(String(string));
 }
 
-export function createFragment(children?: any[]) {
+export function createFragmentWithChildren(children?: any[]) {
   const fragment = document.createDocumentFragment();
-  if (children) fragment.append(...children);
+  if (children) addChildren(children, fragment);
   return fragment;
 }
 
@@ -24,7 +24,7 @@ export function isArray(object: any): any[] {
   return object;
 }
 
-function addText(element: HTMLElement | SVGElement) {
+function addText(element: HTMLElement | SVGElement | DocumentFragment) {
   const text = createText('');
   element.append(text);
   return text;
@@ -37,7 +37,7 @@ function addText(element: HTMLElement | SVGElement) {
  */
 export function addChildren(
   children: ChildrenType,
-  element: HTMLElement | SVGElement
+  element: HTMLElement | SVGElement | DocumentFragment
 ) {
   children instanceof Array
     ? children.forEach((child) => {
@@ -64,7 +64,10 @@ export function addChildren(
     : element.append(children);
 }
 
-const refHash = {
+const refHash: {
+  count: number,
+  refs: MutableRefObject[]
+} = {
   count: 0,
   refs: [],
 };
@@ -119,16 +122,16 @@ export function getSignalValue(signal: Signal) {
 /**
  * used to add a listener to elements so that the get cleaned up after they are removed from the dom.
  */
-async function onElementRemoved(element: Element, callback: CallableFunction) {
+export async function onElementRemoved(element: Element, callback: CallableFunction) {
   await Promise.resolve();
-  const observer = new MutationObserver(function (mutations) {
+  const observer = new MutationObserver(function () {
     if (!document.body.contains(element)) {
       callback();
-      this.disconnect();
+      observer.disconnect();
     }
   });
 
-  observer.observe(element.parentElement, { childList: true });
+  observer.observe(element.parentElement!, { childList: true });
 }
 
 export function raise(message: string) {

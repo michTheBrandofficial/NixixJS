@@ -1,3 +1,4 @@
+import { addChildren, createFragmentWithChildren, createText } from 'dom/helpers';
 import {
   ButtonHTMLAttributes,
   Children,
@@ -5,14 +6,16 @@ import {
   HTMLAttributes,
   InputHTMLAttributes,
   TextareaHTMLAttributes,
+  ValueType
 } from '../types/index';
 import { removeUnusedProps } from './helpers';
-import { ViewComponent } from './types/index';
+import { BaseViewComponent, ViewComponent } from './types/index';
+import { flatten } from 'hoc/helpers';
 
 /**
  * Returns a section that is a flexible box when used NixixJS is used with TailwindCSS
  */
-export const HStack = (props: ViewComponent): someView => {
+export const HStack = (props: BaseViewComponent): someView => {
   const { children } = removeUnusedProps<Children>(props, 'children');
 
   return (
@@ -27,7 +30,7 @@ export const HStack = (props: ViewComponent): someView => {
 /**
  * Returns a stack that has its children aligned vertically - column
  */
-export const VStack = (props: ViewComponent): someView => {
+export const VStack = (props: BaseViewComponent): someView => {
   const { children } = removeUnusedProps<Children>(props, 'children');
 
   return (
@@ -40,7 +43,7 @@ export const VStack = (props: ViewComponent): someView => {
 /**
  * Returns an article element
  */
-export const Article = (props: ViewComponent): someView => {
+export const Article = (props: BaseViewComponent): someView => {
   const { children } = removeUnusedProps<Children>(props, 'children');
 
   return <article {...props}>{children}</article>;
@@ -49,7 +52,7 @@ export const Article = (props: ViewComponent): someView => {
 /**
  * Returns an aside element
  */
-export const Aside = (props: ViewComponent): someView => {
+export const Aside = (props: BaseViewComponent): someView => {
   const { children } = removeUnusedProps<Children>(props, 'children');
 
   return (
@@ -159,8 +162,22 @@ export const Heading = (props: HeadingProps): someView => {
  * Returns a main element
  */
 export const Main = (
-  props: ViewComponent<HTMLAttributes<HTMLElement>>
+  props: BaseViewComponent
 ): someView => {
   const { children } = removeUnusedProps<Children>(props, 'children');
   return <main {...props}>{children}</main>;
+};
+
+type TextNodeProps = {
+  children?: ValueType<string> | ValueType<string>[]
+}
+/**
+ * Returns a textnode 
+ */
+export const TextNode = (props: TextNodeProps): someView => {
+  let {children} = props ? props : { children: [] };
+  return children ? (() => {
+    children = flatten(children as [])
+    return createFragmentWithChildren(children)
+  })() : []  
 };
