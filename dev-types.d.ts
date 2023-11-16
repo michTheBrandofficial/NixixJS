@@ -1,4 +1,3 @@
-import Nixix from './types';
 import {
   StoreObject as NixixStoreObject,
   Signal,

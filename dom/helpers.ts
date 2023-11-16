@@ -30,6 +30,34 @@ function addText(element: HTMLElement | SVGElement | DocumentFragment) {
   return text;
 }
 
+
+export function flatten(arr: Array<any>) {
+  if (Array.isArray(arr)) return arr.flat(Infinity);
+  else return [arr];
+}
+
+export function fillInChildren(element:HTMLElement | SVGElement | DocumentFragment) {
+  return (child: ChildrenType[number]) => {
+    if (checkDataType(child)) {
+      element.append(createText(child as any));
+    } else if (typeof child === 'object') {
+      if (child instanceof Signal) {
+        const text = addText(element);
+        callEffect(() => {
+          text.textContent = getSignalValue(child);
+        }, [child]);
+      } else if (child instanceof Store) {
+        const text = addText(element);
+        callEffect(() => {
+          text.textContent = getStoreValue(child);
+        }, [child]);
+      } else {
+        element.append(child as unknown as string);
+      }
+    }
+  }
+}
+
 /**
  * issue of passing [['nee']] as a store and reading it
  * create('div', null, "name", create('p', null), create(App, {name: 'Ozor'}))
@@ -39,29 +67,10 @@ export function addChildren(
   children: ChildrenType,
   element: HTMLElement | SVGElement | DocumentFragment
 ) {
-  children instanceof Array
-    ? children.forEach((child) => {
-        if (checkDataType(child)) {
-          element.append(createText(child as any));
-        } else if (child instanceof Array) {
-          addChildren(child, element);
-        } else if (typeof child === 'object') {
-          if (child instanceof Signal) {
-            const text = addText(element);
-            callEffect(() => {
-              text.textContent = getSignalValue(child);
-            }, [child]);
-          } else if (child instanceof Store) {
-            const text = addText(element);
-            callEffect(() => {
-              text.textContent = getStoreValue(child);
-            }, [child]);
-          } else {
-            element.append(child as unknown as string);
-          }
-        }
-      })
-    : element.append(children);
+  if (children instanceof Array) {
+    children = flatten(children);
+    children.forEach(fillInChildren(element))
+  } else fillInChildren(element)(children)
 }
 
 const refHash: {

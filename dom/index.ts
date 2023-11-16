@@ -107,17 +107,20 @@ function setAttribute(
   if (attrValue instanceof Signal) {
     callEffect(() => {
       type === 'propertyAttribute'
+        // @ts-ignore
         ? (element[attrName] = getSignalValue(attrValue))
         : element.setAttribute(attrName, getSignalValue(attrValue));
-    }, [attrValue]);
+      }, [attrValue]);
   } else if (attrValue instanceof Store) {
     callEffect(() => {
       type === 'propertyAttribute'
-        ? (element[attrName] = getStoreValue(attrValue))
-        : element.setAttribute(attrName, getStoreValue(attrValue));
+      // @ts-ignore
+      ? (element[attrName] = getStoreValue(attrValue))
+      : element.setAttribute(attrName, getStoreValue(attrValue));
     }, [attrValue]);
   } else if (checkDataType(attrValue)) {
     type === 'propertyAttribute'
+      // @ts-ignore
       ? (element[attrName] = attrValue)
       : element.setAttribute(attrName, attrValue as any);
   }
@@ -130,23 +133,25 @@ function setStyle(element: NixixElementType, styleValue: StyleValueType) {
     );
   const cssStyleProperties = entries(styleValue) as [string, ValueType][];
   for (let [property, value] of cssStyleProperties) {
+    // typed as display to remove the ts error
+    let styleKey = property as 'display';
     if (isNull(value)) {
       warn(
-        `The ${property} CSS property cannot be null or undefined. Skipping CSS property parsing.`
+        `The ${styleKey} CSS property cannot be null or undefined. Skipping CSS property parsing.`
       );
       continue;
     }
 
     if (value instanceof Signal) {
       callEffect(() => {
-        element['style'][property] = getSignalValue(value as Signal);
+        element['style'][styleKey] = getSignalValue(value as Signal);
       }, [value]);
     } else if (value instanceof Store) {
       callEffect(() => {
-        element['style'][property] = getStoreValue(value as Store);
+        element['style'][styleKey] = getStoreValue(value as Store);
       }, [value]);
     } else {
-      element['style'][property] = value;
+      element['style'][styleKey] = value as string;
     }
   }
 }
@@ -232,11 +237,7 @@ function buildComponent(
 }
 
 function render(element: NixixNode, root: HTMLElement) {
-  if (!Array.isArray(element)) {
-    root?.append?.(element);
-  } else {
-    root?.append?.(...(element as Array<NixixNode>).flat(Infinity));
-  }
+  addChildren((element as any), root);
   doBgWork(root);
 }
 
