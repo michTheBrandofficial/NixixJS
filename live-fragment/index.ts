@@ -127,7 +127,7 @@ export class LiveFragment extends BaseFragment {
   /* Remove all nodes from fragment */
   empty() {
     this._childNodes.forEach((node: NodeFragment) => {
-      this.parentNode?.removeChild(node);
+      this.parentNode?.contains(node) && this.parentNode?.removeChild(node);
     }, this);
 
     this._childNodes = [];

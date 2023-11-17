@@ -3,10 +3,10 @@ import {
   ImgHTMLAttributes,
   type NixixNode,
 } from '../../types/index';
-import { StoreObject } from '../../primitives/types';
+import { SignalObject, StoreObject } from '../../primitives/types';
 
 interface ComponentFallback {
-  fallback?: JSX.Element | null | undefined;
+  fallback?: someView | null | undefined;
 }
 
 /**

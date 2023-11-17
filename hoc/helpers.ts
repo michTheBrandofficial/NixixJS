@@ -1,3 +1,4 @@
+import { createFragment } from '../dom/helpers';
 import { LiveFragment } from '../live-fragment/types';
 
 export function comment(str: string) {
@@ -9,14 +10,14 @@ export function indexes(arr: Array<any>) {
 }
 
 export function createBoundary(
-  values: Array<any>,
+  values: any,
   commentName: 'suspense' | 'for' | 'show'
-): [Comment, ...any[], Comment] {
-  return [
+): DocumentFragment {
+  return createFragment([
     comment(`nixix-${commentName}`),
-    ...values,
+    values,
     comment(`nixix-${commentName}`),
-  ];
+  ]);
 }
 
 export function numArray(start: number, end: number) {
@@ -36,12 +37,6 @@ export function arrayOfJSX(each: any, callback: any) {
 
 export function checkLength(array: any[]) {
   return array.length === 0 ? false : array;
-}
-
-export function arrayToDF(element: SuspenseProps['fallback']) {
-  const DF = new DocumentFragment();
-  DF.append(...(element as any));
-  return DF;
 }
 
 export function isArray(el: any) {

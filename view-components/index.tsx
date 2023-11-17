@@ -1,4 +1,4 @@
-import { createFragmentWithChildren } from '../dom/helpers';
+import { createFragment } from '../dom/helpers';
 import { flatten } from '../hoc/helpers';
 import {
   ButtonHTMLAttributes,
@@ -177,7 +177,7 @@ export const TextNode = (props: TextNodeProps): someView => {
   return children
     ? (() => {
         children = flatten(children as []);
-        return createFragmentWithChildren(children as any);
+        return createFragment(children as any);
       })()
     : [];
 };

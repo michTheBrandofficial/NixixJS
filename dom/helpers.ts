@@ -13,7 +13,7 @@ export function createText(string: string) {
   return document.createTextNode(String(string));
 }
 
-export function createFragmentWithChildren(children?: any[]) {
+export function createFragment(children?: any) {
   const fragment = document.createDocumentFragment();
   if (children) addChildren(children, fragment);
   return fragment;
@@ -30,13 +30,14 @@ function addText(element: HTMLElement | SVGElement | DocumentFragment) {
   return text;
 }
 
-
 export function flatten(arr: Array<any>) {
   if (Array.isArray(arr)) return arr.flat(Infinity);
   else return [arr];
 }
 
-export function fillInChildren(element:HTMLElement | SVGElement | DocumentFragment) {
+export function fillInChildren(
+  element: HTMLElement | SVGElement | DocumentFragment
+) {
   return (child: ChildrenType[number]) => {
     if (checkDataType(child)) {
       element.append(createText(child as any));
@@ -55,7 +56,7 @@ export function fillInChildren(element:HTMLElement | SVGElement | DocumentFragme
         element.append(child as unknown as string);
       }
     }
-  }
+  };
 }
 
 /**
@@ -69,13 +70,13 @@ export function addChildren(
 ) {
   if (children instanceof Array) {
     children = flatten(children);
-    children.forEach(fillInChildren(element))
-  } else fillInChildren(element)(children)
+    children.forEach(fillInChildren(element));
+  } else fillInChildren(element)(children);
 }
 
 const refHash: {
-  count: number,
-  refs: MutableRefObject[]
+  count: number;
+  refs: MutableRefObject[];
 } = {
   count: 0,
   refs: [],
@@ -131,7 +132,10 @@ export function getSignalValue(signal: Signal) {
 /**
  * used to add a listener to elements so that the get cleaned up after they are removed from the dom.
  */
-export async function onElementRemoved(element: Element, callback: CallableFunction) {
+export async function onElementRemoved(
+  element: Element,
+  callback: CallableFunction
+) {
   await Promise.resolve();
   const observer = new MutationObserver(function () {
     if (!document.body.contains(element)) {

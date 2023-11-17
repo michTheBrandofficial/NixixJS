@@ -1,20 +1,15 @@
-import { createFragmentWithChildren, raise, warn } from '../dom/helpers';
-import { comment } from '../hoc/helpers';
 import Nixix, { nixixStore } from '../dom';
+import { createFragment, raise, warn } from '../dom/helpers';
+import { comment } from '../hoc/helpers';
+import { LiveFragment } from '../live-fragment';
 import { type MouseEvent } from '../types/eventhandlers';
 import { EmptyObject } from '../types/index';
-import NestedRoute, {
-  changeRouteComment,
-  getWinPath,
-  isNull,
-  pushState,
-} from './helpers';
-import { LiveFragment } from '../live-fragment';
+import { changeRouteComment, getWinPath, isNull, pushState } from './helpers';
 
 type RouteStoreType = typeof nixixStore.$$__routeStore;
 
 function createRouteBoundary(routes: RouteStoreType, path: string) {
-  const routeBoundary = createFragmentWithChildren([
+  const routeBoundary = createFragment([
     comment(`route-${path}`),
     routes![path],
     comment(`route-${path}`),

@@ -10,5 +10,5 @@
     "moduleResolution": "node",
     "skipLibCheck": false
   },
-  "include": ["src/**/*"]
+  "include": ["./**/*"]
 }

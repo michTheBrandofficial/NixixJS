@@ -9,7 +9,7 @@ interface TBaseFragment {
 
 type Null<T> = T | null | undefined;
 
-type NodeFragment = Node & TBaseFragment;
+type NodeFragment = (Node & TBaseFragment) | DocumentFragment;
 
 declare class BaseFragment implements TBaseFragment {
   constructor(
