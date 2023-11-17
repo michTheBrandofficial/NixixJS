@@ -1,6 +1,7 @@
 import {
   AnchorHTMLAttributes,
   ExoticComponent,
+  HTMLAttributes,
   NixixNode,
   RouteExoticComponent,
 } from '../../types';
@@ -15,18 +16,17 @@ export interface RouteConfig<T extends string> {
   element: NixixNode;
   children?: NixixNode;
   path?: T;
-  common?: boolean;
-  errorPage?: boolean;
+  errorRoute?: boolean;
 }
 
-export type PathToRoute = RoutePath;
-declare const Link: <T extends string>(props: RouteLink<T>) => JSX.Element;
+export type PathToRoute = `/${string}`;
+declare const Link: <T extends PathToRoute>(props: RouteLink<T>) => JSX.Element;
 declare const Routes: ExoticComponent<{
-  children?: JSX.Element[] | JSX.Element;
+  children?: NixixNode;
   callback?: () => PathToRoute;
 }>;
-declare const Route: <T extends string>(props: RouteConfig<T>) => JSX.Element;
-declare const Outlet: (props?: HTMLAttributes<HTMLSpanElement>) => JSX.Element;
+declare const Route: <T extends PathToRoute>(props: RouteConfig<T>) => someView;
+declare const Outlet: (props?: HTMLAttributes<HTMLSpanElement>) => someView;
 /**
  * ```jsx
  *  Should be used to programmatically switch routes.
@@ -39,7 +39,7 @@ declare const Outlet: (props?: HTMLAttributes<HTMLSpanElement>) => JSX.Element;
  * ```
  */
 declare const Router: RouteExoticComponent<{
-  push: <P extends string>(path: P) => void;
+  push: <P extends PathToRoute>(path: P) => void;
 }>;
 
 export { Link, Routes, Route, Outlet, Router };

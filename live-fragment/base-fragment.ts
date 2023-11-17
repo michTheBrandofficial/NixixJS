@@ -1,7 +1,7 @@
 import { DOCUMENT_FRAGMENT_NODE } from './functions.js';
 
 export class BaseFragment implements TBaseFragment {
-  constructor(parentNode?: ParentNode | Array<Node>, nextSibling?: Node) {
+  constructor() {
     let args = [].slice.call(arguments) as (typeof prev)[],
       valid = false,
       parent: Null<ParentNode> = null,
@@ -30,14 +30,12 @@ export class BaseFragment implements TBaseFragment {
       }
     }
 
-    this._parentNode = parent;
     this._childNodes = children;
     this._previousSibling = prev || null;
     this._nextSibling = next || null;
-    this._ownerDocument = this?._parentNode?.ownerDocument;
+    this._ownerDocument = parent?.ownerDocument;
     this._nodeType = DOCUMENT_FRAGMENT_NODE;
   }
-  _parentNode: Null<ParentNode>;
   _childNodes: any;
   _previousSibling: any;
   _nextSibling: any;
@@ -49,7 +47,7 @@ export class BaseFragment implements TBaseFragment {
   }
 
   get parentNode() {
-    return this._parentNode;
+    return this._previousSibling.parentNode;
   }
 
   get previousSibling() {

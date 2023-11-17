@@ -20,7 +20,7 @@ type GlobalStore = {
     common?: boolean;
     [path: string]: string | Node | (string | Node)[] | any;
   };
-  $$__routeProvider?: Element;
+  root?: Element;
   $$__commonRouteProvider?: HTMLSpanElement;
   Store?: {
     [index: string]: WindowStoreObject;
@@ -107,21 +107,21 @@ function setAttribute(
   if (attrValue instanceof Signal) {
     callEffect(() => {
       type === 'propertyAttribute'
-        // @ts-ignore
-        ? (element[attrName] = getSignalValue(attrValue))
+        ? // @ts-ignore
+          (element[attrName] = getSignalValue(attrValue))
         : element.setAttribute(attrName, getSignalValue(attrValue));
-      }, [attrValue]);
+    }, [attrValue]);
   } else if (attrValue instanceof Store) {
     callEffect(() => {
       type === 'propertyAttribute'
-      // @ts-ignore
-      ? (element[attrName] = getStoreValue(attrValue))
-      : element.setAttribute(attrName, getStoreValue(attrValue));
+        ? // @ts-ignore
+          (element[attrName] = getStoreValue(attrValue))
+        : element.setAttribute(attrName, getStoreValue(attrValue));
     }, [attrValue]);
   } else if (checkDataType(attrValue)) {
     type === 'propertyAttribute'
-      // @ts-ignore
-      ? (element[attrName] = attrValue)
+      ? // @ts-ignore
+        (element[attrName] = attrValue)
       : element.setAttribute(attrName, attrValue as any);
   }
 }
@@ -237,13 +237,13 @@ function buildComponent(
 }
 
 function render(element: NixixNode, root: HTMLElement) {
-  addChildren((element as any), root);
+  addChildren(element as any, root);
   doBgWork(root);
 }
 
 async function doBgWork(root: Element) {
   await Promise.resolve();
-  nixixStore['$$__routeProvider'] = root;
+  nixixStore['root'] = root;
 }
 
 export default Nixix;

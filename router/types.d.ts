@@ -2,10 +2,10 @@ export {}
 declare global {
   interface Window {
     $$__routeStore: {
-      [path: any]: string | Node | (string | Node)[];
+      [path: string]: string | Node | (string | Node)[];
     }
     $$__routeProvider: Element;
     $$__commonRouteProvider: HTMLSpanElement;
   }
-  var window: Window;
+  var window: Window & typeof globalThis;
 }

@@ -1,5 +1,4 @@
 interface TBaseFragment {
-  _parentNode: Null<ParentNode>;
   _childNodes: any;
   _previousSibling: any;
   _nextSibling: any;

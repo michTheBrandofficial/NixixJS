@@ -13,7 +13,7 @@ export default function NixixHMR(projectRoot, dev) {
       if (regExp) {
         const prelude = `if (import.meta.hot) {
             import.meta.hot?.accept((newMod) => {
-              nixixStore?.$$__routeProvider?.replaceChildren('');
+              nixixStore?.root?.replaceChildren('');
               newMod?.default();
             });
           }

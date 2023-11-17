@@ -44,9 +44,9 @@ export class LiveFragment extends BaseFragment {
     this._removeChildNoFail(node);
 
     if (this.nextSibling) {
-      this._parentNode?.insertBefore(node as any, this.nextSibling);
+      this.parentNode?.insertBefore(node as any, this.nextSibling);
     } else {
-      this._parentNode?.appendChild(node as any);
+      this.parentNode?.appendChild(node as any);
     }
 
     this._childNodes.push(node);
@@ -91,7 +91,7 @@ export class LiveFragment extends BaseFragment {
       throw makeDOMException(8);
     }
 
-    this._parentNode?.insertBefore(newNode, refNode);
+    this.parentNode?.insertBefore(newNode, refNode);
     this._childNodes.splice(index, 0, newNode);
 
     return newNode;
@@ -105,7 +105,7 @@ export class LiveFragment extends BaseFragment {
       throw makeDOMException(8);
     }
 
-    this._parentNode?.removeChild(node);
+    this.parentNode?.removeChild(node);
     this._childNodes.splice(index, 1);
 
     return node;
@@ -118,7 +118,7 @@ export class LiveFragment extends BaseFragment {
       return;
     }
 
-    this._parentNode?.removeChild(node as any);
+    this.parentNode?.removeChild(node as any);
     this._childNodes.splice(index, 1);
 
     return node;
@@ -127,7 +127,7 @@ export class LiveFragment extends BaseFragment {
   /* Remove all nodes from fragment */
   empty() {
     this._childNodes.forEach((node: NodeFragment) => {
-      this._parentNode?.removeChild(node);
+      this.parentNode?.removeChild(node);
     }, this);
 
     this._childNodes = [];
