@@ -1,4 +1,5 @@
-import { addChildren, createFragmentWithChildren, createText } from 'dom/helpers';
+import { createFragmentWithChildren } from '../dom/helpers';
+import { flatten } from '../hoc/helpers';
 import {
   ButtonHTMLAttributes,
   Children,
@@ -6,11 +7,10 @@ import {
   HTMLAttributes,
   InputHTMLAttributes,
   TextareaHTMLAttributes,
-  ValueType
+  ValueType,
 } from '../types/index';
 import { removeUnusedProps } from './helpers';
 import { BaseViewComponent, ViewComponent } from './types/index';
-import { flatten } from 'hoc/helpers';
 
 /**
  * Returns a section that is a flexible box when used NixixJS is used with TailwindCSS
@@ -161,23 +161,23 @@ export const Heading = (props: HeadingProps): someView => {
 /**
  * Returns a main element
  */
-export const Main = (
-  props: BaseViewComponent
-): someView => {
+export const Main = (props: BaseViewComponent): someView => {
   const { children } = removeUnusedProps<Children>(props, 'children');
   return <main {...props}>{children}</main>;
 };
 
 type TextNodeProps<T = string | number | boolean> = {
-  children?: ValueType<T> | ValueType<T>[]
-}
+  children?: ValueType<T> | ValueType<T>[];
+};
 /**
- * Returns a textnode 
+ * Returns a textnode
  */
 export const TextNode = (props: TextNodeProps): someView => {
-  let {children} = props ? props : { children: [] };
-  return children ? (() => {
-    children = flatten(children as [])
-    return createFragmentWithChildren(children)
-  })() : []  
+  let { children } = props ? props : { children: [] };
+  return children
+    ? (() => {
+        children = flatten(children as []);
+        return createFragmentWithChildren(children as any);
+      })()
+    : [];
 };
