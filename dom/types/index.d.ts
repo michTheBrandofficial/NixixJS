@@ -22,11 +22,13 @@ interface $$__NixixStore {
   $$__routeStore?: {
     errorRoute?: string;
     provider?: LiveFragment;
-    [path: string]: string | Node | (string | Node)[] | any;
+  } & {
+    [path: string]: {
+      element: string | Node | (string | Node)[] | any;
+      protect?: () => Promise<any>;
+    };
   };
-  $$__commonRouteProvider?: HTMLSpanElement;
   Store?: {
-    // @ts-expect-error
     [index: string]: WindowStoreObject;
   };
   SignalStore?: {
@@ -36,13 +38,7 @@ interface $$__NixixStore {
     };
   };
   storeCount?: number;
-  diffStore?: (id: number) => void;
   signalCount?: number;
-  diffSignal?: (id: number) => void;
-  $$__For?: {
-    [id: string]: string[] | Element[] | JSX.Element[];
-  };
-
   refCount?: number;
 }
 

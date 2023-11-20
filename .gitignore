@@ -8,3 +8,4 @@ esbuild.config.js
 out.js
 *.html
 vite.config.js
+package.schema.json

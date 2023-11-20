@@ -20,12 +20,12 @@ declare namespace Nixix {
   const Fragment: 'fragment';
 
   type EmptyObject = {
-    [index: string | number | symbol]: any
-  }
+    [index: string | number | symbol]: any;
+  };
 
   type Children<T = NixixNode> = {
-    children?: T  
-  }
+    children?: T;
+  };
 
   type Component = <T>(props?: T) => someView;
 
@@ -1331,11 +1331,19 @@ declare namespace Nixix {
   > {
     key?: number;
   }
+
+  namespace JSX {
+    type ElementType = GlobalJSXElementType;
+    interface Element extends GlobalJSXElement {}
+    interface IntrinsicAttributes extends GlobalJSXIntrinsicAttributes {}
+    interface IntrinsicElements extends GlobalJSXIntrinsicElements {}
+    interface ElementChildrenAttribute
+      extends GlobalJSXElementChildrenAttribute {}
+  }
 }
 
 declare global {
   type someView = JSX.ElementType;
-
   namespace JSX {
     type ElementType =
       | string
@@ -1543,3 +1551,10 @@ declare global {
     interface IntrinsicElements extends HTMLElementTags, SVGElementTags {}
   }
 }
+
+type GlobalJSXElementType = JSX.ElementType;
+interface GlobalJSXElement extends JSX.Element {}
+interface GlobalJSXElementChildrenAttribute
+  extends JSX.ElementChildrenAttribute {}
+interface GlobalJSXIntrinsicAttributes extends JSX.IntrinsicAttributes {}
+interface GlobalJSXIntrinsicElements extends JSX.IntrinsicElements {}
