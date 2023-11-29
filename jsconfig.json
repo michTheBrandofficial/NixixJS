@@ -6,7 +6,7 @@
     "jsx": "react-jsxdev",
     "strict": true,
     "jsxImportSource": "types",
-    "types": ["./types"],
+    "types": ["./types", "@remix-run/router"],
     "moduleResolution": "node",
     "skipLibCheck": false
   },

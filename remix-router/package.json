@@ -1,6 +1,5 @@
 {
-  "$schema": "../package.schema.json",
-  "name": "nixix/router",
+  "name": "nixix/remix-router",
   "main": "./index.ts",
   "type": "module",
   "scripts": {

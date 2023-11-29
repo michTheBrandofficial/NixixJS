@@ -19,6 +19,7 @@
   "author": "Charles Ikechukwu",
   "license": "MIT",
   "dependencies": {
+    "@remix-run/router": "^1.12.0",
     "csstype": "latest",
     "vite": "latest",
     "vite-jsconfig-paths": "latest"
