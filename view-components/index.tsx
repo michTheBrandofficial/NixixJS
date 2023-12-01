@@ -13,7 +13,7 @@ import { removeUnusedProps } from './helpers';
 import { BaseViewComponent, ViewComponent } from './types/index';
 
 /**
- * Returns a section that is a flexible box when used NixixJS is used with TailwindCSS
+ * Returns a section that is a flexible box when NixixJS is used with TailwindCSS
  */
 export const HStack = (props: BaseViewComponent): someView => {
   const { children } = removeUnusedProps<Children>(props, 'children');
