@@ -10,23 +10,34 @@ declare const Nixix: {
     ...children: (string | Node)[]
   ) => Element;
 };
+
+type RenderConfig = {
+  commentForLF: boolean
+}
 /**
  * render function
  * @param element JSX.Element to render
  * @param root element which element will be appended to
  */
-export function render(element: JSX.Element, root: HTMLElement): void;
+export function render(element: JSX.Element, root: HTMLElement, {
+  commentForLF
+}?: RenderConfig): void;
+
+type RouteType = {
+  element?: any;
+  path?: `/${string}`
+}
 
 interface $$__NixixStore {
   $$__lastReactionProvider?: 'signal' | 'store';
+  commentForLF: boolean;
   $$__routeStore?: {
-    errorRoute?: string;
+    errorRoute?: RouteType;
     provider?: LiveFragment;
-  } & {
-    [path: string]: {
-      element: string | Node | (string | Node)[] | any;
-      protect?: () => Promise<any>;
+    routeMatch?: {
+      route: RouteType
     };
+    currentRoute?: RouteType;
   };
   Store?: {
     [index: string]: WindowStoreObject;

@@ -1,4 +1,5 @@
-import { createFragment } from '../dom/helpers';
+import { nixixStore } from '../dom';
+import { createFragment, createText } from '../dom/helpers';
 import { LiveFragment } from '../live-fragment/types';
 
 export function comment(str: string) {
@@ -9,14 +10,24 @@ export function indexes(arr: Array<any>) {
   return [arr[0], arr[arr.length - 1]];
 }
 
+export function boundary(commentName?: 'suspense' | 'for' | 'show') {
+  const { commentForLF } = nixixStore;
+  return commentForLF ? comment(`nixix-${commentName}`) : createText('');
+}
+
+export function compFallback() {
+  const { commentForLF } = nixixStore;
+  return commentForLF ? comment('nixix-fallback') : createText('')
+}
+
 export function createBoundary(
   values: any,
   commentName: 'suspense' | 'for' | 'show'
 ): DocumentFragment {
   return createFragment([
-    comment(`nixix-${commentName}`),
+    boundary(commentName),
     values,
-    comment(`nixix-${commentName}`),
+    boundary(commentName),
   ]);
 }
 

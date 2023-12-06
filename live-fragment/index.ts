@@ -126,11 +126,13 @@ export class LiveFragment extends BaseFragment {
 
   /* Remove all nodes from fragment */
   empty() {
+    const oldNodes: NodeFragment[] = [];
     this._childNodes.forEach((node: NodeFragment) => {
-      this.parentNode?.contains(node) && this.parentNode?.removeChild(node);
+      this.parentNode?.contains(node) && (this.parentNode?.removeChild(node), oldNodes.push(node));
     }, this);
 
     this._childNodes = [];
+    return oldNodes;
   }
 
   /* Empty LiveFragment and return a DocumentFragment with all nodes.
@@ -166,9 +168,9 @@ export class LiveFragment extends BaseFragment {
     }
 
     this.parentNode?.insertBefore(node, this.nextSibling);
-    this.empty();
-
+    const oldChildren = this.empty();
     this._childNodes = newChildren;
+    return oldChildren
   }
 
   /* Check for child existence */

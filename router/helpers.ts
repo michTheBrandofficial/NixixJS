@@ -5,13 +5,33 @@ export function getWinPath() {
   return window.location.pathname;
 }
 
+export function len(val:string | Array<any>) {
+  return val.length;
+}
+
+export function trimTrailingSlash(str:string) {
+  return (str) ? (
+    str.endsWith('/') ? str.slice(0, len(str) - 1) : str
+  ) : ''
+}
+
+export function startsWithSlash(path?: string) {
+  if (!path) return '';
+  switch (path?.startsWith('/')) {
+    case true:
+      return path;
+    case false:
+      return `/${path}`;
+  }
+}
+
 export function pushState(path?: string) {
   window.history.pushState({}, '', path);
 }
 
 export function changeRouteComment(path: string, ...comments: Comment[]) {
   comments.forEach((c) => {
-    c.textContent = `route-${path}`;
+    c.textContent = `${path}`;
   });
 }
 
@@ -28,6 +48,15 @@ export function getLink(link: string | Store | Signal): string {
     default:
       return link as any;
   }
+}
+
+type ForEachParams<T> = Parameters<Array<T>['forEach']>;
+
+/**
+ * Returns void, to be used when you want to mutate some outside code in an array
+ */
+export function forEach<T>(arr:Array<T>, cb: ForEachParams<T>[0], thisArg?: ForEachParams<T>[1]) {
+  arr.forEach(cb, thisArg)
 }
 
 export function routePromise(path: string) {

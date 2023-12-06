@@ -20,11 +20,10 @@ export default function NixixHMR(
       if (regExp) {
         const prelude = `if (import.meta.hot) {
             import.meta.hot?.accept((newMod) => {
-              nixixStore?.root?.replaceChildren('');
-              newMod?.default();
+              $$cleanupNixixRuntime(newMod)
             });
           }
-          import { nixixStore } from '${dev ? 'dom' : 'nixix/dom/index'}';`;
+          import { $$cleanupNixixRuntime } from '${dev ? 'vite-plugin/cleanupRuntime' : 'nixix/vite-plugin/cleanupRuntime'}';`;
         return {
           code: `${prelude}${code}`,
         };

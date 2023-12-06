@@ -2,16 +2,23 @@ import { nixixStore } from "../dom";
 import { createFragment } from "../dom/helpers";
 import { LiveFragment } from "../live-fragment";
 import { callReaction, Store } from "../primitives";
-import { comment, arrayOfJSX, createBoundary, removeNodes, numArray, getIncrementalNodes } from "./helpers";
+import {
+  arrayOfJSX,
+  createBoundary,
+  removeNodes,
+  numArray,
+  getIncrementalNodes,
+  compFallback,
+} from "./helpers";
 
 export function For(props: ForProps) {
   let { fallback, children, each } = props;
   let [callback] = children!;
-  fallback = fallback || (comment('nixix-fallback') as any);
+  fallback = fallback || (compFallback() as any);
   children = arrayOfJSX(each, callback);
   const commentBoundary = createBoundary(
     children.length > 0 ? children : fallback,
-    'for'
+    "for"
   );
   let liveFragment: LiveFragment = new LiveFragment(
     commentBoundary.firstChild!,

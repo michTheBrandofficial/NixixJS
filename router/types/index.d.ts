@@ -7,12 +7,23 @@ import {
   ValueType,
 } from '../../types';
 
-interface LoaderFunction {
-  (config?: any): Promise<any>;
+export interface LoaderProps {
+  params: {
+    [id: string]: string;
+  }
+  /**
+   * Experimental *use at your own risk*
+   */
+  request: Request;
 }
 
-interface ActionFunction {
-  (config?: any): Promise<any>;
+
+export interface LoaderFunction {
+  (config: LoaderProps): Promise<any>;
+}
+
+export interface ActionFunction {
+  (config: any): Promise<any>;
 }
 
 export type RoutePath = string;
@@ -52,4 +63,6 @@ declare const Router: RouteExoticComponent<{
   push: <P extends PathToRoute>(path: P) => void;
 }>;
 
-export { Link, Routes, Route, Outlet, Router };
+declare const callRouter: () => { router: typeof Router; };
+
+export { Link, Routes, Route, Outlet, Router, callRouter };

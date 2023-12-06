@@ -1,24 +1,29 @@
+import { createFragment } from '../dom/helpers';
 import { nixixStore } from '../dom';
 import { getWinPath, changeRouteComment } from './helpers';
 
 export function handleLocation() {
   const path = getWinPath();
   const {
-    $$__routeStore: { provider, ...rest },
+    $$__routeStore: { provider, routeMatch },
+    commentForLF
   } = nixixStore as Required<typeof nixixStore>;
-  const route = rest![path];
-  switch (route.element) {
+  
+  const route = routeMatch!.route;
+  const element = route.element;
+  switch (element) {
     case null:
     case undefined:
       break;
     default:
-      changeRouteComment(
+      if (nixixStore.$$__routeStore?.currentRoute === route) return;
+      nixixStore.$$__routeStore!.currentRoute!.element = createFragment(provider?.replace(element));
+      nixixStore.$$__routeStore!.currentRoute! = route;
+      commentForLF && changeRouteComment(
         path,
         provider?.previousSibling,
         provider?.nextSibling
       );
-
-      provider?.replace(route.element);
       break;
   }
 }

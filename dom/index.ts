@@ -1,5 +1,5 @@
-import { callEffect } from '../primitives/index';
-import { Signal, Store } from '../primitives/classes';
+import { callEffect } from "../primitives/index";
+import { Signal, Store } from "../primitives/classes";
 import {
   raise,
   addChildren,
@@ -8,11 +8,13 @@ import {
   getStoreValue,
   getSignalValue,
   checkDataType,
-} from './helpers';
-import { PROP_ALIASES, SVG_ELEMENTTAGS, SVG_NAMESPACE } from './utilVars';
+} from "./helpers";
+import { PROP_ALIASES, SVG_ELEMENTTAGS, SVG_NAMESPACE } from "./utilVars";
+import { agnosticRouteObjects } from "router/utils";
 
 type GlobalStore = {
-  $$__lastReactionProvider?: 'signal' | 'store';
+  $$__lastReactionProvider?: "signal" | "store";
+  commentForLF: boolean;
   $$__routeStore?: {
     errorPage?: {
       errorRoute: string;
@@ -43,7 +45,9 @@ type GlobalStore = {
 };
 
 // Global store for the store class and signals.
-window['$$__NixixStore'] = {};
+window["$$__NixixStore"] = {
+  commentForLF: false,
+};
 export const nixixStore = window.$$__NixixStore as GlobalStore;
 
 const Nixix = {
@@ -52,8 +56,8 @@ const Nixix = {
     props: Proptype,
     ...children: ChildrenType
   ): Element | Array<Element | string | Signal> | undefined {
-    if (typeof tagNameFC === 'string') {
-      if (tagNameFC === 'fragment') {
+    if (typeof tagNameFC === "string") {
+      if (tagNameFC === "fragment") {
         if (children !== null) return children;
         return [];
       } else {
@@ -74,7 +78,7 @@ const Nixix = {
     attrValue,
   }: DynamicAttrType) => {
     const attrSuffix = attrName.slice(attrPrefix.length);
-    const newAttrName = `${attrPrefix.replace(':', '-')}${attrSuffix}`;
+    const newAttrName = `${attrPrefix.replace(":", "-")}${attrSuffix}`;
     setAttribute(element, newAttrName, attrValue);
   },
 };
@@ -106,20 +110,20 @@ function setAttribute(
     );
   if (attrValue instanceof Signal) {
     callEffect(() => {
-      type === 'propertyAttribute'
+      type === "propertyAttribute"
         ? // @ts-ignore
           (element[attrName] = getSignalValue(attrValue))
         : element.setAttribute(attrName, getSignalValue(attrValue));
     }, [attrValue]);
   } else if (attrValue instanceof Store) {
     callEffect(() => {
-      type === 'propertyAttribute'
+      type === "propertyAttribute"
         ? // @ts-ignore
           (element[attrName] = getStoreValue(attrValue))
         : element.setAttribute(attrName, getStoreValue(attrValue));
     }, [attrValue]);
   } else if (checkDataType(attrValue)) {
-    type === 'propertyAttribute'
+    type === "propertyAttribute"
       ? // @ts-ignore
         (element[attrName] = attrValue)
       : element.setAttribute(attrName, attrValue as any);
@@ -134,7 +138,7 @@ function setStyle(element: NixixElementType, styleValue: StyleValueType) {
   const cssStyleProperties = entries(styleValue) as [string, ValueType][];
   for (let [property, value] of cssStyleProperties) {
     // typed as display to remove the ts error
-    let styleKey = property as 'display';
+    let styleKey = property as "display";
     if (isNull(value)) {
       warn(
         `The ${styleKey} CSS property cannot be null or undefined. Skipping CSS property parsing.`
@@ -144,14 +148,14 @@ function setStyle(element: NixixElementType, styleValue: StyleValueType) {
 
     if (value instanceof Signal) {
       callEffect(() => {
-        element['style'][styleKey] = getSignalValue(value as Signal);
+        element["style"][styleKey] = getSignalValue(value as Signal);
       }, [value]);
     } else if (value instanceof Store) {
       callEffect(() => {
-        element['style'][styleKey] = getStoreValue(value as Store);
+        element["style"][styleKey] = getStoreValue(value as Store);
       }, [value]);
     } else {
-      element['style'][styleKey] = value as string;
+      element["style"][styleKey] = value as string;
     }
   }
 }
@@ -161,16 +165,16 @@ function setProps(props: Proptype | null, element: NixixElementType) {
     props = Object.entries(props);
     for (const [k, v] of props as [string, StyleValueType | ValueType][]) {
       if (k in PROP_ALIASES) {
-        const mayBeClass = PROP_ALIASES[k]['$'];
+        const mayBeClass = PROP_ALIASES[k]["$"];
         setAttribute(
           element,
-          mayBeClass === 'className' ? 'class' : mayBeClass,
+          mayBeClass === "className" ? "class" : mayBeClass,
           v as ValueType,
-          mayBeClass === 'className' ? 'regularAttribute' : 'propertyAttribute'
+          mayBeClass === "className" ? "regularAttribute" : "propertyAttribute"
         );
-      } else if (k === 'style') {
+      } else if (k === "style") {
         setStyle(element, v as unknown as StyleValueType);
-      } else if (k.startsWith('on:')) {
+      } else if (k.startsWith("on:")) {
         if (isNull(v))
           return warn(
             `The ${k} prop cannot be null or undefined. Skipping prop parsing`
@@ -178,21 +182,21 @@ function setProps(props: Proptype | null, element: NixixElementType) {
         isReactiveValue(v as any, k);
         const domAttribute = k.slice(3);
         element.addEventListener(domAttribute, v as any);
-      } else if (k.startsWith('aria:')) {
+      } else if (k.startsWith("aria:")) {
         Nixix.handleDynamicAttrs({
           element,
-          attrPrefix: 'aria:',
+          attrPrefix: "aria:",
           attrName: k,
           attrValue: v as ValueType,
         });
-      } else if (k.startsWith('stroke:')) {
+      } else if (k.startsWith("stroke:")) {
         Nixix.handleDynamicAttrs({
           element,
-          attrPrefix: 'stroke:',
+          attrPrefix: "stroke:",
           attrName: k,
           attrValue: v as ValueType,
         });
-      } else if (k.startsWith('bind:')) {
+      } else if (k.startsWith("bind:")) {
         if (isNull(v))
           return raise(
             `The ${k} directive value cannot be null or undefined. Skipping directive parsing`
@@ -221,7 +225,7 @@ function buildComponent(
   props: Proptype,
   children: ChildrenType
 ) {
-  if (typeof tagNameFC === 'function') {
+  if (typeof tagNameFC === "function") {
     if (props != null && props != undefined) {
       if (children.length !== 0) {
         props.children = children;
@@ -236,14 +240,16 @@ function buildComponent(
   }
 }
 
-function render(element: NixixNode, root: HTMLElement) {
+function render(
+  element: NixixNode,
+  root: HTMLElement,
+  config: {
+    commentForLF: boolean;
+  } = { commentForLF: true }
+) {
+  nixixStore.commentForLF = config.commentForLF; 
+  nixixStore["root"] = root;
   addChildren(element as any, root);
-  doBgWork(root);
-}
-
-async function doBgWork(root: Element) {
-  await Promise.resolve();
-  nixixStore['root'] = root;
 }
 
 export default Nixix;

@@ -54,7 +54,7 @@ export declare class LiveFragment extends BaseFragment {
   append(node: NodeFragment): void;
   before(node: NodeFragment): void;
   after(node: NodeFragment): void;
-  replace(node: NodeFragment): void;
+  replace(node: NodeFragment): NodeFragment[];
   remove(): void;
   contains(node: TBaseFragment): boolean;
 }

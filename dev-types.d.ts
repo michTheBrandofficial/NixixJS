@@ -41,6 +41,7 @@ declare global {
   interface Window {
     $$__NixixStore?: {
       $$__lastReactionProvider?: 'signal' | 'store';
+      commentForLF: boolean;
       $$__routeStore?: {
         errorPage?: {
           errorRoute: string;
@@ -48,8 +49,6 @@ declare global {
         common?: boolean;
         [path: string]: string | Node | (string | Node)[] | any;
       };
-      $$__routeProvider?: Element;
-      $$__commonRouteProvider?: HTMLSpanElement;
       Store?: {
         [index: string]: WindowStoreObject;
       };
@@ -60,13 +59,7 @@ declare global {
         };
       };
       storeCount?: number;
-      diffStore?: (id: number) => void;
       signalCount?: number;
-      diffSignal?: (id: number) => void;
-      $$__For?: {
-        [id: string]: string[] | Element[] | JSX.Element[];
-      };
-
       refCount?: number;
     };
   }
