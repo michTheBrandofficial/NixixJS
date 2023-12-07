@@ -39,8 +39,11 @@ export const Router = {
   },
 };
 
-export const callRouter = () => {
-  return {
-    router: Router
-  };
+export const redirect = (path: `/${string}`) => {
+  typeof path === "string" && (nixixStore.$$__routeStore!.redirect = path);
+  return;
+};
+
+export const navigate = (path: `/${string}`) => {
+  Router.push(path);
 };

@@ -1,7 +1,7 @@
-import Nixix from '../dom';
-import { AnchorHTMLAttributes } from '../types';
-import { type MouseEvent } from '../types/eventhandlers';
-import { Router } from './Router';
+import Nixix from "../dom";
+import { AnchorHTMLAttributes } from "../types";
+import { type MouseEvent } from "../types/eventhandlers";
+import { navigate } from "./Router";
 
 const { create } = Nixix;
 
@@ -12,13 +12,13 @@ type LinkProps = {
 export function Link(props: LinkProps) {
   const { children, to, ...rest } = props;
   function changeLocation(event: MouseEvent<HTMLAnchorElement>) {
-    rest?.['on:click']?.(event);
+    rest?.["on:click"]?.(event);
     event.preventDefault();
-    Router.push(to);
+    navigate(to as any);
   }
   return create(
-    'a',
-    { ...rest, href: to || '/', 'on:click': changeLocation },
+    "a",
+    { ...rest, href: to || "/", "on:click": changeLocation },
     children
   );
 }

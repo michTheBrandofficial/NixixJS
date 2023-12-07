@@ -37,6 +37,7 @@ interface $$__NixixStore {
     routeMatch?: {
       route: RouteType
     };
+    redirect?: string | null;
     currentRoute?: RouteType;
   };
   Store?: {

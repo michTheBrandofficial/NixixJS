@@ -1,4 +1,3 @@
-import { matchRoutes } from "@remix-run/router";
 import { raise } from "../dom/helpers";
 import { RouteStoreType, createBrowserRouter } from "./createRoute";
 import {
@@ -9,9 +8,8 @@ import {
   trimTrailingSlash,
 } from "./helpers";
 import { agnosticRouteObjects } from "./utils";
-import { Router } from "./Router";
+import { navigate } from "./Router";
 import type { LoaderFunction, ActionFunction } from "./types/index";
-import changeRouteMatches from "./routeMatches";
 
 type AgnosticRouteProps = {
   element: JSX.Element;
@@ -22,7 +20,7 @@ type AgnosticRouteProps = {
 };
 
 export function popHandler() {
-  Router.push(getWinPath());
+  navigate(getWinPath() as `/${string}`);
 }
 
 type BuildRouteConfig = {
@@ -68,25 +66,18 @@ export function Routes(props: RoutesProps) {
   const { children } = props;
   const routes: RouteStoreType = {
     routeMatch: {} as any,
-    // current route will be the route that get first and changes when we switch routes successfully
+    // current route will be the route that we get first and changes when we switch routes successfully
     currentRoute: {},
   };
   buildRoutes({ children, routes });
-  let routeMatches = changeRouteMatches(
-    matchRoutes(agnosticRouteObjects as any, {
-      pathname: getWinPath(),
-    })
-  );
 
   return createBrowserRouter({
     routes,
-    routeMatches,
-    popHandler,
   });
 }
 
 type RouteProps = AgnosticRouteProps & { children?: AgnosticRouteProps };
 export function Route(props: RouteProps) {
   if (!props) raise(`No props were passed to the Route component`);
-  return props;
+  else return props;
 }

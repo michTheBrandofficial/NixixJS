@@ -14,5 +14,8 @@ export async function callLoader({
     params: params || {},
     request: new Request(getWinPath()),
   } as LoaderProps;
-  const val = await (route?.loader as LoaderFunction)?.(loaderArgs);
+  // do something with the data here;
+  const val =
+    (await (route?.loader as LoaderFunction)?.(loaderArgs)) ||
+    (async () => {})();
 }

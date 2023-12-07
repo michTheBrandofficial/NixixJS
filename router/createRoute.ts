@@ -1,13 +1,10 @@
-import type {
-  AgnosticRouteMatch,
-  AgnosticRouteObject,
-} from "@remix-run/router";
 import { nixixStore } from "../dom";
-import { createFragment, createText, warn } from "../dom/helpers";
+import { createFragment, createText } from "../dom/helpers";
 import { comment } from "../hoc/helpers";
 import { LiveFragment } from "../live-fragment";
-import { handleLocation } from "./handleLoc";
-import { isNull } from "./helpers";
+import { getWinPath } from "./helpers";
+import { effect } from "../primitives";
+import { navigate } from "./Router";
 
 export type RouteStoreType = typeof nixixStore.$$__routeStore;
 
@@ -18,17 +15,16 @@ export function boundary(path?: `/${string}`) {
   return commentForLF ? comment(`${path}`) : createText("");
 }
 
-export function createRouteBoundary({ element, path }: RouteObject) {
+export function createRouteBoundary() {
   const routeBoundary = createFragment([
-    boundary(path),
-    element,
-    boundary(path),
+    boundary(),
+    boundary(),
   ]);
   return routeBoundary;
 }
 
-export function createRouteLF(routes: RouteStoreType, thisRoute: RouteObject) {
-  const routeBoundary = createRouteBoundary(thisRoute as any);
+export function createRouteLF(routes: RouteStoreType, thisRoute?: RouteObject) {
+  const routeBoundary = createRouteBoundary();
   routes!.provider = new LiveFragment(
     routeBoundary.firstChild!,
     routeBoundary.lastChild!
@@ -36,40 +32,17 @@ export function createRouteLF(routes: RouteStoreType, thisRoute: RouteObject) {
   return routeBoundary;
 }
 
-export function redirect(path: `/${string}`) {
-  // check for the path;
-  // run the browser router config again;
+export function popHandler() {
+  navigate(getWinPath() as `/${string}`);
 }
 
 export type BrowserRouterConfig = {
   routes: RouteStoreType;
-  routeMatches: any;
-  popHandler: typeof handleLocation;
 };
 export function createBrowserRouter(config: BrowserRouterConfig) {
-  const { routes, popHandler, routeMatches } = config;
+  const { routes } = config;
   nixixStore.$$__routeStore = routes;
   window.onpopstate = popHandler;
-  /**
-   * route precedence
-   * window path - 0;
-   * callback() -> path - 1;
-   * errorPage - 2
-   */
-  switch (true) {
-    case routeMatches instanceof Array:
-      const routeMatch: AgnosticRouteMatch<string, AgnosticRouteObject> =
-        routeMatches[routeMatches.length - 1];
-      if (!routeMatch) return [];
-      routes!.currentRoute = routeMatch.route as any;
-      return createRouteLF(routes, routeMatch.route as any);
-    case isNull(routeMatches):
-      const errorRoute = routes?.errorRoute!;
-      if (isNull(errorRoute)) {
-        warn(`Specify an not found route in your Routes component`);
-        return [];
-      }
-      routes!.currentRoute = errorRoute;
-      return createRouteLF(routes, errorRoute as any);
-  }
+  effect(popHandler, "once");
+  return createRouteLF(routes);
 }

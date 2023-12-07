@@ -1,22 +1,20 @@
 import {
   AnchorHTMLAttributes,
   ExoticComponent,
-  HTMLAttributes,
   NixixNode,
   RouteExoticComponent,
   ValueType,
-} from '../../types';
+} from "../../types";
 
 export interface LoaderProps {
   params: {
     [id: string]: string;
-  }
+  };
   /**
    * Experimental *use at your own risk*
    */
   request: Request;
 }
-
 
 export interface LoaderFunction {
   (config: LoaderProps): Promise<any>;
@@ -47,7 +45,6 @@ declare const Routes: ExoticComponent<{
   children?: NixixNode;
 }>;
 declare const Route: <T extends PathToRoute>(props: RouteConfig<T>) => someView;
-declare const Outlet: (props?: HTMLAttributes<HTMLSpanElement>) => someView;
 /**
  * ```jsx
  *  Should be used to programmatically switch routes.
@@ -63,6 +60,25 @@ declare const Router: RouteExoticComponent<{
   push: <P extends PathToRoute>(path: P) => void;
 }>;
 
-declare const callRouter: () => { router: typeof Router; };
+/**
+ * To be used to navigate the pages
+ */
+declare const navigate: (path: PathToRoute) => void;
 
-export { Link, Routes, Route, Outlet, Router, callRouter };
+/**
+ * To be used within a loader context to redirect to new pages
+ * ```jsx
+ *  <Route 
+ *    path='/products' 
+ *    loader={async () => {
+ *      // CAN BE USED TO PROTECTED ROUTES
+ *     // DO SOME AUTHENTICATION HERE
+ *     redirect('/sign-in')
+ *    }} 
+ *    element={<Products />}>
+ *  </Route>
+ * ```
+ */
+declare const redirect: (path: PathToRoute) => void;
+
+export { Link, Routes, Route, Router, navigate, redirect };
