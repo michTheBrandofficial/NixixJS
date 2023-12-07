@@ -1,19 +1,22 @@
 import {
   AnchorHTMLAttributes,
+  EmptyObject,
   ExoticComponent,
+  FormHTMLAttributes,
   NixixNode,
   RouteExoticComponent,
   ValueType,
 } from "../../types";
 
 export interface LoaderProps {
-  params: {
-    [id: string]: string;
-  };
+  params: EmptyObject<string>
   /**
    * Experimental *use at your own risk*
    */
   request: Request;
+}
+
+export interface ActionProps extends LoaderProps {
 }
 
 export interface LoaderFunction {
@@ -21,7 +24,7 @@ export interface LoaderFunction {
 }
 
 export interface ActionFunction {
-  (config: any): Promise<any>;
+  (config: ActionProps): Promise<any>;
 }
 
 export type RoutePath = string;
@@ -39,12 +42,18 @@ export interface RouteConfig<T extends string> {
   action?: ActionFunction;
 }
 
+export type FormActionProps = {
+  action: `/${string}`,
+  method: 'put' | 'post' | 'delete' | 'patch'
+} & FormHTMLAttributes<HTMLFormElement>
+
 export type PathToRoute = `/${string}`;
 declare const Link: <T extends PathToRoute>(props: RouteLink<T>) => JSX.Element;
 declare const Routes: ExoticComponent<{
   children?: NixixNode;
 }>;
 declare const Route: <T extends PathToRoute>(props: RouteConfig<T>) => someView;
+declare const Form: (props: FormActionProps) => someView;
 /**
  * ```jsx
  *  Should be used to programmatically switch routes.
@@ -81,4 +90,4 @@ declare const navigate: (path: PathToRoute) => void;
  */
 declare const redirect: (path: PathToRoute) => void;
 
-export { Link, Routes, Route, Router, navigate, redirect };
+export { Link, Routes, Route, Form, Router, navigate, redirect };

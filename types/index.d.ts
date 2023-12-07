@@ -19,8 +19,8 @@ declare namespace Nixix {
    */
   const Fragment: 'fragment';
 
-  type EmptyObject = {
-    [index: string | number | symbol]: any;
+  type EmptyObject<T = any> = {
+    [index: string | number | symbol]: T;
   };
 
   type Children<T = NixixNode> = {

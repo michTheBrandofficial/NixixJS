@@ -16,7 +16,6 @@ export const Router = {
     const routeMatches = matchRoutes(agnosticRouteObjects, {
       pathname: path,
     })!;
-    // this function works with handleLocation
     switch (true) {
       case routeMatches instanceof Array:
         const routeMatch: AgnosticRouteMatch<string, AgnosticRouteObject> =

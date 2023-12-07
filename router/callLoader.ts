@@ -18,4 +18,5 @@ export async function callLoader({
   const val =
     (await (route?.loader as LoaderFunction)?.(loaderArgs)) ||
     (async () => {})();
+  return val;
 }
