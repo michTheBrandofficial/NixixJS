@@ -49,6 +49,9 @@ export function callSignal<S>(
   }
 ): [SignalObject<S>, SetSignalDispatcher<S>];
 
+export const signal: typeof callSignal;
+export const store: typeof callStore;
+
 /**
  * Returns a tuple of the initial value and a setter function to update the values.
  *

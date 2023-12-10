@@ -291,9 +291,15 @@ function removeSignal(
     : dispatchSignalRemoval(signals);
 }
 
+// This is only for simplicity
+const signal = callSignal;
+const store = callStore;
+
 export {
   callRef,
   callSignal,
+  signal,
+  store,
   callStore,
   memo,
   getValueType,
