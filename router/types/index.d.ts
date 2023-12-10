@@ -7,25 +7,23 @@ import {
   RouteExoticComponent,
   ValueType,
 } from "../../types";
+import { MemoSignal, MemoStore } from "../../primitives/types";
 
 export interface LoaderProps {
-  params: EmptyObject<string>
+  params: EmptyObject<string>;
   /**
    * Experimental *use at your own risk*
    */
   request: Request;
 }
 
-export interface ActionProps extends LoaderProps {
-}
+export interface ActionProps extends LoaderProps {}
 
 export interface LoaderFunction {
   (config: LoaderProps): Promise<any>;
 }
 
-export interface ActionFunction {
-  (config: ActionProps): Promise<any>;
-}
+export type ActionFunction <T> = (config: ActionProps) => T;
 
 export type RoutePath = string;
 export interface RouteLink<T extends string>
@@ -39,13 +37,13 @@ export interface RouteConfig<T extends string> {
   path?: T;
   errorRoute?: boolean;
   loader?: LoaderFunction;
-  action?: ActionFunction;
+  action?: ActionFunction<Promise<object>>;
 }
 
 export type FormActionProps = {
-  action: `/${string}`,
-  method: 'put' | 'post' | 'delete' | 'patch'
-} & FormHTMLAttributes<HTMLFormElement>
+  action: `/${string}`;
+  method: "put" | "post" | "delete" | "patch";
+} & FormHTMLAttributes<HTMLFormElement>;
 
 export type PathToRoute = `/${string}`;
 declare const Link: <T extends PathToRoute>(props: RouteLink<T>) => JSX.Element;
@@ -69,25 +67,34 @@ declare const Router: RouteExoticComponent<{
   push: <P extends PathToRoute>(path: P) => void;
 }>;
 
+type PathFunction<T> = (path: PathToRoute) => T;
+
 /**
  * To be used to navigate the pages
  */
-declare const navigate: (path: PathToRoute) => void;
+declare const navigate: PathFunction<void>;
 
 /**
  * To be used within a loader context to redirect to new pages
  * ```jsx
- *  <Route 
- *    path='/products' 
+ *  <Route
+ *    path='/products'
  *    loader={async () => {
  *      // CAN BE USED TO PROTECTED ROUTES
  *     // DO SOME AUTHENTICATION HERE
  *     redirect('/sign-in')
- *    }} 
+ *    }}
  *    element={<Products />}>
  *  </Route>
  * ```
  */
-declare const redirect: (path: PathToRoute) => void;
+declare const redirect: PathFunction<void>;
 
-export { Link, Routes, Route, Form, Router, navigate, redirect };
+declare const changeTitle: (title: string) => void;
+
+declare function actionData<T extends any[] | object>(
+  path: PathToRoute,
+  value: T
+): MemoStore<T>;
+
+export { Link, Routes, Route, Form, Router, navigate, redirect, changeTitle, actionData };

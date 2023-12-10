@@ -10,17 +10,25 @@ import {
 import { agnosticRouteObjects } from "./utils";
 import { navigate } from "./Router";
 import type { LoaderFunction, ActionFunction } from "./types/index";
+import type { EmptyObject } from "../types";
+import { callStore } from "../primitives";
 
 type AgnosticRouteProps = {
   element: JSX.Element;
   path: string;
   errorRoute?: boolean;
-  action?: ActionFunction;
+  action?: ActionFunction<Promise<any>>;
   loader?: LoaderFunction;
 };
 
 export function popHandler() {
   navigate(getWinPath() as `/${string}`);
+}
+
+export function configLoaderAndAction({ route }: { route: EmptyObject }) {
+  if (route.action) {
+    route.actionSignal = callStore({});
+  }
 }
 
 type BuildRouteConfig = {
@@ -45,7 +53,7 @@ export function buildRoutes(config: BuildRouteConfig) {
       loader: child.loader,
       action: child.action,
     };
-
+    configLoaderAndAction({ route });
     isNull(child.errorRoute) === false &&
       (config.routes!["errorRoute"] = route);
     agnosticRouteObjects.push(route);

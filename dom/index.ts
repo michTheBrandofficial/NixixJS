@@ -10,7 +10,6 @@ import {
   checkDataType,
 } from "./helpers";
 import { PROP_ALIASES, SVG_ELEMENTTAGS, SVG_NAMESPACE } from "./utilVars";
-import { agnosticRouteObjects } from "router/utils";
 
 type GlobalStore = {
   $$__lastReactionProvider?: "signal" | "store";
@@ -19,11 +18,9 @@ type GlobalStore = {
     errorPage?: {
       errorRoute: string;
     };
-    common?: boolean;
     [path: string]: string | Node | (string | Node)[] | any;
   };
   root?: Element;
-  $$__commonRouteProvider?: HTMLSpanElement;
   Store?: {
     [index: string]: WindowStoreObject;
   };
@@ -34,13 +31,7 @@ type GlobalStore = {
     };
   };
   storeCount?: number;
-  diffStore?: (id: number) => void;
   signalCount?: number;
-  diffSignal?: (id: number) => void;
-  $$__For?: {
-    [id: string]: string[] | Element[] | JSX.Element[];
-  };
-
   refCount?: number;
 };
 
@@ -247,7 +238,7 @@ function render(
     commentForLF: boolean;
   } = { commentForLF: true }
 ) {
-  nixixStore.commentForLF = config.commentForLF; 
+  nixixStore.commentForLF = config.commentForLF;
   nixixStore["root"] = root;
   addChildren(element as any, root);
 }

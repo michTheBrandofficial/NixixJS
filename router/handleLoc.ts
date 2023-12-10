@@ -34,3 +34,7 @@ export function switchRoutes({ provider, routeMatch }: EmptyObject) {
       break;
   }
 }
+
+export function changeTitle(title:string) {
+  document.title = title;
+}

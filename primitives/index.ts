@@ -1,24 +1,23 @@
-import { Signal, Store } from './classes';
-import { nixixStore } from '../dom';
+import { Signal, Store } from "./classes";
+import { nixixStore } from "../dom";
 import {
   incrementId,
   checkType,
-  cleanup,
   isNotEqualObject,
   cloneObject,
   removeChars,
-} from './helpers';
-import { raise } from '../dom/helpers';
+} from "./helpers";
+import { raise } from "../dom/helpers";
 
 function callRef<R extends Element | HTMLElement>(ref: R): MutableRefObject {
-  if (nixixStore['refCount'] === undefined) {
-    nixixStore['refCount'] = 0;
-  } else if (nixixStore['refCount'] != undefined) {
-    nixixStore['refCount'] = nixixStore['refCount'] + 1;
+  if (nixixStore["refCount"] === undefined) {
+    nixixStore["refCount"] = 0;
+  } else if (nixixStore["refCount"] != undefined) {
+    nixixStore["refCount"] = nixixStore["refCount"] + 1;
   }
   return {
     current: {} as Current,
-    refId: nixixStore['refCount'],
+    refId: nixixStore["refCount"],
     nextElementSibling: ref,
     prevElementSibling: ref,
     parent: ref ? (ref as HTMLElement) : null,
@@ -34,9 +33,9 @@ function callSignal<S>(
     equals: boolean;
   }
 ): [SignalObject<S>, SetSignalDispatcher<S>] {
-  incrementId('signalCount');
+  incrementId("signalCount");
   const signalId = nixixStore.signalCount;
-  nixixStore['$$__lastReactionProvider'] = 'signal';
+  nixixStore["$$__lastReactionProvider"] = "signal";
 
   if (nixixStore.SignalStore === undefined) {
     nixixStore.SignalStore = {};
@@ -45,7 +44,7 @@ function callSignal<S>(
    * value - in the worst case of it being an instance of object, throw an error.
    */
   let value: string | number | boolean =
-    typeof initialValue === 'function' ? initialValue() : initialValue;
+    typeof initialValue === "function" ? initialValue() : initialValue;
 
   nixixStore.SignalStore[`_${signalId}_`] = { value: value };
   let initValue = new Signal(checkType(value)(value), signalId);
@@ -58,13 +57,13 @@ function callSignal<S>(
       originalValue = nixixStore.SignalStore[`_${signalId}_`].value
     ) {
       let newStatePassed =
-        typeof newState === 'function'
+        typeof newState === "function"
           ? (newState as Function)(originalValue)
           : newState;
       if (config?.equals) {
         nixixStore.SignalStore[`_${id}_`].value = newStatePassed;
         initValue.value = newStatePassed;
-        const effect = nixixStore['SignalStore'][`_${id}_`].effect;
+        const effect = nixixStore["SignalStore"][`_${id}_`].effect;
         if (effect) {
           effect.forEach((eff) => eff());
         }
@@ -72,7 +71,7 @@ function callSignal<S>(
       } else if (String(originalValue) !== String(newStatePassed)) {
         nixixStore.SignalStore[`_${id}_`].value = newStatePassed;
         initValue.value = newStatePassed;
-        const effect = nixixStore['SignalStore'][`_${id}_`].effect;
+        const effect = nixixStore["SignalStore"][`_${id}_`].effect;
         if (effect) {
           effect.forEach((eff) => eff());
         }
@@ -91,27 +90,24 @@ function callStore<S>(
     equals: boolean;
   }
 ): any[] {
-  incrementId('storeCount');
+  incrementId("storeCount");
   const storeId = nixixStore.storeCount;
-  nixixStore['$$__lastReactionProvider'] = 'store';
+  nixixStore["$$__lastReactionProvider"] = "store";
   if (nixixStore.Store === undefined) {
     nixixStore.Store = {};
   }
 
   let value: Array<any> | object =
-    typeof initialValue === 'function' ? initialValue() : initialValue;
+    typeof initialValue === "function" ? initialValue() : initialValue;
 
   nixixStore.Store[`_${storeId}_`] = { value: value };
   let initValue = new Store({ value: value, id: storeId, firstValue: 1 });
-  nixixStore.Store[`_${storeId}_`].cleanup = () => {
-    cleanup(initValue);
-  };
 
   return [
     initValue,
     (newValue: (prev?: any) => any, id = storeId) => {
       let newValuePassed =
-        typeof newValue === 'function'
+        typeof newValue === "function"
           ? newValue(cloneObject(nixixStore.Store[`_${storeId}_`].value))
           : newValue;
       if (config?.equals) {
@@ -127,7 +123,6 @@ function callStore<S>(
           initValue.$$__value instanceof Array
             ? [...store.value]
             : { ...store.value };
-        store.cleanup?.();
         let effect = store.effect;
         if (effect !== undefined && effect !== null) {
           effect.forEach((eff) => eff());
@@ -145,7 +140,6 @@ function callStore<S>(
           initValue.$$__value instanceof Array
             ? [...store.value]
             : { ...store.value };
-        store.cleanup?.();
         let effect = store.effect;
         if (effect !== undefined && effect !== null) {
           effect.forEach((eff) => eff());
@@ -156,11 +150,11 @@ function callStore<S>(
 }
 
 function getValueType<T>(value: any) {
-  if (typeof value === 'function')
+  if (typeof value === "function")
     raise(`Cannot pass a function as a reactive value.`);
-  if (['boolean', 'number', 'string'].includes(typeof value))
+  if (["boolean", "number", "string"].includes(typeof value))
     return callSignal<T>(value);
-  if (typeof value === 'object') return callStore<T>(value);
+  if (typeof value === "object") return callStore<T>(value);
 }
 
 function memo<T>(fn: () => T, deps: any[]) {
@@ -205,16 +199,16 @@ function pushFurtherDeps(
 
 function dispatchEffect(
   callbackFn: CallableFunction,
-  config?: 'once',
+  config?: "once",
   furtherDependents?: (Signal | Store)[],
-  id = nixixStore['$$__lastReactionProvider'] === 'signal'
-    ? nixixStore['signalCount']
-    : nixixStore['storeCount']
+  id = nixixStore["$$__lastReactionProvider"] === "signal"
+    ? nixixStore["signalCount"]
+    : nixixStore["storeCount"]
 ) {
   if (!config) {
-    if (nixixStore['$$__lastReactionProvider']) {
-      const lastRP = nixixStore['$$__lastReactionProvider'];
-      if (lastRP === 'signal') {
+    if (nixixStore["$$__lastReactionProvider"]) {
+      const lastRP = nixixStore["$$__lastReactionProvider"];
+      if (lastRP === "signal") {
         let obj = nixixStore.SignalStore?.[`_${id}_`];
         obj ? (obj.effect ? null : (obj.effect = [callbackFn])) : null;
       } else {
@@ -229,11 +223,11 @@ function dispatchEffect(
 
 function effect(
   callbackFn: CallableFunction,
-  config?: 'once',
+  config?: "once",
   furtherDependents?: (Signal | Store)[],
-  id = nixixStore['$$__lastReactionProvider'] === 'signal'
-    ? nixixStore['signalCount']
-    : nixixStore['storeCount']
+  id = nixixStore["$$__lastReactionProvider"] === "signal"
+    ? nixixStore["signalCount"]
+    : nixixStore["storeCount"]
 ) {
   dispatchEffect(callbackFn, config, furtherDependents, id);
 
@@ -264,11 +258,11 @@ function callReaction(
 
 function renderEffect(
   callbackFn: CallableFunction,
-  config?: 'once',
+  config?: "once",
   furtherDependents?: (Signal | Store)[],
-  id = nixixStore['$$__lastReactionProvider'] === 'signal'
-    ? nixixStore['signalCount']
-    : nixixStore['storeCount']
+  id = nixixStore["$$__lastReactionProvider"] === "signal"
+    ? nixixStore["signalCount"]
+    : nixixStore["storeCount"]
 ) {
   callbackFn();
   dispatchEffect(callbackFn, config, furtherDependents, id);
@@ -302,6 +296,7 @@ export {
   callSignal,
   callStore,
   memo,
+  getValueType,
   effect,
   callEffect,
   renderEffect,

@@ -62,29 +62,19 @@ export function callStore<O>(
   }
 ): [StoreObject<O>, SetStoreDispatcher<O>];
 
+export function getValueType<T>(value: any): any[] | undefined
+
 /**
  * Creates a read-only signal or store which depends on other signals or stores.
  *
  * @param fn callback function to return the initialValue
  * @param deps array of signals or stores to which when changed re-runs and updates the memo's value;
  */
-export function memo<S extends string>(
+export function memo<S extends string | number | boolean>(
   fn: () => S,
   deps: (SignalObject<any> | StoreObject<any>)[]
 ): MemoSignal<S>;
-export function memo<S extends boolean>(
-  fn: () => S,
-  deps: (SignalObject<any> | StoreObject<any>)[]
-): MemoSignal<S>;
-export function memo<S extends number>(
-  fn: () => S,
-  deps: (SignalObject<any> | StoreObject<any>)[]
-): MemoSignal<S>;
-export function memo<S extends object>(
-  fn: () => S,
-  deps: (SignalObject<any> | StoreObject<any>)[]
-): MemoStore<S>;
-export function memo<S extends any[]>(
+export function memo<S extends any[] | object>(
   fn: () => S,
   deps: (SignalObject<any> | StoreObject<any>)[]
 ): MemoStore<S>;

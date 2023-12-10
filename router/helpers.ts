@@ -35,6 +35,10 @@ export function changeRouteComment(path: string, ...comments: Comment[]) {
   });
 }
 
+export function lastElement<T>(arr:T[]): T {
+  return arr[len(arr) - 1]
+}
+
 export function isNull(val: any) {
   return val === null || val === undefined;
 }
