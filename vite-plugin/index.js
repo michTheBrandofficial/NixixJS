@@ -1,20 +1,16 @@
-import type { ESBuildOptions } from 'vite';
-import { Plugin as Plugin_2 } from 'vite';
-import { join, normalize } from 'path';
+// @ts-nocheck
+import { join, normalize } from "path";
 
-export default function NixixHMR(
-  projectRoot?: `${'src' | (string & {})}/${'index.tsx' | (string & {})}`,
-  dev?: boolean
-): Plugin_2[] {
-  const plugin: Plugin_2 = {
-    name: 'nixix-vite-hmr',
-    apply: 'serve',
+export default function NixixHMR(projectRoot, dev) {
+  const plugin = {
+    name: "nixix-vite-hmr",
+    apply: "serve",
 
     async transform(code, id) {
       // if file extension is not ts | js | jsx | tsx.
       if (/node_modules/.test(id) || !/\.(t|j)sx?$/.test(id)) return;
       // project root
-      const root = projectRoot?.split?.('/') || ['src', 'index.tsx'];
+      const root = projectRoot?.split?.("/") || ["src", "index.tsx"];
       const path = normalize(join(`${process.cwd()}`, ...root));
       const regExp = normalize(id).includes(path);
       if (regExp) {
@@ -23,7 +19,11 @@ export default function NixixHMR(
               $$cleanupNixixRuntime(newMod)
             });
           }
-          import { $$cleanupNixixRuntime } from '${dev ? 'vite-plugin/cleanupRuntime' : 'nixix/vite-plugin/cleanupRuntime'}';`;
+          import { $$cleanupNixixRuntime } from '${
+            dev
+              ? "vite-plugin/cleanupRuntime"
+              : "nixix/vite-plugin/cleanupRuntime"
+          }';`;
         return {
           code: `${prelude}${code}`,
         };
@@ -34,20 +34,20 @@ export default function NixixHMR(
   return [plugin];
 }
 
-const esbuildOptions: ESBuildOptions = {
-  jsxFactory: 'Nixix.create',
+const esbuildOptions = {
+  jsxFactory: "Nixix.create",
   jsxFragment: '"fragment"',
-  jsxImportSource: 'nixix',
+  jsxImportSource: "nixix",
   jsxDev: false,
-  jsx: 'transform',
+  jsx: "transform",
   jsxInject: "import Nixix from 'nixix/dom';",
   minifyIdentifiers: true,
 };
 
 const devEsbuildOptions = {
-  jsxFactory: 'Nixix.create',
+  jsxFactory: "Nixix.create",
   jsxFragment: "'fragment'",
-  jsxImportSource: './index.js',
+  jsxImportSource: "./index.js",
   jsxInject: 'import Nixix from "dom"',
 };
 

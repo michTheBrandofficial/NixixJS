@@ -1,13 +1,14 @@
 import { handleLocation } from "./handleLoc";
-import { nixixStore } from "../dom";
+import { nixixStore } from "../dom/index";
 import { getLink, isNull, pushState } from "./helpers";
 import { agnosticRouteObjects } from "./utils";
 import {
   AgnosticRouteMatch,
   AgnosticRouteObject,
   matchRoutes,
+  // @ts-ignore
 } from "@remix-run/router";
-import { warn } from "dom/helpers";
+import { warn } from "../dom/helpers";
 
 export const Router = {
   push: (path: string) => {

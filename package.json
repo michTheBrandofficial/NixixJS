@@ -1,14 +1,11 @@
 {
   "name": "nixix",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "NixixJS is a lightweight JavaScript Library used for building reactive User Interfaces.",
   "main": "./dom/index.ts",
   "module": "./dom/index.ts",
   "type": "module",
   "types": "./types/index.d.ts",
-  "bin": {
-    "create-nixix-app": "./index.js"
-  },
   "scripts": {
     "start": "vite"
   },

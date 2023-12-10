@@ -1,7 +1,7 @@
 {
   "name": "nixix/vite-plugin",
-  "main": "./index.mts",
-  "module": "./index.mts",
+  "main": "./index.js",
+  "module": "./index.js",
   "types": "./types.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
