@@ -1,6 +1,6 @@
-import { createFragment } from '../dom/helpers';
-import { flatten } from '../hoc/helpers';
-import {
+import { createFragment } from "../dom/helpers";
+import { flatten } from "../hoc/helpers";
+import type {
   ButtonHTMLAttributes,
   Children,
   FormHTMLAttributes,
@@ -8,20 +8,21 @@ import {
   InputHTMLAttributes,
   TextareaHTMLAttributes,
   ValueType,
-} from '../types/index';
-import { removeUnusedProps } from './helpers';
-import { BaseViewComponent, ViewComponent } from './types/index';
+} from "../types/index";
+import { removeUnusedProps } from "./helpers";
+import type { BaseViewComponent, ViewComponent } from "./types/index";
 
 /**
  * Returns a section that is a flexible box when NixixJS is used with TailwindCSS
  */
 export const HStack = (props: BaseViewComponent): someView => {
-  const { children } = removeUnusedProps<Children>(props, 'children');
+  const { children } = removeUnusedProps<Children>(props, "children");
 
   return (
     <section
       {...props}
-      className={`flex ${props.className ? props.className : ''}`}>
+      className={`flex ${props.className ? props.className : ""}`}
+    >
       {children}
     </section>
   );
@@ -31,10 +32,10 @@ export const HStack = (props: BaseViewComponent): someView => {
  * Returns a stack that has its children aligned vertically - column
  */
 export const VStack = (props: BaseViewComponent): someView => {
-  const { children } = removeUnusedProps<Children>(props, 'children');
+  const { children } = removeUnusedProps<Children>(props, "children");
 
   return (
-    <section {...props} className={props.className ?? ''}>
+    <section {...props} className={props.className ?? ""}>
       {children}
     </section>
   );
@@ -44,7 +45,7 @@ export const VStack = (props: BaseViewComponent): someView => {
  * Returns an article element
  */
 export const Article = (props: BaseViewComponent): someView => {
-  const { children } = removeUnusedProps<Children>(props, 'children');
+  const { children } = removeUnusedProps<Children>(props, "children");
 
   return <article {...props}>{children}</article>;
 };
@@ -53,10 +54,10 @@ export const Article = (props: BaseViewComponent): someView => {
  * Returns an aside element
  */
 export const Aside = (props: BaseViewComponent): someView => {
-  const { children } = removeUnusedProps<Children>(props, 'children');
+  const { children } = removeUnusedProps<Children>(props, "children");
 
   return (
-    <aside {...props} className={props.className ?? ''}>
+    <aside {...props} className={props.className ?? ""}>
       {children}
     </aside>
   );
@@ -68,7 +69,7 @@ export const Aside = (props: BaseViewComponent): someView => {
 export const FormField = (
   props: ViewComponent<FormHTMLAttributes<HTMLFormElement>>
 ): someView => {
-  const { children } = removeUnusedProps<Children>(props, 'children');
+  const { children } = removeUnusedProps<Children>(props, "children");
 
   return <form {...props}>{children}</form>;
 };
@@ -79,10 +80,10 @@ export const FormField = (
 export const TextField = (
   props: ViewComponent<InputHTMLAttributes<HTMLInputElement>>
 ): someView => {
-  removeUnusedProps<Children>(props, 'children');
+  removeUnusedProps<Children>(props, "children");
 
   return (
-    <input spellcheck autocapitalize={'sentences'} type={'text'} {...props} />
+    <input spellcheck autocapitalize={"sentences"} type={"text"} {...props} />
   );
 };
 
@@ -92,10 +93,10 @@ export const TextField = (
 export const TextArea = (
   props: ViewComponent<TextareaHTMLAttributes<HTMLTextAreaElement>>
 ): someView => {
-  const { children } = removeUnusedProps<Children>(props, 'children');
+  const { children } = removeUnusedProps<Children>(props, "children");
 
   return (
-    <textarea spellcheck autocapitalize={'sentences'} {...props}>
+    <textarea spellcheck autocapitalize={"sentences"} {...props}>
       {children}
     </textarea>
   );
@@ -107,10 +108,10 @@ export const TextArea = (
 export const Button = (
   props: ViewComponent<ButtonHTMLAttributes<HTMLButtonElement>>
 ): someView => {
-  const { children } = removeUnusedProps<Children>(props, 'children');
+  const { children } = removeUnusedProps<Children>(props, "children");
 
   return (
-    <button style={{ cursor: 'pointer' }} {...props}>
+    <button style={{ cursor: "pointer" }} {...props}>
       {children}
     </button>
   );
@@ -122,7 +123,7 @@ export const Button = (
 export const Paragragh = (
   props: ViewComponent<HTMLAttributes<HTMLParagraphElement>>
 ): someView => {
-  const { children } = removeUnusedProps<Children>(props, 'children');
+  const { children } = removeUnusedProps<Children>(props, "children");
 
   return <p {...props}>{children || []}</p>;
 };
@@ -133,12 +134,12 @@ export const Paragragh = (
 export const Container = (
   props: ViewComponent<HTMLAttributes<HTMLDivElement>>
 ): someView => {
-  const { children } = removeUnusedProps<Children>(props, 'children');
+  const { children } = removeUnusedProps<Children>(props, "children");
   return <div {...props}>{children}</div>;
 };
 
 type HeadingProps = ViewComponent<HTMLAttributes<HTMLHeadingElement>> & {
-  type?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  type?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 };
 /**
  * Returns an h1, h2, h3 heading element with prop passed else returns a h1 tag.
@@ -146,8 +147,8 @@ type HeadingProps = ViewComponent<HTMLAttributes<HTMLHeadingElement>> & {
 export const Heading = (props: HeadingProps): someView => {
   const { children, type: Type } = removeUnusedProps<typeof props>(
     props,
-    'children',
-    'type'
+    "children",
+    "type"
   );
   switch (Type) {
     case undefined:
@@ -162,7 +163,7 @@ export const Heading = (props: HeadingProps): someView => {
  * Returns a main element
  */
 export const Main = (props: BaseViewComponent): someView => {
-  const { children } = removeUnusedProps<Children>(props, 'children');
+  const { children } = removeUnusedProps<Children>(props, "children");
   return <main {...props}>{children}</main>;
 };
 
@@ -181,3 +182,5 @@ export const TextNode = (props: TextNodeProps): someView => {
       })()
     : [];
 };
+
+export { BaseViewComponent, ViewComponent };

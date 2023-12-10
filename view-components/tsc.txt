@@ -1,0 +1,1 @@
+tsc index.tsx --declaration --emitDeclarationOnly --jsx preserve --lib es2020,dom
