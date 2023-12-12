@@ -26,7 +26,7 @@ export function isArray(object: any): any[] {
 
 function addText(element: HTMLElement | SVGElement | DocumentFragment) {
   const text = createText('');
-  element.append?.(text);
+  element?.append?.(text);
   return text;
 }
 
@@ -40,7 +40,7 @@ export function fillInChildren(
 ) {
   return (child: ChildrenType[number]) => {
     if (checkDataType(child)) {
-      element.append?.(createText(child as any));
+      element?.append?.(createText(child as any));
     } else if (typeof child === 'object') {
       if (child instanceof Signal) {
         const text = addText(element);
@@ -53,7 +53,7 @@ export function fillInChildren(
           text.textContent = getStoreValue(child);
         }, [child]);
       } else {
-        element.append?.(child as unknown as string);
+        element?.append?.(child as unknown as string);
       }
     }
   };
