@@ -60,9 +60,8 @@ export function fillInChildren(
 }
 
 /**
- * issue of passing [['nee']] as a store and reading it
  * create('div', null, "name", create('p', null), create(App, {name: 'Ozor'}))
- * if the child is a string, append a textNode, else if if is an array, append all of it, else if it is an object, the append it
+ * if the child is a string, append a textNode, else if it is an array, append all of it, else if it is an object, the append it
  */
 export function addChildren(
   children: ChildrenType,

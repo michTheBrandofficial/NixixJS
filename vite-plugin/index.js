@@ -15,11 +15,7 @@ export default function NixixHMR(projectRoot, dev) {
       if (regExp) {
         const prelude = `if (import.meta.hot) {
           import.meta.hot?.accept((newMod) => {
-            Object.entries(nixixStore)?.forEach(([k]) => {
-              if (k === "root") return;
-              // @ts-ignore
-              delete nixixStore[k];
-            });
+            delete nixixStore['$$__routeStore']
             agnosticRouteObjects.length = 0;
             // @ts-ignore
             (nixixStore?.root)?.replaceChildren?.("");
@@ -40,7 +36,7 @@ export default function NixixHMR(projectRoot, dev) {
   return [plugin];
 }
 
-export const esbuildOptions = {
+const esbuildOptions = {
   jsxFactory: "Nixix.create",
   jsxFragment: '"fragment"',
   jsxImportSource: "nixix",
@@ -50,10 +46,11 @@ export const esbuildOptions = {
   minifyIdentifiers: true,
 };
 
-export const devEsbuildOptions = {
+const devEsbuildOptions = {
   jsxFactory: "Nixix.create",
   jsxFragment: "'fragment'",
   jsxImportSource: "./index.js",
   jsxInject: 'import Nixix from "dom"',
 };
 
+export { devEsbuildOptions, esbuildOptions };

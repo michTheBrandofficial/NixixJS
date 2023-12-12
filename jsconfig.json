@@ -1,13 +1,12 @@
 {
   "compilerOptions": {
     "lib": ["es2017", "dom"],
-    "checkJs": true,
     "baseUrl": ".",
     "jsx": "react-jsxdev",
     "strict": true,
     "jsxImportSource": "types",
     "types": ["./types", "@remix-run/router"],
-    "moduleResolution": "classic",
+    "moduleResolution": "node",
     "skipLibCheck": false
   },
   "include": ["./**/*"]

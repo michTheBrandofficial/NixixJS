@@ -7,7 +7,7 @@ import {
   RouteExoticComponent,
   ValueType,
 } from "../../types";
-import { MemoSignal, MemoStore } from "../../primitives/types";
+import { MemoStore } from "../../primitives/types";
 
 export interface LoaderProps {
   params: EmptyObject<string>;
@@ -23,7 +23,7 @@ export interface LoaderFunction {
   (config: LoaderProps): Promise<any>;
 }
 
-export type ActionFunction <T> = (config: ActionProps) => T;
+export type ActionFunction<T> = (config: ActionProps) => T;
 
 export type RoutePath = string;
 export interface RouteLink<T extends string>
@@ -97,4 +97,14 @@ declare function actionData<T extends any[] | object>(
   value: T
 ): MemoStore<T>;
 
-export { Link, Routes, Route, Form, Router, navigate, redirect, changeTitle, actionData };
+export {
+  Link,
+  Routes,
+  Route,
+  Form,
+  Router,
+  navigate,
+  redirect,
+  changeTitle,
+  actionData,
+};

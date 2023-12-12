@@ -239,8 +239,13 @@ function render(
   } = { commentForLF: true }
 ) {
   nixixStore.commentForLF = config.commentForLF;
-  nixixStore["root"] = root;
   addChildren(element as any, root);
+  doBGWork(root)
+}
+
+async function doBGWork(root:any) {
+  await Promise.resolve()
+  nixixStore["root"] = root;
 }
 
 export default Nixix;
