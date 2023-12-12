@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { join, normalize } from "path";
 
 export default function NixixHMR(projectRoot, dev) {
@@ -15,15 +14,22 @@ export default function NixixHMR(projectRoot, dev) {
       const regExp = normalize(id).includes(path);
       if (regExp) {
         const prelude = `if (import.meta.hot) {
-            import.meta.hot?.accept((newMod) => {
-              $$cleanupNixixRuntime(newMod)
+          import.meta.hot?.accept((newMod) => {
+            Object.entries(nixixStore)?.forEach(([k]) => {
+              if (k === "root") return;
+              // @ts-ignore
+              delete nixixStore[k];
             });
-          }
-          import { $$cleanupNixixRuntime } from '${
-            dev
-              ? "vite-plugin/cleanupRuntime"
-              : "nixix/vite-plugin/cleanupRuntime"
-          }';`;
+            agnosticRouteObjects.length = 0;
+            // @ts-ignore
+            (nixixStore?.root)?.replaceChildren?.("");
+        
+            newMod?.default?.();
+          });
+        };
+        import { nixixStore } from "nixix/dom";
+        import { agnosticRouteObjects } from "nixix/router/utils";
+        `;
         return {
           code: `${prelude}${code}`,
         };
@@ -34,7 +40,7 @@ export default function NixixHMR(projectRoot, dev) {
   return [plugin];
 }
 
-const esbuildOptions = {
+export const esbuildOptions = {
   jsxFactory: "Nixix.create",
   jsxFragment: '"fragment"',
   jsxImportSource: "nixix",
@@ -44,11 +50,10 @@ const esbuildOptions = {
   minifyIdentifiers: true,
 };
 
-const devEsbuildOptions = {
+export const devEsbuildOptions = {
   jsxFactory: "Nixix.create",
   jsxFragment: "'fragment'",
   jsxImportSource: "./index.js",
   jsxInject: 'import Nixix from "dom"',
 };
 
-export { devEsbuildOptions, esbuildOptions };
