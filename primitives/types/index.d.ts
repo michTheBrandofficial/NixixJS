@@ -8,10 +8,7 @@ export type SignalObject<S> = {
   value: S;
 } & S;
 
-export type StoreObject<O> = {
-  readonly $$__value: O;
-  [index: string]: any;
-} & O;
+export type StoreObject<O> = O;
 
 export type MemoSignal<S> = SignalObject<S>;
 

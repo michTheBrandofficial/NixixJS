@@ -5,7 +5,6 @@ import {
   addChildren,
   handleDirectives_,
   warn,
-  getStoreValue,
   getSignalValue,
   checkDataType,
 } from "./helpers";
@@ -30,6 +29,7 @@ type GlobalStore = {
       effect?: CallableFunction[];
     };
   };
+  jsx?: boolean;
   storeCount?: number;
   signalCount?: number;
   refCount?: number;
@@ -47,8 +47,10 @@ const Nixix = {
     props: Proptype,
     ...children: ChildrenType
   ): Element | Array<Element | string | Signal> | undefined {
+    nixixStore.jsx = true;
     if (typeof tagNameFC === "string") {
       if (tagNameFC === "fragment") {
+        nixixStore.jsx = false;
         if (children !== null) return children;
         return [];
       } else {
@@ -57,6 +59,7 @@ const Nixix = {
           : document.createElementNS(SVG_NAMESPACE, tagNameFC);
         setProps(props, element);
         setChildren(children, element);
+        nixixStore.jsx = false;
         return element;
       }
     } else return buildComponent(tagNameFC, props, children);
@@ -83,7 +86,7 @@ function entries(obj: object) {
 }
 
 function isReactiveValue(value: Signal | Store, prop: string) {
-  if (value instanceof Signal || value instanceof Store) {
+  if (value instanceof Signal) {
     raise(`The ${prop} prop value cannot be reactive.`);
     return true;
   }
@@ -105,13 +108,6 @@ function setAttribute(
         ? // @ts-ignore
           (element[attrName] = getSignalValue(attrValue))
         : element.setAttribute(attrName, getSignalValue(attrValue));
-    }, [attrValue]);
-  } else if (attrValue instanceof Store) {
-    callEffect(() => {
-      type === "propertyAttribute"
-        ? // @ts-ignore
-          (element[attrName] = getStoreValue(attrValue))
-        : element.setAttribute(attrName, getStoreValue(attrValue));
     }, [attrValue]);
   } else if (checkDataType(attrValue)) {
     type === "propertyAttribute"
@@ -140,10 +136,6 @@ function setStyle(element: NixixElementType, styleValue: StyleValueType) {
     if (value instanceof Signal) {
       callEffect(() => {
         element["style"][styleKey] = getSignalValue(value as Signal);
-      }, [value]);
-    } else if (value instanceof Store) {
-      callEffect(() => {
-        element["style"][styleKey] = getStoreValue(value as Store);
       }, [value]);
     } else {
       element["style"][styleKey] = value as string;
@@ -240,13 +232,13 @@ function render(
 ) {
   nixixStore.commentForLF = config.commentForLF;
   addChildren(element as any, root);
-  doBGWork(root)
+  doBGWork(root);
 }
 
-async function doBGWork(root:any) {
-  await Promise.resolve()
+async function doBGWork(root: any) {
+  await Promise.resolve();
   nixixStore["root"] = root;
 }
 
 export default Nixix;
-export { render, setAttribute, getStoreValue };
+export { render, setAttribute };

@@ -1,23 +1,21 @@
-import { getSignalValue, getStoreValue } from '../dom/helpers';
-import { Signal, Store } from '../primitives';
+import { getSignalValue } from "../dom/helpers";
+import { Signal, Store } from "../primitives";
 
 export function getWinPath() {
   return window.location.pathname;
 }
 
-export function len(val:string | Array<any>) {
+export function len(val: string | Array<any>) {
   return val.length;
 }
 
-export function trimTrailingSlash(str:string) {
-  return (str) ? (
-    str.endsWith('/') ? str.slice(0, len(str) - 1) : str
-  ) : ''
+export function trimTrailingSlash(str: string) {
+  return str ? (str.endsWith("/") ? str.slice(0, len(str) - 1) : str) : "";
 }
 
 export function startsWithSlash(path?: string) {
-  if (!path) return '';
-  switch (path?.startsWith('/')) {
+  if (!path) return "";
+  switch (path?.startsWith("/")) {
     case true:
       return path;
     case false:
@@ -26,7 +24,7 @@ export function startsWithSlash(path?: string) {
 }
 
 export function pushState(path?: string) {
-  window.history.pushState({}, '', path);
+  window.history.pushState({}, "", path);
 }
 
 export function changeRouteComment(path: string, ...comments: Comment[]) {
@@ -35,8 +33,8 @@ export function changeRouteComment(path: string, ...comments: Comment[]) {
   });
 }
 
-export function lastElement<T>(arr:T[]): T {
-  return arr[len(arr) - 1]
+export function lastElement<T>(arr: T[]): T {
+  return arr[len(arr) - 1];
 }
 
 export function isNull(val: any) {
@@ -47,20 +45,22 @@ export function getLink(link: string | Store | Signal): string {
   switch (true) {
     case link instanceof Signal:
       return getSignalValue(link as Signal) as any;
-    case link instanceof Store:
-      return getStoreValue(link as Store) as any;
     default:
       return link as any;
   }
 }
 
-type ForEachParams<T> = Parameters<Array<T>['forEach']>;
+type ForEachParams<T> = Parameters<Array<T>["forEach"]>;
 
 /**
  * Returns void, to be used when you want to mutate some outside code in an array
  */
-export function forEach<T>(arr:Array<T>, cb: ForEachParams<T>[0], thisArg?: ForEachParams<T>[1]) {
-  arr.forEach(cb, thisArg)
+export function forEach<T>(
+  arr: Array<T>,
+  cb: ForEachParams<T>[0],
+  thisArg?: ForEachParams<T>[1]
+) {
+  arr.forEach(cb, thisArg);
 }
 
 export function routePromise(path: string) {

@@ -23,8 +23,8 @@ export default function NixixHMR(projectRoot, dev) {
             newMod?.default?.();
           });
         };
-        import { nixixStore } from "nixix/dom";
-        import { agnosticRouteObjects } from "nixix/router/utils";
+        import { nixixStore } from "${dev ? 'dom' : 'nixix/dom'}";
+        import { agnosticRouteObjects } from "${dev ? 'router/utils' : 'nixix/router/utils'}";
         `;
         return {
           code: `${prelude}${code}`,

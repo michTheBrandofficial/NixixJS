@@ -2,12 +2,14 @@ import { Signal, Store } from "./classes";
 import { nixixStore } from "../dom";
 import {
   incrementId,
-  checkType,
   isNotEqualObject,
   cloneObject,
   removeChars,
+  isFunction,
+  isPrimitive,
 } from "./helpers";
 import { raise } from "../dom/helpers";
+import { patchObj } from "./patchObj";
 
 function callRef<R extends Element | HTMLElement>(ref: R): MutableRefObject {
   if (nixixStore["refCount"] === undefined) {
@@ -33,50 +35,38 @@ function callSignal<S>(
     equals: boolean;
   }
 ): [SignalObject<S>, SetSignalDispatcher<S>] {
-  incrementId("signalCount");
-  const signalId = nixixStore.signalCount;
+  const signalId = incrementId("signalCount") as number;
   nixixStore["$$__lastReactionProvider"] = "signal";
-
-  if (nixixStore.SignalStore === undefined) {
-    nixixStore.SignalStore = {};
-  }
+  !(nixixStore.SignalStore) && (nixixStore.SignalStore = {});
+  const { SignalStore } = nixixStore as Required<typeof nixixStore>;
   /**
    * value - in the worst case of it being an instance of object, throw an error.
    */
-  let value: string | number | boolean =
-    typeof initialValue === "function" ? initialValue() : initialValue;
-
-  nixixStore.SignalStore[`_${signalId}_`] = { value: value };
-  let initValue = new Signal(checkType(value)(value), signalId);
+  let value: string | number | boolean = isFunction(initialValue)
+    ? (initialValue as Function)()
+    : initialValue;
+  !isPrimitive(value) &&
+    raise(`You must passe a primitve to the signal function`);
+  SignalStore[`_${signalId}_`] = { value: value };
+  let initValue = new Signal(value, signalId);
   return [
     initValue,
 
     function (
       newState,
-      id = signalId,
-      originalValue = nixixStore.SignalStore[`_${signalId}_`].value
     ) {
-      let newStatePassed =
-        typeof newState === "function"
-          ? (newState as Function)(originalValue)
-          : newState;
-      if (config?.equals) {
-        nixixStore.SignalStore[`_${id}_`].value = newStatePassed;
-        initValue.value = newStatePassed;
-        const effect = nixixStore["SignalStore"][`_${id}_`].effect;
-        if (effect) {
-          effect.forEach((eff) => eff());
+      let oldState = initValue.value;
+      let newStatePassed = isFunction(newState)
+        ? (newState as Function)(oldState)
+        : newState;
+        switch (true) {
+          case config?.equals:
+          case String(oldState) !== String(newStatePassed):
+            const signal = SignalStore[`_${signalId}_`];
+            signal.value = newStatePassed;
+            initValue.value = newStatePassed;
+            signal.effect?.forEach((eff) => eff());
         }
-        return;
-      } else if (String(originalValue) !== String(newStatePassed)) {
-        nixixStore.SignalStore[`_${id}_`].value = newStatePassed;
-        initValue.value = newStatePassed;
-        const effect = nixixStore["SignalStore"][`_${id}_`].effect;
-        if (effect) {
-          effect.forEach((eff) => eff());
-        }
-        return;
-      }
     },
   ];
 }
@@ -90,60 +80,32 @@ function callStore<S>(
     equals: boolean;
   }
 ): any[] {
-  incrementId("storeCount");
-  const storeId = nixixStore.storeCount;
+  const storeId = incrementId("storeCount") as number;
   nixixStore["$$__lastReactionProvider"] = "store";
-  if (nixixStore.Store === undefined) {
-    nixixStore.Store = {};
-  }
+  nixixStore.Store === undefined  && (nixixStore.Store = {});
+  const { Store: SStore } = nixixStore as Required<typeof nixixStore>
+  let value: Array<any> | object = isFunction(initialValue)
+    ? (initialValue as Function)()
+    : initialValue;
 
-  let value: Array<any> | object =
-    typeof initialValue === "function" ? initialValue() : initialValue;
-
-  nixixStore.Store[`_${storeId}_`] = { value: value };
-  let initValue = new Store({ value: value, id: storeId, firstValue: 1 });
+  SStore[`_${storeId}_`] = { value: value };
+  let initValue = new Store({ value: value, id: storeId });
 
   return [
     initValue,
-    (newValue: (prev?: any) => any, id = storeId) => {
+    (newValue: (prev?: any) => any) => {
       let newValuePassed =
-        typeof newValue === "function"
-          ? newValue(cloneObject(nixixStore.Store[`_${storeId}_`].value))
+        isFunction(newValue)
+          ? newValue(cloneObject(SStore[`_${storeId}_`].value))
           : newValue;
-      if (config?.equals) {
-        const store = nixixStore.Store[`_${id}_`];
-        store.value =
-          initValue.$$__value instanceof Array
-            ? newValuePassed
-            : {
-                ...initValue.$$__value,
-                ...newValuePassed,
-              };
-        initValue.$$__value =
-          initValue.$$__value instanceof Array
-            ? [...store.value]
-            : { ...store.value };
-        let effect = store.effect;
-        if (effect !== undefined && effect !== null) {
-          effect.forEach((eff) => eff());
-        }
-      } else if (isNotEqualObject(initValue, newValuePassed)) {
-        const store = nixixStore.Store[`_${id}_`];
-        store.value =
-          initValue.$$__value instanceof Array
-            ? newValuePassed
-            : {
-                ...initValue.$$__value,
-                ...newValuePassed,
-              };
-        initValue.$$__value =
-          initValue.$$__value instanceof Array
-            ? [...store.value]
-            : { ...store.value };
-        let effect = store.effect;
-        if (effect !== undefined && effect !== null) {
-          effect.forEach((eff) => eff());
-        }
+
+      switch (true) {
+        case config?.equals: 
+        default:
+          newValuePassed.SS__id = storeId;
+          patchObj(initValue, newValuePassed)
+          const store = SStore[`_${storeId}_`];
+          store.effect?.forEach((eff) => eff());
       }
     },
   ];
@@ -184,6 +146,7 @@ function pushFurtherDeps(
             : (obj.effect = [callbackFn])
           : null;
       } else if (furtherDep instanceof Store) {
+        // @ts-expect-error
         let obj = nixixStore.Store?.[`_${removeChars(furtherDep.$$__id)}_`];
         obj
           ? obj.effect
@@ -270,11 +233,13 @@ function renderEffect(
 
 function dispatchSignalRemoval(signal: StoreObject | SignalObject<any>) {
   if (signal instanceof Store) {
-    delete window.$$__NixixStore.Store[`_${signal.$$__id}_`];
-    --window.$$__NixixStore.storeCount;
+    delete nixixStore.Store?.[`_${signal.$$__id}_`];
+    // @ts-expect-error
+    nixixStore.Store && --nixixStore.Store.storeCount;
   } else if (signal instanceof Signal) {
-    delete window.$$__NixixStore.SignalStore[`_${signal.$$__id}_`];
-    --window.$$__NixixStore.signalCount;
+    delete nixixStore.SignalStore?.[`_${signal.$$__id}_`];
+    // @ts-expect-error
+    nixixStore.SignalStore && --nixixStore.SignalStore.signalCount;
   }
 }
 

@@ -52,10 +52,14 @@ interface $$__NixixStore {
   storeCount?: number;
   signalCount?: number;
   refCount?: number;
+  jsx?: boolean;
 }
 
 export const nixixStore: $$__NixixStore;
 
+/**
+ * @deprecated PLEASE DO NOT USE THIS FUNCTION
+ */
 export function getStoreValue(store: any): any;
 
 export default Nixix;
