@@ -102,7 +102,6 @@ function callStore<S>(
       switch (true) {
         case config?.equals: 
         default:
-          newValuePassed.SS__id = storeId;
           patchObj(initValue, newValuePassed)
           const store = SStore[`_${storeId}_`];
           store.effect?.forEach((eff) => eff());
@@ -184,6 +183,14 @@ function dispatchEffect(
   }
 }
 
+async function resolveImmediate(fn: CallableFunction) {
+  await Promise.resolve();
+  (async (cb: CallableFunction) => {
+    await Promise.resolve()
+    cb()
+  })(fn)
+}
+
 function effect(
   callbackFn: CallableFunction,
   config?: "once",
@@ -194,10 +201,7 @@ function effect(
 ) {
   dispatchEffect(callbackFn, config, furtherDependents, id);
 
-  (async function (cb) {
-    await Promise.resolve();
-    cb();
-  })(callbackFn);
+  resolveImmediate(callbackFn)
 }
 
 function callEffect(
@@ -206,10 +210,7 @@ function callEffect(
 ) {
   pushFurtherDeps(callbackFn, furtherDependents);
 
-  (async function (cb) {
-    await Promise.resolve();
-    cb();
-  })(callbackFn);
+  resolveImmediate(callbackFn)
 }
 
 function callReaction(

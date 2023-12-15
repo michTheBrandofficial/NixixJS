@@ -17,6 +17,8 @@ export declare const devEsbuildOptions: {
   jsxInject: 'import Nixix from "dom"';
 };
 
+export function NixixPlugin({hmr}: { hmr?: boolean; dev?: boolean }): Plugin_2[]
+
 /**
  * This function for HMR in NixixJS is experimental
  */

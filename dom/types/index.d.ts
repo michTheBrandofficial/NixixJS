@@ -1,5 +1,5 @@
 import { LiveFragment } from '../../live-fragment/types';
-import '../../types/index';
+import { NixixNode } from '../../types/index'
 /**
  * jsxFactory - Nixix.create()
  */
@@ -19,7 +19,7 @@ type RenderConfig = {
  * @param element JSX.Element to render
  * @param root element which element will be appended to
  */
-export function render(element: JSX.Element, root: HTMLElement, {
+export function render(element: NixixNode | (() => NixixNode), root: HTMLElement, {
   commentForLF
 }?: RenderConfig): void;
 

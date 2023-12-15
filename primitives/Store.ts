@@ -10,41 +10,35 @@ type StoreProps<T extends object | any[]> = {
 
 type StoreProxyHandler<T extends object> = ProxyHandler<T> & {
   firstAccess?: boolean;
-  trueSignal: ReturnType<typeof signal> | null;
 };
 
 function createStoreProxy(obj: object | any[]) {
+  // there are levels to each proxy; so we can use a map to store the names and signals for each;
+  const signalMap = new Map<string | symbol, ReturnType<typeof signal>>()
   // on the first access, return a value or init an return a
   // signal value
   const proxy = new Proxy<EmptyObject>(obj, {
-    // @ts-ignore
-    firstAccess: true,
-    trueSignal: null,
     get(target, p) {
       let jsx = nixixStore.jsx
       const val = target[p];
-      if (!isPrimitive(val)) return val;
-      switch (this.firstAccess) {
-        case true:
-          this.firstAccess = false;
-          // if it is not in a jsx scrope - nixix.create call;
-          if (!jsx) return val;
+      let returnedValue: any = null;
+      if (!isPrimitive(val)) returnedValue = val;
+      else {
+        if (jsx) {
+          if (signalMap.has(p)) returnedValue = signalMap.get(p)?.[0]
           else {
-            this.trueSignal = signal(val);
-            return this.trueSignal[0];
+            const valueSignal = signal(val)
+            signalMap.set(p, valueSignal)
+            returnedValue = valueSignal![0]
           }
-        case false:
-          // if it is not in a jsx scrope - nixix.create call;
-          if (!jsx) return val;
-          else {
-            return this.trueSignal![0];
-          }
+        } else returnedValue = val;
       }
+      return returnedValue
     },
     set(target, p, newValue) {
       // set the value and then set the signal, if there is one;
       target[p] = newValue;
-      this.trueSignal?.[1]?.(newValue);
+      signalMap.get(p)?.[1]?.(newValue);
       return true;
     },
   } as StoreProxyHandler<EmptyObject>);
@@ -84,6 +78,7 @@ class Store_Object {
     });
     // do a foreach to make the nested objects stores too;
     const proxyvalue = createStoreProxy(value!);
+    console.log(proxyvalue);
     return proxyvalue;
   }
 }

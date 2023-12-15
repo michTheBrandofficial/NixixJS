@@ -9,6 +9,7 @@ import {
   checkDataType,
 } from "./helpers";
 import { PROP_ALIASES, SVG_ELEMENTTAGS, SVG_NAMESPACE } from "./utilVars";
+import { isFunction } from "primitives/helpers";
 
 type GlobalStore = {
   $$__lastReactionProvider?: "signal" | "store";
@@ -38,7 +39,8 @@ type GlobalStore = {
 // Global store for the store class and signals.
 window["$$__NixixStore"] = {
   commentForLF: false,
-};
+  jsx: false
+} as GlobalStore;
 export const nixixStore = window.$$__NixixStore as GlobalStore;
 
 const Nixix = {
@@ -47,22 +49,22 @@ const Nixix = {
     props: Proptype,
     ...children: ChildrenType
   ): Element | Array<Element | string | Signal> | undefined {
-    nixixStore.jsx = true;
+    !nixixStore.jsx && (nixixStore.jsx = true, doBGWork(() => nixixStore.jsx = false));
+    let returnedElement: any = null;
     if (typeof tagNameFC === "string") {
       if (tagNameFC === "fragment") {
-        nixixStore.jsx = false;
-        if (children !== null) return children;
-        return [];
+        if (children !== null) returnedElement = children;
+        else returnedElement = [];
       } else {
         const element = !SVG_ELEMENTTAGS.includes(tagNameFC)
           ? document.createElement(tagNameFC)
           : document.createElementNS(SVG_NAMESPACE, tagNameFC);
         setProps(props, element);
         setChildren(children, element);
-        nixixStore.jsx = false;
-        return element;
+        returnedElement = element;
       }
-    } else return buildComponent(tagNameFC, props, children);
+    } else returnedElement = buildComponent(tagNameFC, props, children);
+    return returnedElement;
   },
   handleDirectives: handleDirectives_,
   handleDynamicAttrs: ({
@@ -208,37 +210,37 @@ function buildComponent(
   props: Proptype,
   children: ChildrenType
 ) {
-  if (typeof tagNameFC === "function") {
-    if (props != null && props != undefined) {
-      if (children.length !== 0) {
-        props.children = children;
-        return tagNameFC(props);
-      }
-      return tagNameFC(props);
-    } else if (children.length !== 0) {
-      props = { children: children };
-      return tagNameFC(props);
-    }
-    return tagNameFC();
+  let returnedElement: any = null;
+  if (isFunction(tagNameFC)) {
+    const artificialProps = props || {}
+    Boolean(children?.length) && (artificialProps.children = children) 
+    returnedElement = (tagNameFC as Function)(artificialProps)
   }
+  return returnedElement;
 }
 
 function render(
-  element: NixixNode,
+  fn: () => NixixNode | NixixNode,
   root: HTMLElement,
   config: {
     commentForLF: boolean;
   } = { commentForLF: true }
 ) {
+  let bool = isFunction(fn)
+  if (!bool) warn(`You may not get top level reacitivity. Wrap your jsx element in a function like so: () => <View />`)
   nixixStore.commentForLF = config.commentForLF;
-  addChildren(element as any, root);
-  doBGWork(root);
+  addChildren((bool ? fn() : fn) as any, root);
+  doBGWork(() => nixixStore["root"] = root);
 }
 
-async function doBGWork(root: any) {
+async function doBGWork(fn: CallableFunction) {
   await Promise.resolve();
-  nixixStore["root"] = root;
+  fn()
+}
+
+function turnOnJsx() {
+  nixixStore.jsx = true;
 }
 
 export default Nixix;
-export { render, setAttribute };
+export { render, setAttribute, turnOnJsx };
