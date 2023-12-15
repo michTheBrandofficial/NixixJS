@@ -68,8 +68,6 @@ declare global {
 
   interface StoreObject {
     $$__id: string | number;
-    $$__value?: any;
-    $$__name?: string;
   }
 
   type SetSignalDispatcher<S> = (newValue: S | ((prev?: S) => S)) => void;

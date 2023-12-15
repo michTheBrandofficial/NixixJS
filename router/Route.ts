@@ -12,6 +12,7 @@ import { navigate } from "./Router";
 import type { LoaderFunction, ActionFunction } from "./types/index";
 import type { EmptyObject } from "../types";
 import { callStore } from "../primitives";
+import { nixixStore } from "../dom/index";
 
 type AgnosticRouteProps = {
   element: JSX.Element;
@@ -68,10 +69,12 @@ export function buildRoutes(config: BuildRouteConfig) {
 
 type RoutesProps = {
   children: (AgnosticRouteProps & { children?: AgnosticRouteProps[] })[];
+  viewTransitions?: boolean;
 };
 export function Routes(props: RoutesProps) {
   if (!props) raise(`No props were passed to the Routes component`);
-  const { children } = props;
+  const { children, viewTransitions } = props;
+  nixixStore.viewTransitions = viewTransitions;
   const routes: RouteStoreType = {
     routeMatch: {} as any,
     // current route will be the route that we get first and changes when we switch routes successfully

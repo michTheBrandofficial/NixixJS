@@ -1,19 +1,23 @@
 import { createFragment } from "../dom/helpers";
 import { LiveFragment } from "../live-fragment";
-import { callReaction } from "../primitives";
+import { callEffect, callReaction } from "../primitives";
 import { getShow, createBoundary, compFallback } from "./helpers";
 
 export function Show(props: ShowProps) {
   let { children, when, switch: signalSwitch, fallback } = props;
   fallback = createFragment(fallback || (compFallback() as any));
   children = createFragment(children);
-  let bool = when();
-  const show = getShow(bool, children, fallback);
-  const commentBoundary = createBoundary(show, "show");
+  const commentBoundary = createBoundary("", "show");
+  let bool: boolean | null = null;
   let liveFragment: LiveFragment = new LiveFragment(
     commentBoundary.firstChild!,
     commentBoundary.lastChild!
   );
+  callEffect(() => {
+    bool = when();
+    const show = getShow(bool!, children, fallback);
+    liveFragment.replace(createFragment(show));
+  });
 
   callReaction(() => {
     const newBool = when();

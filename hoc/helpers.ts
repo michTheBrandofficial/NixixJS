@@ -1,5 +1,6 @@
 import { nixixStore } from '../dom';
 import { createFragment, createText } from '../dom/helpers';
+import { Store } from '../primitives/classes';
 import { LiveFragment } from '../live-fragment/types';
 
 export function comment(str: string) {
@@ -39,11 +40,14 @@ export function numArray(start: number, end: number) {
   return arr;
 }
 
-export function arrayOfJSX(each: any, callback: any) {
-  const array = each.$$__value as [];
-  return array.map((_, i) => {
-    return callback(each, i) as any;
+export function arrayOfJSX(each: any[], callback: any): any[]  {
+  const array = each as [];
+  const returnedValue = array.map((e, i) => {
+    nixixStore.jsx = true
+    return callback(e,i)
   });
+  nixixStore.jsx = false;
+  return returnedValue;
 }
 
 export function checkLength(array: any[]) {
@@ -88,22 +92,18 @@ export function removeNodes(
 
 export function getIncrementalNodes(
   indexArray: any[],
-  Store: any,
-  each: any,
+  each: any[],
   callback: Required<ForProps>['children'][number]
 ) {
-  return indexArray.map((nIndex) => {
+  let returnedValue = indexArray.map((nIndex) => {
     const freshStore = new Store({
-      value: null,
-      id: `_${each.$$__id}_`,
-      name: `${nIndex}`,
+      value: each[nIndex],
+      // @ts-expect-error
+      id: each.$$__id,
     });
-    Store.addStoreChildren(
-      each.$$__value[nIndex],
-      freshStore.$$__id,
-      freshStore
-    );
-    each[`${nIndex}`] = freshStore;
-    return callback(each, nIndex) as any;
+    nixixStore.jsx = true
+    return callback(freshStore, nIndex) as any;
   });
+  nixixStore.jsx = false;
+  return returnedValue;
 }

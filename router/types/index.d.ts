@@ -49,6 +49,7 @@ export type PathToRoute = `/${string}`;
 declare const Link: <T extends PathToRoute>(props: RouteLink<T>) => JSX.Element;
 declare const Routes: ExoticComponent<{
   children?: NixixNode;
+  viewTransitions?: boolean;
 }>;
 declare const Route: <T extends PathToRoute>(props: RouteConfig<T>) => someView;
 declare const Form: (props: FormActionProps) => someView;

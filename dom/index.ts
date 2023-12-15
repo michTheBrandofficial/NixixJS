@@ -14,6 +14,7 @@ import { isFunction } from "primitives/helpers";
 type GlobalStore = {
   $$__lastReactionProvider?: "signal" | "store";
   commentForLF: boolean;
+  viewTransitions?: boolean;
   $$__routeStore?: {
     errorPage?: {
       errorRoute: string;
@@ -39,7 +40,7 @@ type GlobalStore = {
 // Global store for the store class and signals.
 window["$$__NixixStore"] = {
   commentForLF: false,
-  jsx: false
+  jsx: false,
 } as GlobalStore;
 export const nixixStore = window.$$__NixixStore as GlobalStore;
 
@@ -49,7 +50,8 @@ const Nixix = {
     props: Proptype,
     ...children: ChildrenType
   ): Element | Array<Element | string | Signal> | undefined {
-    !nixixStore.jsx && (nixixStore.jsx = true, doBGWork(() => nixixStore.jsx = false));
+    !nixixStore.jsx &&
+      ((nixixStore.jsx = true), callEffect(() => (nixixStore.jsx = false)));
     let returnedElement: any = null;
     if (typeof tagNameFC === "string") {
       if (tagNameFC === "fragment") {
@@ -212,9 +214,9 @@ function buildComponent(
 ) {
   let returnedElement: any = null;
   if (isFunction(tagNameFC)) {
-    const artificialProps = props || {}
-    Boolean(children?.length) && (artificialProps.children = children) 
-    returnedElement = (tagNameFC as Function)(artificialProps)
+    const artificialProps = props || {};
+    Boolean(children?.length) && (artificialProps.children = children);
+    returnedElement = (tagNameFC as Function)(artificialProps);
   }
   return returnedElement;
 }
@@ -226,16 +228,19 @@ function render(
     commentForLF: boolean;
   } = { commentForLF: true }
 ) {
-  let bool = isFunction(fn)
-  if (!bool) warn(`You may not get top level reacitivity. Wrap your jsx element in a function like so: () => <View />`)
+  let bool = isFunction(fn);
+  if (!bool)
+    warn(
+      `You may not get top level reacitivity. Wrap your jsx element in a function like so: () => <View />`
+    );
   nixixStore.commentForLF = config.commentForLF;
   addChildren((bool ? fn() : fn) as any, root);
-  doBGWork(() => nixixStore["root"] = root);
+  doBGWork(() => (nixixStore["root"] = root));
 }
 
 async function doBGWork(fn: CallableFunction) {
   await Promise.resolve();
-  fn()
+  fn();
 }
 
 function turnOnJsx() {

@@ -37,7 +37,7 @@ export function Suspense(props: SuspenseProps) {
     })
     ?.catch(() => {
       resolvedJSX = onError ? onError : fallback;
-      onError && setLoading({ rejected: !loading.$$__value.rejected });
+      onError && setLoading({ rejected: !loading.rejected });
     });
   return commentBoundary;
 }

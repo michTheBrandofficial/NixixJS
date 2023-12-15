@@ -24,20 +24,6 @@ function cloneObject(object: any) {
   return JSON.parse(JSON.stringify(object));
 }
 
-function isNotEqualObject(oldObject: StoreObject, newObject: StoreObject) {
-  return (
-    JSON.stringify(oldObject.$$__value) !==
-    JSON.stringify(
-      oldObject.$$__value instanceof Array
-        ? newObject
-        : {
-            ...oldObject.$$__value,
-            ...newObject,
-          }
-    )
-  );
-}
-
 function removeChars(str: string | number) {
   return String(str).replace(/_/g, '');
 }
@@ -70,25 +56,12 @@ function forEach<T>(arr:Array<T>, cb: ForEachParams<T>[0], thisArg?: ForEachPara
   arr.forEach(cb, thisArg)
 }
 
-
-async function cleanup(store: Store) {
-  await Promise.resolve();
-  Object.keys(store).forEach((val) => {
-    if (val !== '$$__id' && val !== '$$__value') {
-      // @ts-ignore
-      delete store[val];
-    }
-  });
-}
-
 export {
   incrementId,
   checkType,
   isNull,
   isPrimitive,
   removeChars,
-  cleanup,
-  isNotEqualObject,
   cloneObject,
   isFunction,
   entries,

@@ -77,7 +77,7 @@ export const asyncComponent: AsyncComponent<Props>;
 
 interface ForProps<T extends any[]> extends ComponentFallback {
   each: StoreObject<T>;
-  children: (item: StoreObject<T>, i: number) => someView;
+  children: (item: T[number], i: number) => someView;
 }
 
 export declare function For<T extends any[]>(props?: ForProps<T>): someView;

@@ -6,9 +6,13 @@ import {
   AgnosticRouteMatch,
   AgnosticRouteObject,
   matchRoutes,
-  // @ts-ignore
 } from "@remix-run/router";
 import { warn } from "../dom/helpers";
+
+export function transitionIfSupported(cb: CallableFunction) {
+  // @ts-expect-error
+  document.startViewTransition?.(cb) || cb()
+}
 
 export const Router = {
   push: (path: string) => {
@@ -45,5 +49,6 @@ export const redirect = (path: `/${string}`) => {
 };
 
 export const navigate = (path: `/${string}`) => {
-  Router.push(path);
+  // if nixixStore.viewTransitions 
+  nixixStore.viewTransitions ? transitionIfSupported(() => Router.push(path)) : Router.push(path)
 };

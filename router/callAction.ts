@@ -50,7 +50,7 @@ export const actionData: typeof ActionDataFunction = (path: PathToRoute, value: 
       const [adStore] = routeMatch.route.actionSignal as typeof valStore  || [];
       if (!adStore) raise(`Specify an action function for ${path}`)
       callReaction(() => {
-        setVal(adStore.$$__value)
+        setVal(adStore)
         navigate(path)
       }, [adStore])
     } else raise(`There are no route matches for ${path}.`);

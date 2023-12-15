@@ -2,7 +2,6 @@ import { Signal, Store } from "./classes";
 import { nixixStore } from "../dom";
 import {
   incrementId,
-  isNotEqualObject,
   cloneObject,
   removeChars,
   isFunction,
@@ -230,7 +229,10 @@ function renderEffect(
     ? nixixStore["signalCount"]
     : nixixStore["storeCount"]
 ) {
-  callbackFn();
+  window.addEventListener('DOMContentLoaded', function rendered () {
+    callbackFn()
+    this.window.removeEventListener('DOMContentLoaded', rendered)
+  })
   dispatchEffect(callbackFn, config, furtherDependents, id);
 }
 

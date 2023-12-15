@@ -1,7 +1,6 @@
-import { nixixStore } from "../dom";
 import { createFragment } from "../dom/helpers";
 import { LiveFragment } from "../live-fragment";
-import { callReaction, Store } from "../primitives";
+import { callEffect, callReaction, Store } from "../primitives";
 import {
   arrayOfJSX,
   createBoundary,
@@ -15,18 +14,21 @@ export function For(props: ForProps) {
   let { fallback, children, each } = props;
   let [callback] = children!;
   fallback = fallback || (compFallback() as any);
-  children = arrayOfJSX(each, callback);
-  const commentBoundary = createBoundary(
-    children.length > 0 ? children : fallback,
-    "for"
-  );
+  // create the children on the resolve immediate, because arr.map may access arr.length and return a signal which is not wanted.
+
+  const commentBoundary = createBoundary("", "for");
   let liveFragment: LiveFragment = new LiveFragment(
     commentBoundary.firstChild!,
     commentBoundary.lastChild!
   );
+  callEffect(() => {
+    children = arrayOfJSX(each, callback);
+    liveFragment.replace(createFragment(children));
+  });
   const removedNodes: any[] = [];
+
   callReaction(() => {
-    const eachLen = each.$$__value.length;
+    const eachLen = each.length;
     if (eachLen === 0) {
       removeNodes(eachLen, liveFragment, removedNodes);
       return liveFragment.replace(createFragment(fallback));
@@ -52,9 +54,8 @@ export function For(props: ForProps) {
           childnodesLength = liveFragment.childNodes.length; // 4
           if (childnodesLength === eachLen) return;
           const indexArray = numArray(childnodesLength, eachLen);
-          children = getIncrementalNodes(indexArray, Store, each, callback);
+          children = getIncrementalNodes(indexArray, each, callback);
           liveFragment.append(createFragment(children));
-          nixixStore.Store?.[`_${each.$$__id}_`].cleanup?.();
         } else if (targetLength > eachLen) {
           // [<div class="text-blue-200" >, <div>, <div>, <div>]
           // [<div class="text-blue-200" >, <div>, ]
