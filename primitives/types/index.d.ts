@@ -1,4 +1,4 @@
-import '../types/index';
+import { EmptyObject } from '../../types/index';
 
 // primitives
 export type SetSignalDispatcher<S> = (newValue: S | ((prev: S) => S)) => void;
@@ -20,9 +20,7 @@ export class Signal {
 }
 
 export class Store {
-  '$$__name': string;
   '$$__id': string | number;
-  '$$__value': any;
 }
 
 export interface MutableRefObject<T> {
@@ -33,21 +31,22 @@ export interface MutableRefObject<T> {
   parent: HTMLElement;
 }
 
+type Primitives = string | boolean | number;
+
+type NonPrimitives = EmptyObject | Array<any>
+
 /**
  * Returns a tuple of the initial value and a setter function to update the values.
  *
  * @param initialValue initial value to be tracked: can be an object or an array.
  * @param config this object is optional, it requires an equals property of type 'boolean'. If equals is 'true', it will skip comparing the two objects for sameness else it will check for sameness before updating the signal
  */
-export function callSignal<S>(
+export function callSignal<S extends Primitives>(
   initialValue: S,
   config?: {
     equals: boolean;
   }
 ): [SignalObject<S>, SetSignalDispatcher<S>];
-
-export const signal: typeof callSignal;
-export const store: typeof callStore;
 
 /**
  * Returns a tuple of the initial value and a setter function to update the values.
@@ -55,14 +54,20 @@ export const store: typeof callStore;
  * @param initialValue initial value to be tracked: can be an object or an array.
  * @param config this object is optional, it requires an equals property of type 'boolean'. If equals is 'true', it will skip comparing the two objects for sameness else it will check for sameness before updating the store
  */
-export function callStore<O>(
+export function callStore<O extends NonPrimitives>(
   initialValue: O,
   config?: {
     equals: boolean;
   }
 ): [StoreObject<O>, SetStoreDispatcher<O>];
 
+export const signal: typeof callSignal;
+
+export const store: typeof callStore;
+
 export function getValueType<T>(value: any): any[] | undefined
+
+type Deps = (SignalObject<Primitives> | StoreObject<NonPrimitives>)[]
 
 /**
  * Creates a read-only signal or store which depends on other signals or stores.
@@ -70,16 +75,17 @@ export function getValueType<T>(value: any): any[] | undefined
  * @param fn callback function to return the initialValue
  * @param deps array of signals or stores to which when changed re-runs and updates the memo's value;
  */
-export function memo<S extends string | number | boolean>(
+export function memo<S extends Primitives>(
   fn: () => S,
-  deps: (SignalObject<any> | StoreObject<any>)[]
+  deps: Deps
 ): MemoSignal<S>;
-export function memo<S extends any[] | object>(
+export function memo<S extends NonPrimitives>(
   fn: () => S,
-  deps: (SignalObject<any> | StoreObject<any>)[]
+  deps: Deps
 ): MemoStore<S>;
 
 /**
+ * @deprecated PLEASE DO NOT USE THIS FUNCTION, USE `callEffect` or `callReaction`
  * Tracks the closest (signal or store) and calls the callback function whenever the (signal or store)'s value changes.
  * If there is no signal or store, it does no tracking.
  *
@@ -88,7 +94,7 @@ export function memo<S extends any[] | object>(
 export function effect(
   callbackFn: CallableFunction,
   config?: 'once' | null,
-  deps?: (SignalObject<any> | StoreObject<any>)[]
+  deps?: Deps
 ): void;
 
 /**
@@ -99,7 +105,7 @@ export function effect(
  */
 export function callEffect(
   callbackFn: CallableFunction,
-  deps?: (SignalObject<any> | StoreObject<any>)[]
+  deps?: Deps
 ): void;
 
 /**
@@ -110,7 +116,7 @@ export function callEffect(
  */
 export function callReaction(
   callbackFn: CallableFunction,
-  deps?: (SignalObject<any> | StoreObject<any>)[]
+  deps?: Deps
 ): void;
 
 /**
@@ -122,7 +128,7 @@ export function callReaction(
 export function renderEffect(
   callbackFn: CallableFunction,
   config?: 'once' | null,
-  deps?: (SignalObject<any> | StoreObject<any>)[]
+  deps?: Deps
 ): void;
 
 export function removeSignal(

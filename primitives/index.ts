@@ -7,6 +7,8 @@ import {
   removeChars,
   isFunction,
   isPrimitive,
+  forEach,
+  isNull,
 } from "./helpers";
 import { raise } from "../dom/helpers";
 import { patchObj } from "./patchObj";
@@ -133,30 +135,32 @@ function pushFurtherDeps(
   callbackFn: CallableFunction,
   furtherDependents?: (Signal | Store)[]
 ) {
-  if (furtherDependents) {
-    furtherDependents.forEach((furtherDep) => {
-      if (furtherDep instanceof Signal) {
-        let obj = nixixStore.SignalStore?.[`_${furtherDep.$$__id}_`];
-        obj
-          ? obj.effect
-            ? obj.effect.includes(callbackFn)
-              ? null
-              : obj.effect.push(callbackFn)
-            : (obj.effect = [callbackFn])
-          : null;
-      } else if (furtherDep instanceof Store) {
+  if (furtherDependents) 
+    resolveImmediate(() => {
+      forEach(furtherDependents, (dep) => {
         // @ts-expect-error
-        let obj = nixixStore.Store?.[`_${removeChars(furtherDep.$$__id)}_`];
-        obj
-          ? obj.effect
-            ? obj.effect.includes(callbackFn)
-              ? null
-              : obj.effect.push(callbackFn)
-            : (obj.effect = [callbackFn])
-          : null;
-      }
-    });
-  }
+        let id = dep.$$__id;
+        if (isNull(id)) return
+        switch (dep instanceof Signal) {
+          case true: 
+            pushInEffects(callbackFn, id, 'SignalStore')
+          case false: 
+            pushInEffects(callbackFn, id, 'Store')
+        }
+      })
+    })
+}
+
+function pushInEffects(cb: CallableFunction, id: number | undefined, type: 'Store' | 'SignalStore') {
+  let obj = nixixStore[type]?.[`_${id}_`];
+  if (!obj) return;
+  let effect = obj.effect
+  if (effect) 
+    if (effect.includes?.(cb)) return;
+    else {
+      effect.push(cb)
+    }
+  else obj.effect = [cb]
 }
 
 function dispatchEffect(
@@ -200,7 +204,6 @@ function effect(
     : nixixStore["storeCount"]
 ) {
   dispatchEffect(callbackFn, config, furtherDependents, id);
-
   resolveImmediate(callbackFn)
 }
 
@@ -209,7 +212,6 @@ function callEffect(
   furtherDependents?: (Signal | Store)[]
 ) {
   pushFurtherDeps(callbackFn, furtherDependents);
-
   resolveImmediate(callbackFn)
 }
 

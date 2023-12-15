@@ -42,6 +42,10 @@ function removeChars(str: string | number) {
   return String(str).replace(/_/g, '');
 }
 
+function isNull(val: any) {
+  return val === null || val === undefined;
+}
+
 function checkType(value: string | number | boolean) {
   const types = {
     boolean: Boolean,
@@ -80,6 +84,7 @@ async function cleanup(store: Store) {
 export {
   incrementId,
   checkType,
+  isNull,
   isPrimitive,
   removeChars,
   cleanup,
