@@ -85,10 +85,10 @@ function callStore<S>(
   nixixStore["$$__lastReactionProvider"] = "store";
   nixixStore.Store === undefined  && (nixixStore.Store = {});
   const { Store: SStore } = nixixStore as Required<typeof nixixStore>
-  let value: Array<any> | object = isFunction(initialValue)
+  let value: Array<any> | object = cloneObject(isFunction(initialValue)
     ? (initialValue as Function)()
-    : initialValue;
-
+    : initialValue );
+  
   SStore[`_${storeId}_`] = { value: value };
   let initValue = new Store({ value: value, id: storeId });
 

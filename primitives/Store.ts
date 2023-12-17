@@ -20,7 +20,7 @@ function createStoreProxy(obj: object | any[]) {
       let jsx = nixixStore.jsx
       const val = target[p];
       let returnedValue: any = null;
-      if (!isPrimitive(val)) returnedValue = val;
+      if (!isPrimitive(val) || (p === '$$__id')) returnedValue = val;
       else {
         let signalMap = this.signalMap;
         if (jsx) {
