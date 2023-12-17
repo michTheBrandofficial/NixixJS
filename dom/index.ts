@@ -9,7 +9,7 @@ import {
   checkDataType,
 } from "./helpers";
 import { PROP_ALIASES, SVG_ELEMENTTAGS, SVG_NAMESPACE } from "./utilVars";
-import { isFunction } from "primitives/helpers";
+import { isFunction } from "../primitives/helpers";
 
 type GlobalStore = {
   $$__lastReactionProvider?: "signal" | "store";

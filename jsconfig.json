@@ -6,7 +6,7 @@
     "strict": true,
     "jsxImportSource": "types",
     "types": ["./types", "@remix-run/router"],
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "skipLibCheck": false
   },
   "include": ["./**/*"]
