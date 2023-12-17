@@ -1,6 +1,6 @@
 import { EmptyObject } from '../../types/index';
 
-// primitives
+// primitive
 export type SetSignalDispatcher<S> = (newValue: S | ((prev: S) => S)) => void;
 export type SetStoreDispatcher<S> = (newValue: S | ((prev: S) => S)) => void;
 
@@ -31,9 +31,9 @@ export interface MutableRefObject<T> {
   parent: HTMLElement;
 }
 
-type Primitives = string | boolean | number;
+type Primitive = string | boolean | number;
 
-type NonPrimitives = EmptyObject | Array<any>
+type NonPrimitive = EmptyObject | Array<any>
 
 /**
  * Returns a tuple of the initial value and a setter function to update the values.
@@ -41,7 +41,7 @@ type NonPrimitives = EmptyObject | Array<any>
  * @param initialValue initial value to be tracked: can be an object or an array.
  * @param config this object is optional, it requires an equals property of type 'boolean'. If equals is 'true', it will skip comparing the two objects for sameness else it will check for sameness before updating the signal
  */
-export function callSignal<S extends Primitives>(
+export function callSignal<S extends Primitive>(
   initialValue: S,
   config?: {
     equals: boolean;
@@ -54,7 +54,7 @@ export function callSignal<S extends Primitives>(
  * @param initialValue initial value to be tracked: can be an object or an array.
  * @param config this object is optional, it requires an equals property of type 'boolean'. If equals is 'true', it will skip comparing the two objects for sameness else it will check for sameness before updating the store
  */
-export function callStore<O extends NonPrimitives>(
+export function callStore<O extends NonPrimitive>(
   initialValue: O,
   config?: {
     equals: boolean;
@@ -67,7 +67,7 @@ export const store: typeof callStore;
 
 export function getValueType<T>(value: any): any[] | undefined
 
-type Deps = (SignalObject<Primitives> | StoreObject<NonPrimitives>)[]
+type Deps = (SignalObject<Primitive> | StoreObject<NonPrimitive>)[]
 
 /**
  * Creates a read-only signal or store which depends on other signals or stores.
@@ -75,11 +75,11 @@ type Deps = (SignalObject<Primitives> | StoreObject<NonPrimitives>)[]
  * @param fn callback function to return the initialValue
  * @param deps array of signals or stores to which when changed re-runs and updates the memo's value;
  */
-export function memo<S extends Primitives>(
+export function memo<S extends Primitive>(
   fn: () => S,
   deps: Deps
 ): MemoSignal<S>;
-export function memo<S extends NonPrimitives>(
+export function memo<S extends NonPrimitive>(
   fn: () => S,
   deps: Deps
 ): MemoStore<S>;

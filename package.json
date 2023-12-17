@@ -1,6 +1,6 @@
 {
   "name": "nixix",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "NixixJS is a lightweight JavaScript Library used for building reactive User Interfaces.",
   "main": "./dom/index.ts",
   "module": "./dom/index.ts",
@@ -20,7 +20,6 @@
   "dependencies": {
     "@remix-run/router": "^1.12.0",
     "csstype": "latest",
-    "recursive-diff": "^1.0.9",
     "vite": "latest",
     "vite-jsconfig-paths": "latest"
   }

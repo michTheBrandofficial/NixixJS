@@ -28,10 +28,8 @@ export function switchRoutes({ provider, routeMatch }: EmptyObject) {
       break;
     default:
       if (nixixStore.$$__routeStore?.currentRoute === route) return;
-      const elementForRoute = createFragment(element);
-      nixixStore.$$__routeStore!.currentRoute!.element = elementForRoute;
-      provider?.replace(elementForRoute);
       nixixStore.$$__routeStore!.currentRoute! = route;
+      provider?.replace(createFragment(element));
       break;
   }
 }

@@ -5,6 +5,7 @@
     "jsx": "react-jsxdev",
     "strict": true,
     "jsxImportSource": "types",
+    "module": "es2020",
     "types": ["./types", "@remix-run/router"],
     "moduleResolution": "Bundler",
     "skipLibCheck": false
