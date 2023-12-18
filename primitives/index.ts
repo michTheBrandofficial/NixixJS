@@ -3,7 +3,6 @@ import { nixixStore } from "../dom";
 import {
   incrementId,
   cloneObject,
-  removeChars,
   isFunction,
   isPrimitive,
   forEach,
@@ -38,7 +37,7 @@ function callSignal<S>(
 ): [SignalObject<S>, SetSignalDispatcher<S>] {
   const signalId = incrementId("signalCount") as number;
   nixixStore["$$__lastReactionProvider"] = "signal";
-  !(nixixStore.SignalStore) && (nixixStore.SignalStore = {});
+  !nixixStore.SignalStore && (nixixStore.SignalStore = {});
   const { SignalStore } = nixixStore as Required<typeof nixixStore>;
   /**
    * value - in the worst case of it being an instance of object, throw an error.
@@ -53,21 +52,19 @@ function callSignal<S>(
   return [
     initValue,
 
-    function (
-      newState,
-    ) {
+    function (newState) {
       let oldState = initValue.value;
       let newStatePassed = isFunction(newState)
         ? (newState as Function)(oldState)
         : newState;
-        switch (true) {
-          case config?.equals:
-          case String(oldState) !== String(newStatePassed):
-            const signal = SignalStore[`_${signalId}_`];
-            signal.value = newStatePassed;
-            initValue.value = newStatePassed;
-            signal.effect?.forEach((eff) => eff());
-        }
+      switch (true) {
+        case config?.equals:
+        case String(oldState) !== String(newStatePassed):
+          const signal = SignalStore[`_${signalId}_`];
+          signal.value = newStatePassed;
+          initValue.value = newStatePassed;
+          signal.effect?.forEach((eff) => eff());
+      }
     },
   ];
 }
@@ -83,27 +80,26 @@ function callStore<S>(
 ): any[] {
   const storeId = incrementId("storeCount") as number;
   nixixStore["$$__lastReactionProvider"] = "store";
-  nixixStore.Store === undefined  && (nixixStore.Store = {});
-  const { Store: SStore } = nixixStore as Required<typeof nixixStore>
-  let value: Array<any> | object = cloneObject(isFunction(initialValue)
-    ? (initialValue as Function)()
-    : initialValue );
-  
+  nixixStore.Store === undefined && (nixixStore.Store = {});
+  const { Store: SStore } = nixixStore as Required<typeof nixixStore>;
+  let value: Array<any> | object = cloneObject(
+    isFunction(initialValue) ? (initialValue as Function)() : initialValue
+  );
+
   SStore[`_${storeId}_`] = { value: value };
   let initValue = new Store({ value: value, id: storeId });
 
   return [
     initValue,
     (newValue: (prev?: any) => any) => {
-      let newValuePassed =
-        isFunction(newValue)
-          ? newValue(cloneObject(SStore[`_${storeId}_`].value))
-          : newValue;
+      let newValuePassed = isFunction(newValue)
+        ? newValue(cloneObject(SStore[`_${storeId}_`].value))
+        : newValue;
 
       switch (true) {
-        case config?.equals: 
+        case config?.equals:
         default:
-          patchObj(initValue, newValuePassed)
+          patchObj(initValue, newValuePassed);
           const store = SStore[`_${storeId}_`];
           store.effect?.forEach((eff) => eff());
       }
@@ -134,32 +130,36 @@ function pushFurtherDeps(
   callbackFn: CallableFunction,
   furtherDependents?: (Signal | Store)[]
 ) {
-  if (furtherDependents) 
+  if (furtherDependents)
     resolveImmediate(() => {
       forEach(furtherDependents, (dep) => {
         // @ts-expect-error
         let id = dep.$$__id;
-        if (isNull(id)) return
+        if (isNull(id)) return;
         switch (dep instanceof Signal) {
-          case true: 
-            pushInEffects(callbackFn, id, 'SignalStore')
-          case false: 
-            pushInEffects(callbackFn, id, 'Store')
+          case true:
+            pushInEffects(callbackFn, id, "SignalStore");
+          case false:
+            pushInEffects(callbackFn, id, "Store");
         }
-      })
-    })
+      });
+    });
 }
 
-function pushInEffects(cb: CallableFunction, id: number | undefined, type: 'Store' | 'SignalStore') {
+function pushInEffects(
+  cb: CallableFunction,
+  id: number | undefined,
+  type: "Store" | "SignalStore"
+) {
   let obj = nixixStore[type]?.[`_${id}_`];
   if (!obj) return;
-  let effect = obj.effect
-  if (effect) 
+  let effect = obj.effect;
+  if (effect)
     if (effect.includes?.(cb)) return;
     else {
-      effect.push(cb)
+      effect.push(cb);
     }
-  else obj.effect = [cb]
+  else obj.effect = [cb];
 }
 
 function dispatchEffect(
@@ -189,9 +189,9 @@ function dispatchEffect(
 async function resolveImmediate(fn: CallableFunction) {
   await Promise.resolve();
   (async (cb: CallableFunction) => {
-    await Promise.resolve()
-    cb()
-  })(fn)
+    await Promise.resolve();
+    cb();
+  })(fn);
 }
 
 function effect(
@@ -203,7 +203,7 @@ function effect(
     : nixixStore["storeCount"]
 ) {
   dispatchEffect(callbackFn, config, furtherDependents, id);
-  resolveImmediate(callbackFn)
+  resolveImmediate(callbackFn);
 }
 
 function callEffect(
@@ -211,7 +211,7 @@ function callEffect(
   furtherDependents?: (Signal | Store)[]
 ) {
   pushFurtherDeps(callbackFn, furtherDependents);
-  resolveImmediate(callbackFn)
+  resolveImmediate(callbackFn);
 }
 
 function callReaction(
@@ -229,22 +229,22 @@ function renderEffect(
     ? nixixStore["signalCount"]
     : nixixStore["storeCount"]
 ) {
-  window.addEventListener('DOMContentLoaded', function rendered () {
-    callbackFn()
-    this.window.removeEventListener('DOMContentLoaded', rendered)
-  })
+  window.addEventListener("DOMContentLoaded", function rendered() {
+    callbackFn();
+    this.window.removeEventListener("DOMContentLoaded", rendered);
+  });
   dispatchEffect(callbackFn, config, furtherDependents, id);
 }
 
 function dispatchSignalRemoval(signal: StoreObject | SignalObject<any>) {
-  if (signal instanceof Store) {
-    delete nixixStore.Store?.[`_${signal.$$__id}_`];
-    // @ts-expect-error
-    nixixStore.Store && --nixixStore.Store.storeCount;
-  } else if (signal instanceof Signal) {
+  if (signal instanceof Signal) {
     delete nixixStore.SignalStore?.[`_${signal.$$__id}_`];
     // @ts-expect-error
-    nixixStore.SignalStore && --nixixStore.SignalStore.signalCount;
+    nixixStore.SignalStore && --nixixStore.signalCount;
+  } else {
+    delete nixixStore.Store?.[`_${signal.$$__id}_`];
+    // @ts-expect-error
+    nixixStore.Store && --nixixStore.storeCount;
   }
 }
 
@@ -259,6 +259,30 @@ function removeSignal(
         dispatchSignalRemoval(signal);
       })
     : dispatchSignalRemoval(signals);
+}
+
+function dispatchEffectRemoval(
+  fn: CallableFunction,
+  signal: StoreObject | SignalObject<any>,
+  effect: CallableFunction[]
+) {
+  if (effect.includes(fn)) effect.splice(effect.indexOf(fn), 1);
+  if (effect.length === 0) removeSignal(signal);
+  return true;
+}
+
+function removeEffect(
+  fn: CallableFunction,
+  signal: StoreObject | SignalObject<any>
+) {
+  if (signal instanceof Signal) {
+    const effect = nixixStore.SignalStore?.[`_${signal.$$__id}_`]?.effect;
+    effect && dispatchEffectRemoval(fn, signal, effect);
+  } else {
+    const effect = nixixStore.Store?.[`_${signal.$$__id}_`]?.effect;
+    effect && dispatchEffectRemoval(fn, signal, effect);
+  }
+  return true;
 }
 
 // This is only for simplicity
@@ -280,4 +304,5 @@ export {
   Store,
   Signal,
   removeSignal,
+  removeEffect,
 };

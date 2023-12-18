@@ -23,7 +23,7 @@ export interface LoaderFunction {
   (config: LoaderProps): Promise<any>;
 }
 
-export type ActionFunction<T> = (config: ActionProps) => T;
+export type ActionFunction<T = Promise<object>> = (config: ActionProps) => T;
 
 export type RoutePath = string;
 export interface RouteLink<T extends string>
@@ -37,7 +37,7 @@ export interface RouteConfig<T extends string> {
   path?: T;
   errorRoute?: boolean;
   loader?: LoaderFunction;
-  action?: ActionFunction<Promise<object>>;
+  action?: ActionFunction;
 }
 
 export type FormActionProps = {

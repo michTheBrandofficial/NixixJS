@@ -10,13 +10,13 @@ import {
   compFallback,
 } from "./helpers";
 
-export function For(props: ForProps) {
+export function Index(props: ForProps) {
   let { fallback, children, each } = props;
   let [callback] = children!;
   fallback = fallback || (compFallback() as any);
   // create the children on the resolve immediate, because arr.map may access arr.length and return a signal which is not wanted.
 
-  const commentBoundary = createBoundary("", "for");
+  const commentBoundary = createBoundary("", "index");
   let liveFragment: LiveFragment = new LiveFragment(
     commentBoundary.firstChild!,
     commentBoundary.lastChild!
@@ -25,11 +25,13 @@ export function For(props: ForProps) {
     children = arrayOfJSX(each, callback);
     liveFragment.replace(createFragment(children));
   });
+  const removedNodes: any[] = [];
 
   callReaction(() => {
     const eachLen = each.length;
     if (eachLen === 0) {
-      return liveFragment.replace((removeNodes(eachLen, liveFragment),createFragment(fallback)));
+      removeNodes(eachLen, liveFragment, removedNodes);
+      return liveFragment.replace(createFragment(fallback));
     } else {
       // @ts-expect-error
       if (fallback?.[0]?.isConnected || (fallback as Element)?.isConnected) {
@@ -38,15 +40,35 @@ export function For(props: ForProps) {
       let childnodesLength = liveFragment.childNodes.length;
       if (childnodesLength === eachLen) return;
       if (childnodesLength > eachLen) {
-        removeNodes(eachLen, liveFragment);
+        removeNodes(eachLen, liveFragment, removedNodes);
       } else if (childnodesLength < eachLen) {
-        // nodes -> 3, eachLen -> 6 --> create new nodes and append
+        const targetLength =
+          removedNodes.length + liveFragment.childNodes.length;
+        if (targetLength === eachLen) {
+          Boolean(removedNodes.length) &&
+            liveFragment.appendChild(createFragment(removedNodes));
+          removedNodes.length = 0;
+        } else if (targetLength < eachLen) {
+          Boolean(removedNodes.length) &&
+            liveFragment.appendChild(createFragment(removedNodes));
+          childnodesLength = liveFragment.childNodes.length; // 4
+          if (childnodesLength === eachLen) return;
           const indexArray = numArray(childnodesLength, eachLen);
           children = getIncrementalNodes(indexArray, each, callback);
           liveFragment.append(createFragment(children));
+        } else if (targetLength > eachLen) {
+          // [<div class="text-blue-200" >, <div>, <div>, <div>]
+          // [<div class="text-blue-200" >, <div>, ]
+          const restoredNodes = removedNodes.splice(
+            0,
+            eachLen - childnodesLength
+          );
+          liveFragment.appendChild(createFragment(restoredNodes));
+        }
       }
     }
   }, [each]);
 
   return commentBoundary;
 }
+  

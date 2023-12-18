@@ -23,6 +23,11 @@ export function render(element: NixixNode | (() => NixixNode), root: HTMLElement
   commentForLF
 }?: RenderConfig): void;
 
+/**
+ * This function should be used to remove nodes, it also removes reactions and signals from the nodes, thereby helping in garbage collection of dom nodes.
+ */
+export function removeNode(node: Element | Text): boolean;
+
 type RouteType = {
   element?: any;
   path?: `/${string}`

@@ -1,4 +1,4 @@
-import { nixixStore } from '../dom';
+import { nixixStore, removeNode } from '../dom/index';
 import { createFragment, createText } from '../dom/helpers';
 import { Store } from '../primitives/classes';
 import { LiveFragment } from '../live-fragment/types';
@@ -11,7 +11,9 @@ export function indexes(arr: Array<any>) {
   return [arr[0], arr[arr.length - 1]];
 }
 
-export function boundary(commentName?: 'suspense' | 'for' | 'show') {
+type CommentName = 'suspense' | 'for' | 'show' | 'index';
+
+export function boundary(commentName?: CommentName) {
   const { commentForLF } = nixixStore;
   return commentForLF ? comment(`nixix-${commentName}`) : createText('');
 }
@@ -23,7 +25,7 @@ export function compFallback() {
 
 export function createBoundary(
   values: any,
-  commentName: 'suspense' | 'for' | 'show'
+  commentName: CommentName
 ): DocumentFragment {
   return createFragment([
     boundary(commentName),
@@ -81,12 +83,13 @@ export function getShow(bool: boolean, children: any, fallback: any) {
 export function removeNodes(
   eachLen: number,
   liveFragment: LiveFragment,
-  removedNodes: any[]
+  removedNodes?: any[]
 ) {
   const cachedNodes = liveFragment?.childNodes?.slice(eachLen) as any[];
-  removedNodes.unshift(...cachedNodes);
+  removedNodes?.unshift?.(...cachedNodes);
   cachedNodes.forEach((node) => {
-    liveFragment.removeChild(node);
+    liveFragment.removeChild(node) 
+    if (!removedNodes) removeNode(node)
   });
 }
 

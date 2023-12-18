@@ -1,7 +1,8 @@
 import { Img } from "./Img";
 import { Suspense } from "./Suspense";
 import { For } from "./For";
+import { Index } from './IndexHOC'
 import { Show } from "./Show";
 import { lazy, asyncComponent } from "./Async";
 
-export { For, Img, Show, Suspense, asyncComponent, lazy };
+export { Img, For, Index, Show, Suspense, asyncComponent, lazy };

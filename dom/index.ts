@@ -1,4 +1,4 @@
-import { callEffect } from "../primitives/index";
+import { callEffect, removeEffect } from "../primitives/index";
 import { Signal, Store } from "../primitives/classes";
 import {
   raise,
@@ -107,12 +107,19 @@ function setAttribute(
       `The ${attrName} prop cannot be null or undefined. Skipping attribute parsing.`
     );
   if (attrValue instanceof Signal) {
-    callEffect(() => {
+    // @ts-expect-error
+    function propEff() {
       type === "propertyAttribute"
         ? // @ts-ignore
           (element[attrName] = getSignalValue(attrValue))
-        : element.setAttribute(attrName, getSignalValue(attrValue));
-    }, [attrValue]);
+        : element.setAttribute(attrName, getSignalValue(attrValue as Signal));
+    }
+    element.addEventListener('remove:node', function removeRxn(e) {
+      // remove the effect;
+      removeEffect(propEff, attrValue as any)
+      e.currentTarget?.removeEventListener?.('remove:node', removeRxn)
+    })
+    callEffect(propEff, [attrValue]);
   } else if (checkDataType(attrValue)) {
     type === "propertyAttribute"
       ? // @ts-ignore
@@ -138,9 +145,16 @@ function setStyle(element: NixixElementType, styleValue: StyleValueType) {
     }
 
     if (value instanceof Signal) {
-      callEffect(() => {
+      // @ts-expect-error
+      function styleEff() {
         element["style"][styleKey] = getSignalValue(value as Signal);
-      }, [value]);
+      }
+      element.addEventListener('remove:node', function removeRxn(e) {
+        // remove the effect;
+        removeEffect(styleEff, value as any)
+        e.currentTarget?.removeEventListener?.('remove:node', removeRxn)
+      })  
+      callEffect(styleEff, [value]);
     } else {
       element["style"][styleKey] = value as string;
     }
@@ -238,6 +252,14 @@ function render(
   doBGWork(() => (nixixStore["root"] = root));
 }
 
+function removeNode(node: Element | Text) {
+  const isConnected = node.isConnected;
+  if (isConnected) node?.remove?.();
+  node?.dispatchEvent?.(new Event('remove:node'))
+  node?.childNodes?.forEach?.(child => removeNode(child as any))
+  return isConnected
+}
+
 async function doBGWork(fn: CallableFunction) {
   await Promise.resolve();
   fn();
@@ -248,4 +270,4 @@ function turnOnJsx() {
 }
 
 export default Nixix;
-export { render, setAttribute, turnOnJsx };
+export { render, setAttribute, turnOnJsx, removeNode };

@@ -1,5 +1,5 @@
 import { Signal } from "../primitives/classes";
-import { callEffect } from "../primitives/index";
+import { callEffect, removeEffect } from "../primitives/index";
 
 export function checkDataType(value: any) {
   return (
@@ -44,9 +44,16 @@ export function fillInChildren(
     } else if (typeof child === "object") {
       if (child instanceof Signal) {
         const text = addText(element);
-        callEffect(() => {
-          text.textContent = getSignalValue(child);
-        }, [child]);
+        // @ts-expect-error
+        function textEff() {
+          text.textContent = getSignalValue(child as any);
+        }
+        text.addEventListener('remove:node', function removeRxn(e) {
+          // remove the effect;
+          removeEffect(textEff, child as any)
+          e.currentTarget?.removeEventListener?.('remove:node', removeRxn)
+        })
+        callEffect(textEff, [child]);
       } else {
         element?.append?.(child as unknown as string);
       }

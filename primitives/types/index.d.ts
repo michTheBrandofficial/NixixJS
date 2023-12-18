@@ -138,6 +138,8 @@ export function removeSignal(
     | SignalObject<any>
 ): void;
 
+export function removeEffect(fn: CallableFunction, signal: Deps[number]): void;
+
 /**
      * ```jsx
      * This function is used to get a reference to a dom element. To get the element you want to manipulate, add the 'bind:ref' prop with it's value as the ref variable. 
