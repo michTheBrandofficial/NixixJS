@@ -47,11 +47,10 @@ export const nixixStore = window.$$__NixixStore as GlobalStore;
 const Nixix = {
   create: function (
     tagNameFC: target,
-    props: Proptype,
-    ...children: ChildrenType
+    props: () => Proptype,
+    children: () => ChildrenType
   ): Element | Array<Element | string | Signal> | undefined {
-    !nixixStore.jsx &&
-      ((nixixStore.jsx = true), callEffect(() => (nixixStore.jsx = false)));
+    nixixStore.jsx = true;
     let returnedElement: any = null;
     if (typeof tagNameFC === "string") {
       if (tagNameFC === "fragment") {
@@ -61,11 +60,12 @@ const Nixix = {
         const element = !SVG_ELEMENTTAGS.includes(tagNameFC)
           ? document.createElement(tagNameFC)
           : document.createElementNS(SVG_NAMESPACE, tagNameFC);
-        setProps(props, element);
-        setChildren(children, element);
+        setProps(props?.(), element);
+        setChildren(children?.(), element);
         returnedElement = element;
       }
-    } else returnedElement = buildComponent(tagNameFC, props, children);
+    } else returnedElement = buildComponent(tagNameFC, props?.(), children?.());
+    nixixStore.jsx = false
     return returnedElement;
   },
   handleDirectives: handleDirectives_,
@@ -228,6 +228,7 @@ function buildComponent(
 ) {
   let returnedElement: any = null;
   if (isFunction(tagNameFC)) {
+    nixixStore.jsx = false
     const artificialProps = props || {};
     Boolean(children?.length) && (artificialProps.children = children);
     returnedElement = (tagNameFC as Function)(artificialProps);
@@ -269,5 +270,7 @@ function turnOnJsx() {
   nixixStore.jsx = true;
 }
 
+const create = Nixix.create;
+
 export default Nixix;
-export { render, setAttribute, turnOnJsx, removeNode };
+export { create, render, setAttribute, turnOnJsx, removeNode };
