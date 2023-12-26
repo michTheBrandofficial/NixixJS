@@ -3,6 +3,7 @@ import { nixixStore } from "../dom";
 import type { EmptyObject } from "../types";
 import { callLoader } from "./callLoader";
 import { navigate } from "./Router";
+import { isFunction } from "../primitives/helpers";
 
 export function handleLocation() {
   const {
@@ -29,7 +30,12 @@ export function switchRoutes({ provider, routeMatch }: EmptyObject) {
     default:
       if (nixixStore.$$__routeStore?.currentRoute === route) return;
       nixixStore.$$__routeStore!.currentRoute! = route;
-      provider?.replace(createFragment(element));
+      let routePage: any;
+      if (isFunction(element)) {
+        routePage = element()
+        route.element = routePage
+      } else routePage = element;
+      provider?.replace(createFragment(routePage));
       break;
   }
 }

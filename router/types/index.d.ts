@@ -10,7 +10,7 @@ import {
 import { MemoStore } from "../../primitives/types";
 
 export interface LoaderProps {
-  params: EmptyObject<string>;
+  params: EmptyObject<string | undefined>;
   /**
    * Experimental *use at your own risk*
    */
@@ -32,7 +32,7 @@ export interface RouteLink<T extends string>
   to: ValueType<T>;
 }
 export interface RouteConfig<T extends string> {
-  element: NixixNode;
+  element: NixixNode | (() => NixixNode);
   children?: NixixNode;
   path?: T;
   errorRoute?: boolean;
