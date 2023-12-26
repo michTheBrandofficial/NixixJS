@@ -48,7 +48,7 @@ const Nixix = {
   create: function (
     tagNameFC: target,
     props: Proptype,
-    children: ChildrenType
+    ...children: ChildrenType
   ): Element | Array<Element | string | Signal> | undefined {
     nixixStore.jsx = true;
     let returnedElement: any = null;
