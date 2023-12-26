@@ -48,8 +48,8 @@ declare module '../../types/index.d.ts' {
   function create<T extends Tagname>(
     tagNameFC: T,
     // @ts-ignore
-    props: () => JSX.IntrinsicElements[T],
-    children?: () => NixixNode[]
+    props: JSX.IntrinsicElements[T],
+    ...children: NixixNode[]
   ): NixixNode
 
   type RenderConfig = {
@@ -58,7 +58,7 @@ declare module '../../types/index.d.ts' {
 
   /**
    * render function
-   * @param element JSX.Element to render
+   * @param element JSX.Element to render | preferably a function to return the jsx.element
    * @param root element which element will be appended to
    */
   function render(

@@ -47,8 +47,8 @@ export const nixixStore = window.$$__NixixStore as GlobalStore;
 const Nixix = {
   create: function (
     tagNameFC: target,
-    props: () => Proptype,
-    children: () => ChildrenType
+    props: Proptype,
+    children: ChildrenType
   ): Element | Array<Element | string | Signal> | undefined {
     nixixStore.jsx = true;
     let returnedElement: any = null;
@@ -60,11 +60,11 @@ const Nixix = {
         const element = !SVG_ELEMENTTAGS.includes(tagNameFC)
           ? document.createElement(tagNameFC)
           : document.createElementNS(SVG_NAMESPACE, tagNameFC);
-        setProps(props?.(), element);
-        setChildren(children?.(), element);
+        setProps(props, element);
+        setChildren(children, element);
         returnedElement = element;
       }
-    } else returnedElement = buildComponent(tagNameFC, props?.(), children?.());
+    } else returnedElement = buildComponent(tagNameFC, props, children);
     nixixStore.jsx = false
     return returnedElement;
   },

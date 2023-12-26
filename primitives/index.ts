@@ -139,7 +139,7 @@ function pushFurtherDeps(
         switch (dep instanceof Signal) {
           case true:
             pushInEffects(callbackFn, id, "SignalStore");
-	    break;
+            break;
           case false:
             pushInEffects(callbackFn, id, "Store");
             break;
