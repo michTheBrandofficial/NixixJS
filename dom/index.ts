@@ -50,7 +50,7 @@ const Nixix = {
     props: Proptype,
     ...children: ChildrenType
   ): Element | Array<Element | string | Signal> | undefined {
-    nixixStore.jsx = true;
+    if (!nixixStore.jsx) doBGWork(() => nixixStore.jsx = false), (nixixStore.jsx = true);
     let returnedElement: any = null;
     if (typeof tagNameFC === "string") {
       if (tagNameFC === "fragment") {
@@ -65,7 +65,6 @@ const Nixix = {
         returnedElement = element;
       }
     } else returnedElement = buildComponent(tagNameFC, props, children);
-    nixixStore.jsx = false
     return returnedElement;
   },
   handleDirectives: handleDirectives_,
@@ -228,7 +227,6 @@ function buildComponent(
 ) {
   let returnedElement: any = null;
   if (isFunction(tagNameFC)) {
-    nixixStore.jsx = false
     const artificialProps = props || {};
     Boolean(children?.length) && (artificialProps.children = children);
     returnedElement = (tagNameFC as Function)(artificialProps);
