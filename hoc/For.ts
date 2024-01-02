@@ -1,6 +1,6 @@
 import { createFragment } from "../dom/helpers";
 import { LiveFragment } from "../live-fragment";
-import { callEffect, callReaction, Store } from "../primitives";
+import { callReaction } from "../primitives";
 import {
   arrayOfJSX,
   createBoundary,
@@ -14,24 +14,20 @@ export function For(props: ForProps) {
   let { fallback, children, each } = props;
   let [callback] = children!;
   fallback = fallback || (compFallback() as any);
-  // create the children on the resolve immediate, because arr.map may access arr.length and return a signal which is not wanted.
-
-  const commentBoundary = createBoundary("", "for");
-  let liveFragment: LiveFragment = new LiveFragment(
+  children = arrayOfJSX(each, callback);
+  const commentBoundary = createBoundary(createFragment(children), "for");
+  const liveFragment: LiveFragment = new LiveFragment(
     commentBoundary.firstChild!,
     commentBoundary.lastChild!
   );
-  callEffect(() => {
-    children = arrayOfJSX(each, callback);
-    liveFragment.replace(createFragment(children));
-  });
 
-  callReaction(() => {
+  callReaction(function ForEff() {
     const eachLen = each.length;
     if (eachLen === 0) {
-      return liveFragment.replace((removeNodes(eachLen, liveFragment),createFragment(fallback)));
+      return liveFragment.replace(
+        (removeNodes(eachLen, liveFragment), createFragment(fallback))
+      );
     } else {
-      // @ts-expect-error
       if (fallback?.[0]?.isConnected || (fallback as Element)?.isConnected) {
         liveFragment.empty();
       }
@@ -41,9 +37,9 @@ export function For(props: ForProps) {
         removeNodes(eachLen, liveFragment);
       } else if (childnodesLength < eachLen) {
         // nodes -> 3, eachLen -> 6 --> create new nodes and append
-          const indexArray = numArray(childnodesLength, eachLen);
-          children = getIncrementalNodes(indexArray, each, callback);
-          liveFragment.append(createFragment(children));
+        const indexArray = numArray(childnodesLength, eachLen);
+        children = getIncrementalNodes(indexArray, each, callback);
+        liveFragment.append(createFragment(children));
       }
     }
   }, [each]);

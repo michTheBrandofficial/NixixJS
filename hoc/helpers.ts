@@ -1,7 +1,7 @@
-import { nixixStore, removeNode } from '../dom/index';
-import { createFragment, createText } from '../dom/helpers';
-import { Store } from '../primitives/classes';
-import { LiveFragment } from '../live-fragment/types';
+import { nixixStore, removeNode } from "../dom/index";
+import { createFragment, createText } from "../dom/helpers";
+import { Store } from "../primitives/classes";
+import { LiveFragment } from "../live-fragment/types";
 
 export function comment(str: string) {
   return document.createComment(str);
@@ -11,27 +11,23 @@ export function indexes(arr: Array<any>) {
   return [arr[0], arr[arr.length - 1]];
 }
 
-type CommentName = 'suspense' | 'for' | 'show' | 'index';
+type CommentName = "suspense" | "for" | "show" | "index";
 
 export function boundary(commentName?: CommentName) {
   const { commentForLF } = nixixStore;
-  return commentForLF ? comment(`nixix-${commentName}`) : createText('');
+  return commentForLF ? comment(`nixix-${commentName}`) : createText("");
 }
 
 export function compFallback() {
   const { commentForLF } = nixixStore;
-  return commentForLF ? comment('nixix-fallback') : createText('')
+  return commentForLF ? comment("nixix-fallback") : createText("");
 }
 
 export function createBoundary(
   values: any,
   commentName: CommentName
 ): DocumentFragment {
-  return createFragment([
-    boundary(commentName),
-    values,
-    boundary(commentName),
-  ]);
+  return createFragment([boundary(commentName), values, boundary(commentName)]);
 }
 
 export function numArray(start: number, end: number) {
@@ -42,13 +38,11 @@ export function numArray(start: number, end: number) {
   return arr;
 }
 
-export function arrayOfJSX(each: any[], callback: any): any[]  {
+export function arrayOfJSX(each: any[], callback: any): any[] {
   const array = each as [];
   const returnedValue = array.map((e, i) => {
-    nixixStore.jsx = true
-    return callback(e,i)
+    return callback(e, i);
   });
-  nixixStore.jsx = false;
   return returnedValue;
 }
 
@@ -69,17 +63,18 @@ export function getShow(bool: boolean, children: any, fallback: any) {
   return bool ? children : fallback;
 }
 
-// childNodes = 7;
-// eachLen = 4;
-// divArray = [<div>, <div>, <div>, <div>, <div class="bg-blue-300" >, <div>, <div>]; length = 7;
-// toRemove = divArray.slice(4) = [<div class="bg-blue-300" >, <div>, <div>]
-// <<<DONE>>>;
-// divArray = [<div>, <div>, <div>, <div>]; length = 4;
-// childNodes = 4;
-// eachLen = 2;
-// anotherToRemove = divArray.slice(2) = [<div>, <div>]
-// removedNodes = first batch in + second batch in + n batches...
-// removedNodes =  [<div>, <div>, <div class="bg-blue-300" >, <div>, <div>, <div>]
+/* childNodes = 7;
+  eachLen = 4;
+  divArray = [<div>, <div>, <div>, <div>, <div class="bg-blue-300" >, <div>, <div>]; length = 7;
+  toRemove = divArray.slice(4) = [<div class="bg-blue-300" >, <div>, <div>]
+  <<<DONE>>>;
+  divArray = [<div>, <div>, <div>, <div>]; length = 4;
+  childNodes = 4;
+  eachLen = 2;
+  anotherToRemove = divArray.slice(2) = [<div>, <div>]
+  removedNodes = first batch in + second batch in + n batches...
+  removedNodes =  [<div>, <div>, <div class="bg-blue-300" >, <div>, <div>, <div>]
+*/
 export function removeNodes(
   eachLen: number,
   liveFragment: LiveFragment,
@@ -88,25 +83,21 @@ export function removeNodes(
   const cachedNodes = liveFragment?.childNodes?.slice(eachLen) as any[];
   removedNodes?.unshift?.(...cachedNodes);
   cachedNodes.forEach((node) => {
-    liveFragment.removeChild(node) 
-    if (!removedNodes) removeNode(node)
+    liveFragment.removeChild(node);
+    if (!removedNodes) removeNode(node);
   });
 }
 
 export function getIncrementalNodes(
   indexArray: any[],
   each: any[],
-  callback: Required<ForProps>['children'][number]
+  callback: Required<ForProps>["children"][number]
 ) {
   let returnedValue = indexArray.map((nIndex) => {
-    const freshStore = new Store({
+    each[nIndex] = new Store({
       value: each[nIndex],
-      // @ts-expect-error
-      id: each.$$__id,
     });
-    nixixStore.jsx = true
-    return callback(freshStore, nIndex) as any;
+    return callback(each[nIndex], nIndex) as any;
   });
-  nixixStore.jsx = false;
   return returnedValue;
 }

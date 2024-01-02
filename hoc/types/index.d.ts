@@ -3,7 +3,7 @@ import {
   ImgHTMLAttributes,
   type NixixNode,
 } from '../../types/index';
-import { SignalObject, StoreObject } from '../../primitives/types';
+import { Signal, Store } from '../../primitives/types';
 
 interface ComponentFallback {
   fallback?: someView | null | undefined;
@@ -75,8 +75,8 @@ type AsyncComponent<T extends Props> = (
  */
 export const asyncComponent: AsyncComponent<Props>;
 
-interface ForProps<T extends any[]> extends ComponentFallback {
-  each: StoreObject<T>;
+interface ForProps<T extends Store<any[]>> extends ComponentFallback {
+  each: T;
   children: (item: T[number], i: number) => someView;
 }
 
@@ -96,10 +96,10 @@ interface ShowProps<T> extends ComponentFallback {
   children: NixixNode;
 }
 
-export declare function Show<T extends SignalObject<string | number | boolean>>(
+export declare function Show<T extends Signal<string | number | boolean>>(
   props?: ShowProps<T>
 ): someView;
-export declare function Show<T extends StoreObject<object | any[]>>(
+export declare function Show<T extends Store<object | any[]>>(
   props?: ShowProps<T>
 ): someView;
 

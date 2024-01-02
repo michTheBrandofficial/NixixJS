@@ -1,5 +1,5 @@
-import { nixixStore } from '../dom';
-import { Store } from './classes';
+import { nixixStore } from "../dom";
+import { type NonPrimitive } from "./types";
 
 function incrementId(prop: keyof typeof nixixStore) {
   if (nixixStore[prop] === undefined) {
@@ -13,19 +13,19 @@ function incrementId(prop: keyof typeof nixixStore) {
 }
 
 function entries(obj: object) {
-  return Object.entries(obj)
+  return Object.entries(obj);
 }
 
-function isFunction(val:any) {
-  return typeof val === 'function' 
+function isFunction(val: any) {
+  return typeof val === "function";
 }
 
-function cloneObject(object: any) {
-  return JSON.parse(JSON.stringify(object));
+function cloneObject<T extends NonPrimitive>(object: T) {
+  return JSON.parse(JSON.stringify(object)) as T;
 }
 
 function removeChars(str: string | number) {
-  return String(str).replace(/_/g, '');
+  return String(str).replace(/_/g, "");
 }
 
 function isNull(val: any) {
@@ -39,21 +39,27 @@ function checkType(value: string | number | boolean) {
     number: Number,
   };
 
-  const type = types[typeof value as (keyof typeof types)];
+  const type = types[typeof value as keyof typeof types];
   return type;
 }
 
-function isPrimitive(value:any) {
-  return ['string', 'boolean', 'number'].includes(typeof value)
+function isPrimitive(value: any) {
+  return (
+    ["string", "boolean", "number"].includes(typeof value) || isNull(value)
+  );
 }
 
-type ForEachParams<T> = Parameters<Array<T>['forEach']>;
+type ForEachParams<T> = Parameters<Array<T>["forEach"]>;
 
 /**
  * Returns void, to be used when you want to mutate some outside code in an array
  */
-function forEach<T>(arr:Array<T>, cb: ForEachParams<T>[0], thisArg?: ForEachParams<T>[1]) {
-  arr.forEach(cb, thisArg)
+function forEach<T>(
+  arr: Array<T>,
+  cb: ForEachParams<T>[0],
+  thisArg?: ForEachParams<T>[1]
+) {
+  arr?.forEach?.(cb, thisArg);
 }
 
 export {
@@ -65,5 +71,5 @@ export {
   cloneObject,
   isFunction,
   entries,
-  forEach
+  forEach,
 };

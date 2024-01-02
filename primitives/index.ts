@@ -1,15 +1,9 @@
 import { Signal, Store } from "./classes";
 import { nixixStore } from "../dom";
-import {
-  incrementId,
-  cloneObject,
-  isFunction,
-  isPrimitive,
-  forEach,
-  isNull,
-} from "./helpers";
+import { cloneObject, isFunction, isPrimitive, forEach } from "./helpers";
 import { raise } from "../dom/helpers";
 import { patchObj } from "./patchObj";
+import { type NonPrimitive } from "./types";
 
 function callRef<R extends Element | HTMLElement>(ref: R): MutableRefObject {
   if (nixixStore["refCount"] === undefined) {
@@ -26,99 +20,70 @@ function callRef<R extends Element | HTMLElement>(ref: R): MutableRefObject {
   };
 }
 
-/**
- * takes an initialValue(string, boolean or number) and returns an array of a object and a function to update that object.
- */
 function callSignal<S>(
   initialValue: S,
   config?: {
     equals: boolean;
   }
 ): [SignalObject<S>, SetSignalDispatcher<S>] {
-  const signalId = incrementId("signalCount") as number;
-  nixixStore["$$__lastReactionProvider"] = "signal";
-  !nixixStore.SignalStore && (nixixStore.SignalStore = {});
-  const { SignalStore } = nixixStore as Required<typeof nixixStore>;
-  /**
-   * value - in the worst case of it being an instance of object, throw an error.
-   */
   let value: string | number | boolean = isFunction(initialValue)
-    ? (initialValue as Function)()
-    : initialValue;
+  ? (initialValue as Function)()
+  : initialValue;
+  // value - in the worst case of it being an instance of object, throw an error.
   !isPrimitive(value) &&
-    raise(`You must passe a primitve to the signal function`);
-  SignalStore[`_${signalId}_`] = { value: value };
-  let initValue = new Signal(value, signalId);
-  return [
-    initValue,
-
-    function (newState) {
-      let oldState = initValue.value;
-      let newStatePassed = isFunction(newState)
-        ? (newState as Function)(oldState)
-        : newState;
-      switch (true) {
-        case config?.equals:
-        case String(oldState) !== String(newStatePassed):
-          const signal = SignalStore[`_${signalId}_`];
-          signal.value = newStatePassed;
-          initValue.value = newStatePassed;
-          signal.effect?.forEach((eff) => eff());
-      }
-    },
-  ];
+    raise(`You must pass a primitve to the signal function`);
+   const initValue = new Signal(value, true, []);
+   const setter: SetSignalDispatcher<S> = function (newState) {
+    let oldState = initValue.value;
+    let newStatePassed = isFunction(newState)
+      ? (newState as Function)(oldState)
+      : newState;
+    switch (true) {
+      case config?.equals:
+      case String(oldState) !== String(newStatePassed):
+        initValue.value = newStatePassed;
+        initValue.$$__effects?.forEach((eff) => eff());
+    }
+  }
+  // @ts-expect-error
+  return [initValue, setter];
 }
 
-/**
- * takes an object or array as a argument and returns an object containing the first arg and a function to update that object.
- */
-function callStore<S>(
+function callStore<S extends NonPrimitive>(
   initialValue: S,
   config?: {
     equals: boolean;
   }
 ): any[] {
-  const storeId = incrementId("storeCount") as number;
-  nixixStore["$$__lastReactionProvider"] = "store";
-  nixixStore.Store === undefined && (nixixStore.Store = {});
-  const { Store: SStore } = nixixStore as Required<typeof nixixStore>;
-  let value: Array<any> | object = cloneObject(
+  let value = cloneObject(
     isFunction(initialValue) ? (initialValue as Function)() : initialValue
   );
+  const initValue = new Store({ value: value, $$__effects: [] });
+  const setter = (newValue: (prev?: any) => any) => {
+    let newValuePassed = isFunction(newValue)
+      ? newValue(cloneObject(initValue))
+      : newValue;
+    switch (true) {
+      case config?.equals:
+      default:
+        newValuePassed.$$__effects = initValue.$$__effects;
+        patchObj(initValue, newValuePassed);
+        initValue?.$$__effects?.forEach?.((eff) => eff());
+    }
+  }
 
-  SStore[`_${storeId}_`] = { value: value };
-  let initValue = new Store({ value: value, id: storeId });
-
-  return [
-    initValue,
-    (newValue: (prev?: any) => any) => {
-      let newValuePassed = isFunction(newValue)
-        ? newValue(cloneObject(SStore[`_${storeId}_`].value))
-        : newValue;
-
-      switch (true) {
-        case config?.equals:
-        default:
-          patchObj(initValue, newValuePassed);
-          const store = SStore[`_${storeId}_`];
-          store.effect?.forEach((eff) => eff());
-      }
-    },
-  ];
+  return [initValue, setter];
 }
 
 function getValueType<T>(value: any) {
   if (typeof value === "function")
     raise(`Cannot pass a function as a reactive value.`);
-  if (["boolean", "number", "string"].includes(typeof value))
-    return callSignal<T>(value);
-  if (typeof value === "object") return callStore<T>(value);
+  if (isPrimitive(value)) return callSignal<T>(value);
+  if (typeof value === "object") return callStore<NonPrimitive>(value);
 }
 
 function memo<T>(fn: () => T, deps: any[]) {
   const value = fn();
-  if (value === null || value === undefined)
-    raise(`Memoized value cannot be null or undefined`);
   const [state, setState] = getValueType<T>(value)!;
   callReaction(() => {
     setState(fn());
@@ -133,35 +98,15 @@ function pushFurtherDeps(
   if (furtherDependents)
     resolveImmediate(() => {
       forEach(furtherDependents, (dep) => {
-        // @ts-expect-error
-        let id = dep.$$__id;
-        if (isNull(id)) return;
-        switch (dep instanceof Signal) {
-          case true:
-            pushInEffects(callbackFn, id, "SignalStore");
-            break;
-          case false:
-            pushInEffects(callbackFn, id, "Store");
-            break;
-        }
+        dep.$$__reactive && pushInEffects(callbackFn, dep as Signal);
       });
     });
 }
 
-function pushInEffects(
-  cb: CallableFunction,
-  id: number | undefined,
-  type: "Store" | "SignalStore"
-) {
-  let obj = nixixStore[type]?.[`_${id}_`];
-  if (!obj) return;
-  let effect = obj.effect;
-  if (effect)
-    if (effect.includes?.(cb)) return;
-    else {
-      effect.push(cb);
-    }
-  else obj.effect = [cb];
+function pushInEffects(cb: CallableFunction, dep: Signal | Store) {
+  // check if the dep is a Store then check if it is a Signal
+  let { $$__effects: effectsArray } = dep;
+  if (effectsArray) !effectsArray.includes?.(cb) && effectsArray.push(cb);
 }
 
 function dispatchEffect(
@@ -191,7 +136,6 @@ function dispatchEffect(
 async function resolveImmediate(fn: CallableFunction) {
   await Promise.resolve();
   (async (cb: CallableFunction) => {
-    await Promise.resolve();
     cb();
   })(fn);
 }
@@ -238,53 +182,32 @@ function renderEffect(
   dispatchEffect(callbackFn, config, furtherDependents, id);
 }
 
-function dispatchSignalRemoval(signal: StoreObject | SignalObject<any>) {
-  if (signal instanceof Signal) {
-    delete nixixStore.SignalStore?.[`_${signal.$$__id}_`];
-    // @ts-expect-error
-    nixixStore.SignalStore && --nixixStore.signalCount;
-  } else {
-    delete nixixStore.Store?.[`_${signal.$$__id}_`];
-    // @ts-expect-error
-    nixixStore.Store && --nixixStore.storeCount;
-  }
+function dispatchSignalRemoval(signal: Store | Signal) {
+  delete signal.$$__effects;
+  // @ts-expect-error
+  delete signal.$$__reactive;
 }
 
-function removeSignal(
-  signals:
-    | Array<StoreObject | SignalObject<any>>
-    | (StoreObject | SignalObject<any>)
+function removeSignal<T extends Store | Signal = Store | Signal>(
+  signals: T | Array<T>
 ) {
-  // remove the signals from the window object and decreases the count.
-  signals instanceof Array
-    ? signals.forEach((signal) => {
+  Array.isArray(signals)
+    ? forEach(signals, (signal) => {
         dispatchSignalRemoval(signal);
       })
     : dispatchSignalRemoval(signals);
 }
 
-function dispatchEffectRemoval(
-  fn: CallableFunction,
-  signal: StoreObject | SignalObject<any>,
-  effect: CallableFunction[]
-) {
-  if (effect.includes(fn)) effect.splice(effect.indexOf(fn), 1);
-  if (effect.length === 0) removeSignal(signal);
-  return true;
+function dispatchEffectRemoval(fn: CallableFunction, signal: Store | Signal) {
+  const { $$__effects: effects } = signal;
+  if (effects) {
+    if (effects.includes(fn)) effects.splice(effects.indexOf(fn), 1);
+    return true;
+  } else return false;
 }
 
-function removeEffect(
-  fn: CallableFunction,
-  signal: StoreObject | SignalObject<any>
-) {
-  if (signal instanceof Signal) {
-    const effect = nixixStore.SignalStore?.[`_${signal.$$__id}_`]?.effect;
-    effect && dispatchEffectRemoval(fn, signal, effect);
-  } else {
-    const effect = nixixStore.Store?.[`_${signal.$$__id}_`]?.effect;
-    effect && dispatchEffectRemoval(fn, signal, effect);
-  }
-  return true;
+function removeEffect(fn: CallableFunction, signal: Store | Signal) {
+  dispatchEffectRemoval(fn, signal);
 }
 
 // This is only for simplicity

@@ -50,7 +50,6 @@ const Nixix = {
     props: Proptype,
     ...children: ChildrenType
   ): Element | Array<Element | string | Signal> | undefined {
-    if (!nixixStore.jsx) doBGWork(() => nixixStore.jsx = false), (nixixStore.jsx = true);
     let returnedElement: any = null;
     if (typeof tagNameFC === "string") {
       if (tagNameFC === "fragment") {
@@ -89,9 +88,8 @@ function entries(obj: object) {
 }
 
 function isReactiveValue(value: Signal | Store, prop: string) {
-  if (value instanceof Signal) {
+  if (value.$$__reactive) {
     raise(`The ${prop} prop value cannot be reactive.`);
-    return true;
   }
 }
 
@@ -105,20 +103,25 @@ function setAttribute(
     return warn(
       `The ${attrName} prop cannot be null or undefined. Skipping attribute parsing.`
     );
-  if (attrValue instanceof Signal) {
+  // signal check
+  // @ts-expect-error
+  if ((attrValue as Signal).$$__reactive) {
     // @ts-expect-error
     function propEff() {
       type === "propertyAttribute"
         ? // @ts-ignore
           (element[attrName] = getSignalValue(attrValue))
-        : element.setAttribute(attrName, getSignalValue(attrValue as Signal));
+        : element.setAttribute(
+            attrName,
+            getSignalValue(attrValue as any) as any
+          );
     }
-    element.addEventListener('remove:node', function removeRxn(e) {
+    element.addEventListener("remove:node", function removeRxn(e) {
       // remove the effect;
-      removeEffect(propEff, attrValue as any)
-      e.currentTarget?.removeEventListener?.('remove:node', removeRxn)
-    })
-    callEffect(propEff, [attrValue]);
+      removeEffect(propEff, attrValue as any);
+      e.currentTarget?.removeEventListener?.("remove:node", removeRxn);
+    });
+    callEffect(propEff, [attrValue as any]);
   } else if (checkDataType(attrValue)) {
     type === "propertyAttribute"
       ? // @ts-ignore
@@ -143,17 +146,19 @@ function setStyle(element: NixixElementType, styleValue: StyleValueType) {
       continue;
     }
 
-    if (value instanceof Signal) {
+    // signal check
+    // @ts-expect-error
+    if ((value as Signal).$$__reactive) {
       // @ts-expect-error
       function styleEff() {
-        element["style"][styleKey] = getSignalValue(value as Signal);
+        element["style"][styleKey] = getSignalValue(value as any) as any;
       }
-      element.addEventListener('remove:node', function removeRxn(e) {
+      element.addEventListener("remove:node", function removeRxn(e) {
         // remove the effect;
-        removeEffect(styleEff, value as any)
-        e.currentTarget?.removeEventListener?.('remove:node', removeRxn)
-      })  
-      callEffect(styleEff, [value]);
+        removeEffect(styleEff, value as any);
+        e.currentTarget?.removeEventListener?.("remove:node", removeRxn);
+      });
+      callEffect(styleEff, [value as any]);
     } else {
       element["style"][styleKey] = value as string;
     }
@@ -252,11 +257,11 @@ function render(
 }
 
 function removeNode(node: Element | Text) {
-  const isConnected = node.isConnected;
+  const isConnected = node?.isConnected;
   if (isConnected) node?.remove?.();
-  node?.dispatchEvent?.(new Event('remove:node'))
-  node?.childNodes?.forEach?.(child => removeNode(child as any))
-  return isConnected
+  node?.dispatchEvent?.(new Event("remove:node"));
+  node?.childNodes?.forEach?.((child) => removeNode(child as any));
+  return isConnected;
 }
 
 async function doBGWork(fn: CallableFunction) {

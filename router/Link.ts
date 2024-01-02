@@ -12,8 +12,8 @@ type LinkProps = {
 export function Link(props: LinkProps) {
   const { children, to, ...rest } = props;
   function changeLocation(event: MouseEvent<HTMLAnchorElement>) {
-    rest?.["on:click"]?.(event);
     event.preventDefault();
+    rest?.["on:click"]?.(event);
     navigate(to as any);
   }
   return create(

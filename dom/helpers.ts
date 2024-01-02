@@ -1,3 +1,4 @@
+import { isNull } from "../primitives/helpers";
 import { Signal } from "../primitives/classes";
 import { callEffect, removeEffect } from "../primitives/index";
 
@@ -31,7 +32,7 @@ function addText(element: HTMLElement | SVGElement | DocumentFragment) {
 }
 
 export function flatten(arr: Array<any>) {
-  if (Array.isArray(arr)) return arr.flat(Infinity);
+  if (Array.isArray(arr)) return arr.flat?.(Infinity);
   else return [arr];
 }
 
@@ -39,25 +40,26 @@ export function fillInChildren(
   element: HTMLElement | SVGElement | DocumentFragment
 ) {
   return (child: ChildrenType[number]) => {
-    if (checkDataType(child)) {
-      element?.append?.(createText(child as any));
-    } else if (typeof child === "object") {
-      if (child instanceof Signal) {
+    if (typeof child === "object") {
+      // signal check
+      if ((child as unknown as Signal).$$__reactive) {
         const text = addText(element);
         // @ts-expect-error
         function textEff() {
-          text.textContent = getSignalValue(child as any);
+          text.textContent = getSignalValue(child as any) as any
         }
         text.addEventListener('remove:node', function removeRxn(e) {
           // remove the effect;
           removeEffect(textEff, child as any)
           e.currentTarget?.removeEventListener?.('remove:node', removeRxn)
         })
-        callEffect(textEff, [child]);
+        callEffect(textEff, [child as any]);
       } else {
         element?.append?.(child as unknown as string);
       }
-    }
+    } else if (checkDataType(child)) {
+      element?.append?.(createText(child as any));
+    } 
   };
 }
 
@@ -118,25 +120,8 @@ export function parseRef(refObject: MutableRefObject) {
 }
 
 export function getSignalValue(signal: Signal) {
-  return signal.value;
-}
-
-/**
- * used to add a listener to elements so that the get cleaned up after they are removed from the dom.
- */
-export async function onElementRemoved(
-  element: Element,
-  callback: CallableFunction
-) {
-  await Promise.resolve();
-  const observer = new MutationObserver(function () {
-    if (!document.body.contains(element)) {
-      callback();
-      observer.disconnect();
-    }
-  });
-
-  observer.observe(element.parentElement!, { childList: true });
+  const value = signal.value
+  return isNull(value) ? '' : value;
 }
 
 export function raise(message: string) {

@@ -3,7 +3,7 @@ import { createFragment, createText } from "../dom/helpers";
 import { comment } from "../hoc/helpers";
 import { LiveFragment } from "../live-fragment";
 import { getWinPath } from "./helpers";
-import { effect } from "../primitives";
+import { callEffect } from "../primitives";
 import { navigate } from "./Router";
 
 export type RouteStoreType = typeof nixixStore.$$__routeStore;
@@ -16,10 +16,7 @@ export function boundary(path?: `/${string}`) {
 }
 
 export function createRouteBoundary() {
-  const routeBoundary = createFragment([
-    boundary(),
-    boundary(),
-  ]);
+  const routeBoundary = createFragment([boundary(), boundary()]);
   return routeBoundary;
 }
 
@@ -43,6 +40,6 @@ export function createBrowserRouter(config: BrowserRouterConfig) {
   const { routes } = config;
   nixixStore.$$__routeStore = routes;
   window.onpopstate = popHandler;
-  effect(popHandler, "once");
+  callEffect(popHandler);
   return createRouteLF(routes);
 }

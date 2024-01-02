@@ -61,7 +61,7 @@ declare const Form: (props: FormActionProps) => someView;
  *  function signUp() {
       // code goes here
       Router.push('/home')
- }
+}
  * ```
  */
 declare const Router: RouteExoticComponent<{

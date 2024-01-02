@@ -1,5 +1,5 @@
 import { getSignalValue } from "../dom/helpers";
-import { Signal, Store } from "../primitives";
+import { Signal, Store } from "../primitives/classes";
 
 export function getWinPath() {
   return window.location.pathname;
@@ -34,7 +34,7 @@ export function changeRouteComment(path: string, ...comments: Comment[]) {
 }
 
 export function lastElement<T>(arr: T[]): T {
-  return arr[len(arr) - 1];
+  return arr?.[len(arr) - 1];
 }
 
 export function isNull(val: any) {
@@ -43,7 +43,8 @@ export function isNull(val: any) {
 
 export function getLink(link: string | Store | Signal): string {
   switch (true) {
-    case link instanceof Signal:
+    // @ts-expect-error
+    case link.$$__reactive:
       return getSignalValue(link as Signal) as any;
     default:
       return link as any;
@@ -60,7 +61,7 @@ export function forEach<T>(
   cb: ForEachParams<T>[0],
   thisArg?: ForEachParams<T>[1]
 ) {
-  arr.forEach(cb, thisArg);
+  arr?.forEach(cb, thisArg);
 }
 
 export function routePromise(path: string) {

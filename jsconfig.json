@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["es2017", "dom"],
+    "lib": ["es2022", "dom"],
     "baseUrl": ".",
     "jsx": "react-jsxdev",
     "strict": true,

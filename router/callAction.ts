@@ -6,7 +6,7 @@ import type {
   PathToRoute,
   actionData as ActionDataFunction,
 } from "./types/index";
-import { callReaction, callStore, effect, getValueType } from "../primitives";
+import { callEffect, callReaction, callStore, effect, getValueType } from "../primitives";
 import type { EmptyObject } from "../types";
 import { raise } from "../dom/helpers";
 import { navigate } from "./Router";
@@ -39,7 +39,7 @@ export async function callAction({ path, formData }: CallActionConfig) {
 
 export const actionData: typeof ActionDataFunction = (path: PathToRoute, value: any) => {
   const [val, setVal]= callStore(value)!;
-  effect(() => {
+  callEffect(() => {
     const routeMatches = matchRoutes(agnosticRouteObjects, {
       pathname: path,
     });
@@ -54,6 +54,6 @@ export const actionData: typeof ActionDataFunction = (path: PathToRoute, value: 
         navigate(path)
       }, [adStore])
     } else raise(`There are no route matches for ${path}.`);
-  }, "once");
+  });
   return val as any;
 };

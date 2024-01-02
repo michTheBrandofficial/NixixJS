@@ -11,6 +11,7 @@ export const Form = (props: FormActionProps) => {
     removeUnusedProps<FormActionProps>(props, "children", "on:submit");
   const subMitHandler: FormActionProps["on:submit"] = (e) => {
     e.preventDefault();
+    onSubmit?.(e)
     const path = getLink(props?.action) as `/`;
     const formData = new FormData(e.currentTarget);
     callAction({ path, formData });

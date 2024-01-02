@@ -17,7 +17,7 @@ export function Suspense(props: SuspenseProps) {
   );
   const commentBoundary = createBoundary(fallback as any, "suspense");
   let resolvedJSX: typeof fallback | null = null;
-  let liveFragment: LiveFragment = new LiveFragment(
+  const liveFragment: LiveFragment = new LiveFragment(
     commentBoundary.firstChild!,
     commentBoundary.lastChild!
   );

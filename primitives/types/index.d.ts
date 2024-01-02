@@ -1,27 +1,26 @@
-import { EmptyObject } from '../../types/index';
+import { EmptyObject } from "../../types/index";
 
 // primitive
 export type SetSignalDispatcher<S> = (newValue: S | ((prev: S) => S)) => void;
 export type SetStoreDispatcher<S> = (newValue: S | ((prev: S) => S)) => void;
 
-export type SignalObject<S> = {
-  value: S;
-} & S;
+export type Signal<S> = S extends null | undefined
+  ? {
+      value: S;
+    } & string
+  : {
+      value: S;
+    } & S;
 
-export type StoreObject<O> = O;
+export type Store<O> = {
+  [index in keyof O]: O[index] extends NonPrimitive ? Store<O[index]> : Signal<O[index]>
+} & (O extends NonPrimitive ? {
+  $$__reactive: true
+} : {})
 
-export type MemoSignal<S> = SignalObject<S>;
+export type MemoSignal<S> = Signal<S>;
 
-export type MemoStore<O> = StoreObject<O>;
-
-export class Signal {
-  'value': any;
-  '$$__id': number;
-}
-
-export class Store {
-  '$$__id': string | number;
-}
+export type MemoStore<O> = Store<O>;
 
 export interface MutableRefObject<T> {
   current: T;
@@ -31,9 +30,9 @@ export interface MutableRefObject<T> {
   parent: HTMLElement;
 }
 
-type Primitive = string | boolean | number;
+type Primitive = string | boolean | number | undefined | null;
 
-type NonPrimitive = EmptyObject | Array<any>
+type NonPrimitive = EmptyObject | Array<any>;
 
 /**
  * Returns a tuple of the initial value and a setter function to update the values.
@@ -46,7 +45,7 @@ export function callSignal<S extends Primitive>(
   config?: {
     equals: boolean;
   }
-): [SignalObject<S>, SetSignalDispatcher<S>];
+): [Signal<S>, SetSignalDispatcher<S>];
 
 /**
  * Returns a tuple of the initial value and a setter function to update the values.
@@ -59,15 +58,15 @@ export function callStore<O extends NonPrimitive>(
   config?: {
     equals: boolean;
   }
-): [StoreObject<O>, SetStoreDispatcher<O>];
+): [Store<O>, SetStoreDispatcher<O>];
 
 export const signal: typeof callSignal;
 
 export const store: typeof callStore;
 
-export function getValueType<T>(value: any): any[] | undefined
+export function getValueType<T>(value: any): any[] | undefined;
 
-type Deps = (SignalObject<Primitive> | StoreObject<NonPrimitive>)[]
+type Deps = (Signal<Primitive> | Store<NonPrimitive>)[];
 
 /**
  * Creates a read-only signal or store which depends on other signals or stores.
@@ -93,7 +92,7 @@ export function memo<S extends NonPrimitive>(
  */
 export function effect(
   callbackFn: CallableFunction,
-  config?: 'once' | null,
+  config?: "once" | null,
   deps?: Deps
 ): void;
 
@@ -103,10 +102,7 @@ export function effect(
  * @param deps furtherDependencies array to subscribe to
  * This function doesn't work like the effect function that subscribes it's callback function to the last signal or store created.
  */
-export function callEffect(
-  callbackFn: CallableFunction,
-  deps?: Deps
-): void;
+export function callEffect(callbackFn: CallableFunction, deps?: Deps): void;
 
 /**
  *
@@ -114,10 +110,7 @@ export function callEffect(
  * @param deps furtherDependencies array to subscribe to
  * This function doesn't work like the effect function that subscribes it's callback function to the last signal or store created. It does not call the callback else just subscribes to all of the signals or stores in the dependencies array
  */
-export function callReaction(
-  callbackFn: CallableFunction,
-  deps?: Deps
-): void;
+export function callReaction(callbackFn: CallableFunction, deps?: Deps): void;
 
 /**
  * Tracks the closest (signal or store) and calls the callback function whenever the (signal or store)'s value changes.
@@ -127,15 +120,15 @@ export function callReaction(
  */
 export function renderEffect(
   callbackFn: CallableFunction,
-  config?: 'once' | null,
+  config?: "once" | null,
   deps?: Deps
 ): void;
 
 export function removeSignal(
   signals:
-    | Array<StoreObject<any> | SignalObject<any>>
-    | StoreObject<any>
-    | SignalObject<any>
+    | Array<Store<any> | Signal<any>>
+    | Store<any>
+    | Signal<any>
 ): void;
 
 export function removeEffect(fn: CallableFunction, signal: Deps[number]): void;
