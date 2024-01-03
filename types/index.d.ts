@@ -3,12 +3,12 @@
 
 /// <reference path="global.d.ts" />
 
-import * as CSS from 'csstype';
-import { AriaRole } from './aria';
-import * as NativeEvents from './eventhandlers';
-import { MutableRefObject, Signal } from '../primitives/types';
+import * as CSS from "csstype";
+import { AriaRole } from "./aria";
+import * as NativeEvents from "./eventhandlers";
+import { MutableRefObject } from "../primitives/types";
 
-type Booleanish = boolean | 'true' | 'false';
+type Booleanish = boolean | "true" | "false";
 
 export = Nixix;
 export as namespace Nixix;
@@ -17,7 +17,7 @@ declare namespace Nixix {
   /**
    * @deprecated fragment - esbuild provides support for 'fragment' string
    */
-  const Fragment: 'fragment';
+  const Fragment: "fragment";
 
   type EmptyObject<T = any> = {
     [index: string | number | symbol]: T;
@@ -32,10 +32,8 @@ declare namespace Nixix {
   type NixixNode = JSX.ElementType | Iterable<JSX.ElementType>;
 
   type ExoticComponent<P> = (props: P) => someView;
-  
-  type RouteExoticComponent<T> = T;
 
-  type ValueType<T> = T | (string & Signal<T>);
+  type RouteExoticComponent<T> = T;
 
   interface CSSProperties extends CSS.Properties<string, number> {}
 
@@ -44,407 +42,412 @@ declare namespace Nixix {
     innerHTML?: string;
 
     // clipboard events
-    'on:copy'?: NativeEvents.ClipboardEventHandler<T>;
-    'on:copycapture'?: NativeEvents.ClipboardEventHandler<T>;
-    'on:cut'?: NativeEvents.ClipboardEventHandler<T>;
-    'on:cutcapture'?: NativeEvents.ClipboardEventHandler<T>;
-    'on:paste'?: NativeEvents.ClipboardEventHandler<T>;
-    'on:pastecapture'?: NativeEvents.ClipboardEventHandler<T>;
+    "on:copy"?: NativeEvents.ClipboardEventHandler<T>;
+    "on:copycapture"?: NativeEvents.ClipboardEventHandler<T>;
+    "on:cut"?: NativeEvents.ClipboardEventHandler<T>;
+    "on:cutcapture"?: NativeEvents.ClipboardEventHandler<T>;
+    "on:paste"?: NativeEvents.ClipboardEventHandler<T>;
+    "on:pastecapture"?: NativeEvents.ClipboardEventHandler<T>;
 
     // composition events
-    'on:compositionend'?: NativeEvents.CompositionEventHandler<T>;
-    'on:compositionendcapture'?: NativeEvents.CompositionEventHandler<T>;
-    'on:compositionstart'?: NativeEvents.CompositionEventHandler<T>;
-    'on:compositionstartcapture'?: NativeEvents.CompositionEventHandler<T>;
-    'on:compositionupdate'?: NativeEvents.CompositionEventHandler<T>;
-    'on:compositionupdatecapture'?: NativeEvents.CompositionEventHandler<T>;
+    "on:compositionend"?: NativeEvents.CompositionEventHandler<T>;
+    "on:compositionendcapture"?: NativeEvents.CompositionEventHandler<T>;
+    "on:compositionstart"?: NativeEvents.CompositionEventHandler<T>;
+    "on:compositionstartcapture"?: NativeEvents.CompositionEventHandler<T>;
+    "on:compositionupdate"?: NativeEvents.CompositionEventHandler<T>;
+    "on:compositionupdatecapture"?: NativeEvents.CompositionEventHandler<T>;
 
     // focus events
-    'on:focus'?: NativeEvents.FocusEventHandler<T>;
-    'on:focuscapture'?: NativeEvents.FocusEventHandler<T>;
-    'on:blur'?: NativeEvents.FocusEventHandler<T>;
-    'on:blurcapture'?: NativeEvents.FocusEventHandler<T>;
+    "on:focus"?: NativeEvents.FocusEventHandler<T>;
+    "on:focuscapture"?: NativeEvents.FocusEventHandler<T>;
+    "on:blur"?: NativeEvents.FocusEventHandler<T>;
+    "on:blurcapture"?: NativeEvents.FocusEventHandler<T>;
 
     // form events
-    'on:change'?: NativeEvents.FormEventHandler<T>;
-    'on:changecapture'?: NativeEvents.FormEventHandler<T>;
-    'on:beforeinput'?: NativeEvents.FormEventHandler<T>;
-    'on:beforeinputcapture'?: NativeEvents.FormEventHandler<T>;
-    'on:input'?: NativeEvents.FormEventHandler<T>;
-    'on:inputcapture'?: NativeEvents.FormEventHandler<T>;
-    'on:reset'?: NativeEvents.FormEventHandler<T>;
-    'on:resetcapture'?: NativeEvents.FormEventHandler<T>;
-    'on:submit'?: NativeEvents.FormEventHandler<T>;
-    'on:submitcapture'?: NativeEvents.FormEventHandler<T>;
-    'on:invalid'?: NativeEvents.FormEventHandler<T>;
-    'on:invalidcapture'?: NativeEvents.FormEventHandler<T>;
+    "on:change"?: NativeEvents.FormEventHandler<T>;
+    "on:changecapture"?: NativeEvents.FormEventHandler<T>;
+    "on:beforeinput"?: NativeEvents.FormEventHandler<T>;
+    "on:beforeinputcapture"?: NativeEvents.FormEventHandler<T>;
+    "on:input"?: NativeEvents.FormEventHandler<T>;
+    "on:inputcapture"?: NativeEvents.FormEventHandler<T>;
+    "on:reset"?: NativeEvents.FormEventHandler<T>;
+    "on:resetcapture"?: NativeEvents.FormEventHandler<T>;
+    "on:submit"?: NativeEvents.FormEventHandler<T>;
+    "on:submitcapture"?: NativeEvents.FormEventHandler<T>;
+    "on:invalid"?: NativeEvents.FormEventHandler<T>;
+    "on:invalidcapture"?: NativeEvents.FormEventHandler<T>;
 
     // image events
-    'on:load'?: NativeEvents.NixixEventHandler<T>;
-    'on:loadcapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:error'?: NativeEvents.NixixEventHandler<T>; // also a media event
-    'on:errorcapture'?: NativeEvents.NixixEventHandler<T>; // also a media event
+    "on:load"?: NativeEvents.NixixEventHandler<T>;
+    "on:loadcapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:error"?: NativeEvents.NixixEventHandler<T>; // also a media event
+    "on:errorcapture"?: NativeEvents.NixixEventHandler<T>; // also a media event
 
     // keyboard events
-    'on:keydown'?: NativeEvents.KeyboardEventHandler<T>;
-    'on:keydowncapture'?: NativeEvents.KeyboardEventHandler<T>;
+    "on:keydown"?: NativeEvents.KeyboardEventHandler<T>;
+    "on:keydowncapture"?: NativeEvents.KeyboardEventHandler<T>;
     /** @deprecated */
-    'on:keypress'?: NativeEvents.KeyboardEventHandler<T>;
+    "on:keypress"?: NativeEvents.KeyboardEventHandler<T>;
     /** @deprecated */
-    'on:keypresscapture'?: NativeEvents.KeyboardEventHandler<T>;
-    'on:keyup'?: NativeEvents.KeyboardEventHandler<T>;
-    'on:keyupcapture'?: NativeEvents.KeyboardEventHandler<T>;
+    "on:keypresscapture"?: NativeEvents.KeyboardEventHandler<T>;
+    "on:keyup"?: NativeEvents.KeyboardEventHandler<T>;
+    "on:keyupcapture"?: NativeEvents.KeyboardEventHandler<T>;
 
     // media events
-    'on:abort'?: NativeEvents.NixixEventHandler<T>;
-    'on:abortcapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:canplay'?: NativeEvents.NixixEventHandler<T>;
-    'on:canplaycapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:canplaythrough'?: NativeEvents.NixixEventHandler<T>;
-    'on:canplaythroughcapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:durationchange'?: NativeEvents.NixixEventHandler<T>;
-    'on:durationchangecapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:emptied'?: NativeEvents.NixixEventHandler<T>;
-    'on:emptiedcapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:encrypted'?: NativeEvents.NixixEventHandler<T>;
-    'on:encryptedcapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:ended'?: NativeEvents.NixixEventHandler<T>;
-    'on:endedcapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:loadeddata'?: NativeEvents.NixixEventHandler<T>;
-    'on:loadeddatacapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:loadedmetadata'?: NativeEvents.NixixEventHandler<T>;
-    'on:loadedmetadatacapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:loadstart'?: NativeEvents.NixixEventHandler<T>;
-    'on:loadstartcapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:pause'?: NativeEvents.NixixEventHandler<T>;
-    'on:pausecapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:play'?: NativeEvents.NixixEventHandler<T>;
-    'on:playcapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:playing'?: NativeEvents.NixixEventHandler<T>;
-    'on:playingcapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:progress'?: NativeEvents.NixixEventHandler<T>;
-    'on:progresscapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:ratechange'?: NativeEvents.NixixEventHandler<T>;
-    'on:ratechangecapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:resize'?: NativeEvents.NixixEventHandler<T>;
-    'on:resizecapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:seeked'?: NativeEvents.NixixEventHandler<T>;
-    'on:seekedcapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:seeking'?: NativeEvents.NixixEventHandler<T>;
-    'on:seekingcapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:stalled'?: NativeEvents.NixixEventHandler<T>;
-    'on:stalledcapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:suspend'?: NativeEvents.NixixEventHandler<T>;
-    'on:suspendcapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:timeupdate'?: NativeEvents.NixixEventHandler<T>;
-    'on:timeupdatecapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:volumechange'?: NativeEvents.NixixEventHandler<T>;
-    'on:volumechangecapture'?: NativeEvents.NixixEventHandler<T>;
-    'on:waiting'?: NativeEvents.NixixEventHandler<T>;
-    'on:waitingcapture'?: NativeEvents.NixixEventHandler<T>;
+    "on:abort"?: NativeEvents.NixixEventHandler<T>;
+    "on:abortcapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:canplay"?: NativeEvents.NixixEventHandler<T>;
+    "on:canplaycapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:canplaythrough"?: NativeEvents.NixixEventHandler<T>;
+    "on:canplaythroughcapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:durationchange"?: NativeEvents.NixixEventHandler<T>;
+    "on:durationchangecapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:emptied"?: NativeEvents.NixixEventHandler<T>;
+    "on:emptiedcapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:encrypted"?: NativeEvents.NixixEventHandler<T>;
+    "on:encryptedcapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:ended"?: NativeEvents.NixixEventHandler<T>;
+    "on:endedcapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:loadeddata"?: NativeEvents.NixixEventHandler<T>;
+    "on:loadeddatacapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:loadedmetadata"?: NativeEvents.NixixEventHandler<T>;
+    "on:loadedmetadatacapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:loadstart"?: NativeEvents.NixixEventHandler<T>;
+    "on:loadstartcapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:pause"?: NativeEvents.NixixEventHandler<T>;
+    "on:pausecapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:play"?: NativeEvents.NixixEventHandler<T>;
+    "on:playcapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:playing"?: NativeEvents.NixixEventHandler<T>;
+    "on:playingcapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:progress"?: NativeEvents.NixixEventHandler<T>;
+    "on:progresscapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:ratechange"?: NativeEvents.NixixEventHandler<T>;
+    "on:ratechangecapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:resize"?: NativeEvents.NixixEventHandler<T>;
+    "on:resizecapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:seeked"?: NativeEvents.NixixEventHandler<T>;
+    "on:seekedcapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:seeking"?: NativeEvents.NixixEventHandler<T>;
+    "on:seekingcapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:stalled"?: NativeEvents.NixixEventHandler<T>;
+    "on:stalledcapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:suspend"?: NativeEvents.NixixEventHandler<T>;
+    "on:suspendcapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:timeupdate"?: NativeEvents.NixixEventHandler<T>;
+    "on:timeupdatecapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:volumechange"?: NativeEvents.NixixEventHandler<T>;
+    "on:volumechangecapture"?: NativeEvents.NixixEventHandler<T>;
+    "on:waiting"?: NativeEvents.NixixEventHandler<T>;
+    "on:waitingcapture"?: NativeEvents.NixixEventHandler<T>;
 
     // mouseevents
-    'on:auxclick'?: NativeEvents.MouseEventHandler<T>;
-    'on:auxclickcapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:click'?: NativeEvents.MouseEventHandler<T>;
-    'on:clickcapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:contextmenu'?: NativeEvents.MouseEventHandler<T>;
-    'on:contextmenucapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:doubleclick'?: NativeEvents.MouseEventHandler<T>;
-    'on:doubleclickcapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:drag'?: NativeEvents.DragEventHandler<T>;
-    'on:dragcapture'?: NativeEvents.DragEventHandler<T>;
-    'on:dragend'?: NativeEvents.DragEventHandler<T>;
-    'on:dragendcapture'?: NativeEvents.DragEventHandler<T>;
-    'on:dragenter'?: NativeEvents.DragEventHandler<T>;
-    'on:dragentercapture'?: NativeEvents.DragEventHandler<T>;
-    'on:dragexit'?: NativeEvents.DragEventHandler<T>;
-    'on:dragexitcapture'?: NativeEvents.DragEventHandler<T>;
-    'on:dragleave'?: NativeEvents.DragEventHandler<T>;
-    'on:dragleavecapture'?: NativeEvents.DragEventHandler<T>;
-    'on:dragover'?: NativeEvents.DragEventHandler<T>;
-    'on:dragovercapture'?: NativeEvents.DragEventHandler<T>;
-    'on:dragstart'?: NativeEvents.DragEventHandler<T>;
-    'on:dragstartcapture'?: NativeEvents.DragEventHandler<T>;
-    'on:drop'?: NativeEvents.DragEventHandler<T>;
-    'on:dropcapture'?: NativeEvents.DragEventHandler<T>;
-    'on:mousedown'?: NativeEvents.MouseEventHandler<T>;
-    'on:mousedowncapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:mouseenter'?: NativeEvents.MouseEventHandler<T>;
-    'on:mouseleave'?: NativeEvents.MouseEventHandler<T>;
-    'on:mousemove'?: NativeEvents.MouseEventHandler<T>;
-    'on:mousemovecapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:mouseout'?: NativeEvents.MouseEventHandler<T>;
-    'on:mouseoutcapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:mouseover'?: NativeEvents.MouseEventHandler<T>;
-    'on:mouseovercapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:mouseup'?: NativeEvents.MouseEventHandler<T>;
-    'on:mouseupcapture'?: NativeEvents.MouseEventHandler<T>;
+    "on:auxclick"?: NativeEvents.MouseEventHandler<T>;
+    "on:auxclickcapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:click"?: NativeEvents.MouseEventHandler<T>;
+    "on:clickcapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:contextmenu"?: NativeEvents.MouseEventHandler<T>;
+    "on:contextmenucapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:doubleclick"?: NativeEvents.MouseEventHandler<T>;
+    "on:doubleclickcapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:drag"?: NativeEvents.DragEventHandler<T>;
+    "on:dragcapture"?: NativeEvents.DragEventHandler<T>;
+    "on:dragend"?: NativeEvents.DragEventHandler<T>;
+    "on:dragendcapture"?: NativeEvents.DragEventHandler<T>;
+    "on:dragenter"?: NativeEvents.DragEventHandler<T>;
+    "on:dragentercapture"?: NativeEvents.DragEventHandler<T>;
+    "on:dragexit"?: NativeEvents.DragEventHandler<T>;
+    "on:dragexitcapture"?: NativeEvents.DragEventHandler<T>;
+    "on:dragleave"?: NativeEvents.DragEventHandler<T>;
+    "on:dragleavecapture"?: NativeEvents.DragEventHandler<T>;
+    "on:dragover"?: NativeEvents.DragEventHandler<T>;
+    "on:dragovercapture"?: NativeEvents.DragEventHandler<T>;
+    "on:dragstart"?: NativeEvents.DragEventHandler<T>;
+    "on:dragstartcapture"?: NativeEvents.DragEventHandler<T>;
+    "on:drop"?: NativeEvents.DragEventHandler<T>;
+    "on:dropcapture"?: NativeEvents.DragEventHandler<T>;
+    "on:mousedown"?: NativeEvents.MouseEventHandler<T>;
+    "on:mousedowncapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:mouseenter"?: NativeEvents.MouseEventHandler<T>;
+    "on:mouseleave"?: NativeEvents.MouseEventHandler<T>;
+    "on:mousemove"?: NativeEvents.MouseEventHandler<T>;
+    "on:mousemovecapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:mouseout"?: NativeEvents.MouseEventHandler<T>;
+    "on:mouseoutcapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:mouseover"?: NativeEvents.MouseEventHandler<T>;
+    "on:mouseovercapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:mouseup"?: NativeEvents.MouseEventHandler<T>;
+    "on:mouseupcapture"?: NativeEvents.MouseEventHandler<T>;
 
     // selection: events
-    'on:select'?: NativeEvents.NixixEventHandler<T>;
-    'on:selectcapture'?: NativeEvents.NixixEventHandler<T>;
+    "on:select"?: NativeEvents.NixixEventHandler<T>;
+    "on:selectcapture"?: NativeEvents.NixixEventHandler<T>;
 
     // touch events
-    'on:touchcancel'?: NativeEvents.TouchEventHandler<T>;
-    'on:touchcancelcapture'?: NativeEvents.TouchEventHandler<T>;
-    'on:touchend'?: NativeEvents.TouchEventHandler<T>;
-    'on:touchendcapture'?: NativeEvents.TouchEventHandler<T>;
-    'on:touchmove'?: NativeEvents.TouchEventHandler<T>;
-    'on:touchmovecapture'?: NativeEvents.TouchEventHandler<T>;
-    'on:touchstart'?: NativeEvents.TouchEventHandler<T>;
-    'on:touchstartcapture'?: NativeEvents.TouchEventHandler<T>;
+    "on:touchcancel"?: NativeEvents.TouchEventHandler<T>;
+    "on:touchcancelcapture"?: NativeEvents.TouchEventHandler<T>;
+    "on:touchend"?: NativeEvents.TouchEventHandler<T>;
+    "on:touchendcapture"?: NativeEvents.TouchEventHandler<T>;
+    "on:touchmove"?: NativeEvents.TouchEventHandler<T>;
+    "on:touchmovecapture"?: NativeEvents.TouchEventHandler<T>;
+    "on:touchstart"?: NativeEvents.TouchEventHandler<T>;
+    "on:touchstartcapture"?: NativeEvents.TouchEventHandler<T>;
 
     // pointer events
-    'on:pointerdown'?: NativeEvents.MouseEventHandler<T>;
-    'on:pointerdowncapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:pointermove'?: NativeEvents.MouseEventHandler<T>;
-    'on:pointermovecapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:pointerup'?: NativeEvents.MouseEventHandler<T>;
-    'on:pointerupcapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:pointercancel'?: NativeEvents.MouseEventHandler<T>;
-    'on:pointercancelcapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:pointerenter'?: NativeEvents.MouseEventHandler<T>;
-    'on:pointerentercapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:pointerleave'?: NativeEvents.MouseEventHandler<T>;
-    'on:pointerleavecapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:pointerover'?: NativeEvents.MouseEventHandler<T>;
-    'on:pointerovercapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:pointerout'?: NativeEvents.MouseEventHandler<T>;
-    'on:pointeroutcapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:gotpointercapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:gotpointercapturecapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:lostpointercapture'?: NativeEvents.MouseEventHandler<T>;
-    'on:lostpointercapturecapture'?: NativeEvents.MouseEventHandler<T>;
+    "on:pointerdown"?: NativeEvents.MouseEventHandler<T>;
+    "on:pointerdowncapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:pointermove"?: NativeEvents.MouseEventHandler<T>;
+    "on:pointermovecapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:pointerup"?: NativeEvents.MouseEventHandler<T>;
+    "on:pointerupcapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:pointercancel"?: NativeEvents.MouseEventHandler<T>;
+    "on:pointercancelcapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:pointerenter"?: NativeEvents.MouseEventHandler<T>;
+    "on:pointerentercapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:pointerleave"?: NativeEvents.MouseEventHandler<T>;
+    "on:pointerleavecapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:pointerover"?: NativeEvents.MouseEventHandler<T>;
+    "on:pointerovercapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:pointerout"?: NativeEvents.MouseEventHandler<T>;
+    "on:pointeroutcapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:gotpointercapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:gotpointercapturecapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:lostpointercapture"?: NativeEvents.MouseEventHandler<T>;
+    "on:lostpointercapturecapture"?: NativeEvents.MouseEventHandler<T>;
 
     // ui events
-    'on:scroll'?: NativeEvents.UIEventHandler<T>;
-    'on:scrollcapture'?: NativeEvents.UIEventHandler<T>;
+    "on:scroll"?: NativeEvents.UIEventHandler<T>;
+    "on:scrollcapture"?: NativeEvents.UIEventHandler<T>;
 
     // wheel events
-    'on:wheel'?: NativeEvents.WheelEventHandler<T>;
-    'on:wheelcapture'?: NativeEvents.WheelEventHandler<T>;
+    "on:wheel"?: NativeEvents.WheelEventHandler<T>;
+    "on:wheelcapture"?: NativeEvents.WheelEventHandler<T>;
 
     // animation events
-    'on:animationstart'?: NativeEvents.AnimationEventHandler<T>;
-    'on:animationstartcapture'?: NativeEvents.AnimationEventHandler<T>;
-    'on:animationend'?: NativeEvents.AnimationEventHandler<T>;
-    'on:animationendcapture'?: NativeEvents.AnimationEventHandler<T>;
-    'on:animationiteration'?: NativeEvents.AnimationEventHandler<T>;
-    'on:animationiterationcapture'?: NativeEvents.AnimationEventHandler<T>;
+    "on:animationstart"?: NativeEvents.AnimationEventHandler<T>;
+    "on:animationstartcapture"?: NativeEvents.AnimationEventHandler<T>;
+    "on:animationend"?: NativeEvents.AnimationEventHandler<T>;
+    "on:animationendcapture"?: NativeEvents.AnimationEventHandler<T>;
+    "on:animationiteration"?: NativeEvents.AnimationEventHandler<T>;
+    "on:animationiterationcapture"?: NativeEvents.AnimationEventHandler<T>;
 
     // transition events
-    'on:transitionend'?: NativeEvents.TransitionEventHandler<T>;
-    'on:transitionendcapture'?: NativeEvents.TransitionEventHandler<T>;
+    "on:transitionend"?: NativeEvents.TransitionEventHandler<T>;
+    "on:transitionendcapture"?: NativeEvents.TransitionEventHandler<T>;
   }
 
   interface NixixAttributes<T> {
-    'bind:ref'?: MutableRefObject<T | null>;
+    "bind:ref"?: MutableRefObject<T | null>;
     key?: number;
   }
 
   interface AriaAttributes {
     /** Identifies the currently active element when DOM focus is on a composite widget, textbox, group, or application. */
-    'aria:activedescendant'?: ValueType<string>;
+    "aria:activedescendant"?: string;
     /** Indicates whether assistive technologies will present all, or only parts of, the changed region based on the change notifications defined by the aria-relevant attribute. */
-    'aria:atomic'?: ValueType<Booleanish>;
+    "aria:atomic"?: Booleanish;
     /**
      * Indicates whether inputting text could trigger display of one or more predictions of the user's intended value for an input and specifies how predictions would be
      * presented if they are made.
      */
-    'aria:autocomplete'?: ValueType<'none' | 'inline' | 'list' | 'both'>;
+    "aria:autocomplete"?: "none" | "inline" | "list" | "both";
     /** Indicates an element is being modified and that assistive technologies MAY want to wait until the modifications are complete before exposing them to the user. */
-    'aria:busy'?: ValueType<Booleanish>;
+    "aria:busy"?: Booleanish;
     /**
      * Indicates the current "checked" Signal of checkboxes, radio buttons, and other widgets.
      * @see aria-pressed @see aria-selected.
      */
-    'aria:checked'?: ValueType<boolean | 'false' | 'mixed' | 'true'>;
+    "aria:checked"?: boolean | "false" | "mixed" | "true";
     /**
      * Defines the total number of columns in a table, grid, or treegrid.
      * @see aria-colindex.
      */
-    'aria:colcount'?: ValueType<number>;
+    "aria:colcount"?: number;
     /**
      * Defines an element's column index or position with respect to the total number of columns within a table, grid, or treegrid.
      * @see aria-colcount @see aria-colspan.
      */
-    'aria:colindex'?: ValueType<number>;
+    "aria:colindex"?: number;
     /**
      * Defines the number of columns spanned by a cell or gridcell within a table, grid, or treegrid.
      * @see aria-colindex @see aria-rowspan.
      */
-    'aria:colspan'?: ValueType<number>;
+    "aria:colspan"?: number;
     /**
      * Identifies the element (or elements) whose contents or presence are controlled by the current element.
      * @see aria-owns.
      */
-    'aria:controls'?: ValueType<string>;
+    "aria:controls"?: string;
     /** Indicates the element that represents the current item within a container or set of related elements. */
-    'aria:current'?: ValueType<
-      Booleanish | 'page' | 'step' | 'location' | 'date' | 'time'
-    >;
+    "aria:current"?:
+      | Booleanish
+      | "page"
+      | "step"
+      | "location"
+      | "date"
+      | "time";
     /**
      * Identifies the element (or elements) that describes the object.
      * @see aria-labelledby
      */
-    'aria:describedby'?: ValueType<string>;
+    "aria:describedby"?: string;
     /**
      * Identifies the element that provides a detailed, extended description for the object.
      * @see aria-describedby.
      */
-    'aria:details'?: ValueType<string>;
+    "aria:details"?: string;
     /**
      * Indicates that the element is perceivable but disabled, so it is not editable or otherwise operable.
      * @see aria-hidden @see aria-readonly.
      */
-    'aria:disabled'?: ValueType<Booleanish>;
+    "aria:disabled"?: Booleanish;
     /**
      * Indicates what functions can be performed when a dragged object is released on the drop target.
      * @deprecated in ARIA 1.1
      */
-    'aria:dropeffect'?: ValueType<
-      'none' | 'copy' | 'execute' | 'link' | 'move' | 'popup'
-    >;
+    "aria:dropeffect"?: "none" | "copy" | "execute" | "link" | "move" | "popup";
     /**
      * Identifies the element that provides an error message for the object.
      * @see aria-invalid @see aria-describedby.
      */
-    'aria:errormessage'?: ValueType<string>;
+    "aria:errormessage"?: string;
     /** Indicates whether the element, or another grouping element it controls, is currently expanded or collapsed. */
-    'aria:expanded'?: ValueType<Booleanish>;
+    "aria:expanded"?: Booleanish;
     /**
      * Identifies the next element (or elements) in an alternate reading order of content which, at the user's discretion,
      * allows assistive technology to override the general default of reading in document source order.
      */
-    'aria:flowto'?: ValueType<string>;
+    "aria:flowto"?: string;
     /**
      * Indicates an element's "grabbed" Signal in a drag-and-drop operation.
      * @deprecated in ARIA 1.1
      */
-    'aria:grabbed'?: ValueType<Booleanish>;
+    "aria:grabbed"?: Booleanish;
     /** Indicates the availability and type of interactive popup element, such as menu or dialog, that can be triggered by an element. */
-    'aria:haspopup'?: ValueType<
-      Booleanish | 'menu' | 'listbox' | 'tree' | 'grid' | 'dialog'
-    >;
+    "aria:haspopup"?:
+      | Booleanish
+      | "menu"
+      | "listbox"
+      | "tree"
+      | "grid"
+      | "dialog";
     /**
      * Indicates whether the element is exposed to an accessibility API.
      * @see aria-disabled.
      */
-    'aria:hidden'?: ValueType<Booleanish>;
+    "aria:hidden"?: Booleanish;
     /**
      * Indicates the entered value does not conform to the format expected by the application.
      * @see aria-errormessage.
      */
-    'aria:invalid'?: ValueType<Booleanish | 'grammar' | 'spelling'>;
+    "aria:invalid"?: Booleanish | "grammar" | "spelling";
     /** Indicates keyboard shortcuts that an author has implemented to activate or give focus to an element. */
-    'aria:keyshortcuts'?: ValueType<string>;
+    "aria:keyshortcuts"?: string;
     /**
      * Defines a string value that labels the current element.
      * @see aria-labelledby.
      */
-    'aria:label'?: ValueType<string>;
+    "aria:label"?: string;
     /**
      * Identifies the element (or elements) that labels the current element.
      * @see aria-describedby.
      */
-    'aria:labelledby'?: ValueType<string>;
+    "aria:labelledby"?: string;
     /** Defines the hierarchical level of an element within a structure. */
-    'aria:level'?: ValueType<number>;
+    "aria:level"?: number;
     /** Indicates that an element will be updated, and describes the types of updates the user agents, assistive technologies, and user can expect from the live region. */
-    'aria:live'?: ValueType<'off' | 'assertive' | 'polite'>;
+    "aria:live"?: "off" | "assertive" | "polite";
     /** Indicates whether an element is modal when displayed. */
-    'aria:modal'?: ValueType<Booleanish>;
+    "aria:modal"?: Booleanish;
     /** Indicates whether a text box accepts multiple lines of input or only a single line. */
-    'aria:multiline'?: ValueType<Booleanish>;
+    "aria:multiline"?: Booleanish;
     /** Indicates that the user may select more than one item from the current selectable descendants. */
-    'aria:multiselectable'?: ValueType<Booleanish>;
+    "aria:multiselectable"?: Booleanish;
     /** Indicates whether the element's orientation is horizontal, vertical, or unknown/ambiguous. */
-    'aria:orientation'?: ValueType<'horizontal' | 'vertical'>;
+    "aria:orientation"?: "horizontal" | "vertical";
     /**
      * Identifies an element (or elements) in order to define a visual, functional, or contextual parent/child relationship
      * between DOM elements where the DOM hierarchy cannot be used to represent the relationship.
      * @see aria-controls.
      */
-    'aria:owns'?: ValueType<string>;
+    "aria:owns"?: string;
     /**
      * Defines a short hint (a word or short phrase) intended to aid the user with data entry when the control has no value.
      * A hint could be a sample value or a brief description of the expected format.
      */
-    'aria:placeholder'?: ValueType<string>;
+    "aria:placeholder"?: string;
     /**
      * Defines an element's number or position in the current set of listitems or treeitems. Not required if all elements in the set are present in the DOM.
      * @see aria-setsize.
      */
-    'aria:posinset'?: ValueType<number>;
+    "aria:posinset"?: number;
     /**
      * Indicates the current "pressed" Signal of toggle buttons.
      * @see aria-checked @see aria-selected.
      */
-    'aria:pressed'?: ValueType<Booleanish | 'mixed'>;
+    "aria:pressed"?: Booleanish | "mixed";
     /**
      * Indicates that the element is not editable, but is otherwise operable.
      * @see aria-disabled.
      */
-    'aria:readonly'?: ValueType<Booleanish>;
+    "aria:readonly"?: Booleanish;
     /**
      * Indicates what notifications the user agent will trigger when the accessibility tree within a live region is modified.
      * @see aria-atomic.
      */
-    'aria:relevant'?: ValueType<
-      | 'additions'
-      | 'additions removals'
-      | 'additions text'
-      | 'all'
-      | 'removals'
-      | 'removals additions'
-      | 'removals text'
-      | 'text'
-      | 'text additions'
-      | 'text removals'
-    >;
+    "aria:relevant"?:
+      | "additions"
+      | "additions removals"
+      | "additions text"
+      | "all"
+      | "removals"
+      | "removals additions"
+      | "removals text"
+      | "text"
+      | "text additions"
+      | "text removals";
     /** Indicates that user input is required on the element before a form may be submitted. */
-    'aria:required'?: ValueType<Booleanish>;
+    "aria:required"?: Booleanish;
     /** Defines a human-readable, author-localized description for the role of an element. */
-    'aria:roledescription'?: ValueType<string>;
+    "aria:roledescription"?: string;
     /**
      * Defines the total number of rows in a table, grid, or treegrid.
      * @see aria-rowindex.
      */
-    'aria:rowcount'?: ValueType<number>;
+    "aria:rowcount"?: number;
     /**
      * Defines an element's row index or position with respect to the total number of rows within a table, grid, or treegrid.
      * @see aria-rowcount @see aria-rowspan.
      */
-    'aria:rowindex'?: ValueType<number>;
+    "aria:rowindex"?: number;
     /**
      * Defines the number of rows spanned by a cell or gridcell within a table, grid, or treegrid.
      * @see aria-rowindex @see aria-colspan.
      */
-    'aria:rowspan'?: ValueType<number>;
+    "aria:rowspan"?: number;
     /**
      * Indicates the current "selected" Signal of various widgets.
      * @see aria-checked @see aria-pressed.
      */
-    'aria:selected'?: ValueType<Booleanish>;
+    "aria:selected"?: Booleanish;
     /**
      * Defines the number of items in the current set of listitems or treeitems. Not required if all elements in the set are present in the DOM.
      * @see aria-posinset.
      */
-    'aria:setsize'?: ValueType<number>;
+    "aria:setsize"?: number;
     /** Indicates if items in a table or grid are sorted in ascending or descending order. */
-    'aria:sort'?: ValueType<'none' | 'ascending' | 'descending' | 'other'>;
+    "aria:sort"?: "none" | "ascending" | "descending" | "other";
     /** Defines the maximum allowed value for a range widget. */
-    'aria:valuemax'?: ValueType<number>;
+    "aria:valuemax"?: number;
     /** Defines the minimum allowed value for a range widget. */
-    'aria:valuemin'?: ValueType<number>;
+    "aria:valuemin"?: number;
     /**
      * Defines the current value for a range widget.
      * @see aria-valuetext.
      */
-    'aria:valuenow'?: ValueType<number>;
+    "aria:valuenow"?: number;
     /** Defines the human readable text alternative of aria-valuenow for a range widget. */
-    'aria:valuetext'?: ValueType<string>;
+    "aria:valuetext"?: string;
   }
 
   interface HTMLAttributes<T>
@@ -452,553 +455,556 @@ declare namespace Nixix {
       AriaAttributes,
       NixixAttributes<T> {
     // Standard HTML Attributes
-    accesskey?: ValueType<string>;
-    autofocus?: ValueType<boolean | undefined>;
-    className?: ValueType<string>;
-    contenteditable?: ValueType<boolean | 'true' | 'false' | 'inherit'>;
-    contextmenu?: ValueType<string>;
-    dir?: ValueType<string>;
-    draggable?: ValueType<Booleanish>;
-    enterkeyhint?: ValueType<
-      'enter' | 'done' | 'go' | 'next' | 'previous' | 'search' | 'send'
-    >;
-    hidden?: ValueType<boolean>;
-    id?: ValueType<string>;
-    lang?: ValueType<string>;
-    part?: ValueType<string>;
-    placeholder?: ValueType<string>;
-    slot?: ValueType<string>;
-    spellcheck?: ValueType<Booleanish>;
+    accesskey?: string;
+    autofocus?: boolean | undefined;
+    className?: string;
+    contenteditable?: boolean | "true" | "false" | "inherit";
+    contextmenu?: string;
+    dir?: string;
+    draggable?: Booleanish;
+    enterkeyhint?:
+      | "enter"
+      | "done"
+      | "go"
+      | "next"
+      | "previous"
+      | "search"
+      | "send";
+    hidden?: boolean;
+    id?: string;
+    lang?: string;
+    part?: string;
+    placeholder?: string;
+    slot?: string;
+    spellcheck?: Booleanish;
     style?: CSSProperties;
-    tabindex?: ValueType<number>;
-    title?: ValueType<string>;
-    translate?: ValueType<'yes' | 'no' | ''>;
-    inert?: ValueType<boolean>;
+    tabindex?: number;
+    title?: string;
+    translate?: "yes" | "no" | "";
+    inert?: boolean;
 
     // Unknown
-    radiogroup?: ValueType<string>; // <command>, <menuitem>
+    radiogroup?: string; // <command>, <menuitem>
 
     // WAI-ARIA
-    role?: ValueType<AriaRole>;
+    role?: AriaRole;
 
     // RDFa Attributes
-    about?: ValueType<string>;
-    datatype?: ValueType<string>;
+    about?: string;
+    datatype?: string;
     inlist?: any;
-    prefix?: ValueType<string>;
-    property?: ValueType<string>;
-    resource?: ValueType<string>;
-    typeof?: ValueType<string>;
-    vocab?: ValueType<string>;
+    prefix?: string;
+    property?: string;
+    resource?: string;
+    typeof?: string;
+    vocab?: string;
 
     // Non-standard Attributes
-    autocapitalize?: ValueType<string>;
-    autocorrect?: ValueType<string>;
-    autosave?: ValueType<string>;
-    color?: ValueType<CSSProperties['color']>;
-    itemprop?: ValueType<string>;
-    itemscope?: ValueType<boolean>;
-    itemtype?: ValueType<string>;
-    itemid?: ValueType<string>;
-    itemref?: ValueType<string>;
-    results?: ValueType<number>;
-    security?: ValueType<string>;
-    unselectable?: ValueType<'on' | 'off'>;
+    autocapitalize?: string;
+    autocorrect?: string;
+    autosave?: string;
+    color?: CSSProperties["color"];
+    itemprop?: string;
+    itemscope?: boolean;
+    itemtype?: string;
+    itemid?: string;
+    itemref?: string;
+    results?: number;
+    security?: string;
+    unselectable?: "on" | "off";
 
     // Living Standard
     /**
      * Hints at the type of data that might be entered by the user while editing the element or its contents
      * @see https://html.spec.whatwg.org/multipage/interaction.html#input-modalities:-the-inputmode-attribute
      */
-    inputmode?: ValueType<
-      | 'none'
-      | 'text'
-      | 'tel'
-      | 'url'
-      | 'email'
-      | 'numeric'
-      | 'decimal'
-      | 'search'
-    >;
+    inputmode?:
+      | "none"
+      | "text"
+      | "tel"
+      | "url"
+      | "email"
+      | "numeric"
+      | "decimal"
+      | "search";
     /**
      * Specify that a standard HTML element should behave like a defined custom built-in element
      * @see https://html.spec.whatwg.org/multipage/custom-elements.html#attr-is
      */
-    is?: ValueType<string>;
+    is?: string;
   }
 
-  type ReferrerPolicy = ValueType<
-    | ''
-    | 'no-referrer'
-    | 'no-referrer-when-downgrade'
-    | 'origin'
-    | 'origin-when-cross-origin'
-    | 'same-origin'
-    | 'strict-origin'
-    | 'strict-origin-when-cross-origin'
-    | 'unsafe-url'
-  >;
+  type ReferrerPolicy =
+    | ""
+    | "no-referrer"
+    | "no-referrer-when-downgrade"
+    | "origin"
+    | "origin-when-cross-origin"
+    | "same-origin"
+    | "strict-origin"
+    | "strict-origin-when-cross-origin"
+    | "unsafe-url";
 
-  type HTMLAttributeAnchorTarget = ValueType<
-    '_self' | '_blank' | '_parent' | '_top' | (string & {})
-  >;
+  type HTMLAttributeAnchorTarget =
+    | "_self"
+    | "_blank"
+    | "_parent"
+    | "_top"
+    | (string & {});
 
   interface AnchorHTMLAttributes<T> extends HTMLAttributes<T> {
     download?: any;
-    href?: ValueType<string>;
-    hreflang?: ValueType<string>;
-    media?: ValueType<string>;
-    ping?: ValueType<string>;
-    rel?: ValueType<string>;
+    href?: string;
+    hreflang?: string;
+    media?: string;
+    ping?: string;
+    rel?: string;
     target?: HTMLAttributeAnchorTarget;
-    type?: ValueType<string>;
+    type?: string;
     referrerpolicy?: ReferrerPolicy;
   }
 
   interface AudioHTMLAttributes<T> extends MediaHTMLAttributes<T> {}
 
   interface AreaHTMLAttributes<T> extends HTMLAttributes<T> {
-    alt?: ValueType<string>;
-    coords?: ValueType<string>;
-    download?: ValueType<string>;
-    href?: ValueType<string>;
-    hreflang?: ValueType<string>;
-    media?: ValueType<string>;
+    alt?: string;
+    coords?: string;
+    download?: string;
+    href?: string;
+    hreflang?: string;
+    media?: string;
     referrerpolicy?: ReferrerPolicy;
-    rel?: ValueType<string>;
-    shape?: ValueType<string>;
-    target?: ValueType<string>;
+    rel?: string;
+    shape?: string;
+    target?: string;
   }
 
   interface BaseHTMLAttributes<T> extends HTMLAttributes<T> {
-    href?: ValueType<string>;
-    target?: ValueType<string>;
+    href?: string;
+    target?: string;
   }
 
   interface BlockquoteHTMLAttributes<T> extends HTMLAttributes<T> {
-    cite?: ValueType<string>;
+    cite?: string;
   }
 
   interface ButtonHTMLAttributes<T> extends HTMLAttributes<T> {
-    disabled?: ValueType<boolean>;
-    form?: ValueType<string>;
-    formaction?: ValueType<string>;
-    formenctype?: ValueType<string>;
-    formmethod?: ValueType<string>;
-    formnovalidate?: ValueType<boolean>;
-    formtarget?: ValueType<string>;
-    name?: ValueType<string>;
-    type?: ValueType<'submit' | 'reset' | 'button'>;
-    value?: ValueType<string | string[] | number>;
+    disabled?: boolean;
+    form?: string;
+    formaction?: string;
+    formenctype?: string;
+    formmethod?: string;
+    formnovalidate?: boolean;
+    formtarget?: string;
+    name?: string;
+    type?: "submit" | "reset" | "button";
+    value?: string | string[] | number;
   }
 
   interface CanvasHTMLAttributes<T> extends HTMLAttributes<T> {
-    height?: ValueType<number | string>;
-    width?: ValueType<number | string>;
+    height?: number | string;
+    width?: number | string;
   }
 
   interface ColHTMLAttributes<T> extends HTMLAttributes<T> {
-    span?: ValueType<number>;
-    width?: ValueType<number | string>;
+    span?: number;
+    width?: number | string;
   }
 
   interface ColgroupHTMLAttributes<T> extends HTMLAttributes<T> {
-    span?: ValueType<number>;
+    span?: number;
   }
 
   interface DataHTMLAttributes<T> extends HTMLAttributes<T> {
-    value?: ValueType<string | ReadonlyArray<string> | number | undefined>;
+    value?: string | ReadonlyArray<string> | number | undefined;
   }
 
   interface DetailsHTMLAttributes<T> extends HTMLAttributes<T> {
-    open?: ValueType<boolean | undefined>;
-    'on:toggle'?: NativeEvents.NixixEventHandler<T>;
+    open?: boolean | undefined;
+    "on:toggle"?: NativeEvents.NixixEventHandler<T>;
   }
 
   interface DelHTMLAttributes<T> extends HTMLAttributes<T> {
-    cite?: ValueType<string | undefined>;
-    datetime?: ValueType<string | undefined>;
+    cite?: string | undefined;
+    datetime?: string | undefined;
   }
 
   interface DialogHTMLAttributes<T> extends HTMLAttributes<T> {
-    open?: ValueType<boolean | undefined>;
-    'on:cancel'?: NativeEvents.NixixEventHandler<T>;
-    'on:close'?: NativeEvents.NixixEventHandler<T>;
+    open?: boolean | undefined;
+    "on:cancel"?: NativeEvents.NixixEventHandler<T>;
+    "on:close"?: NativeEvents.NixixEventHandler<T>;
   }
 
   interface EmbedHTMLAttributes<T> extends HTMLAttributes<T> {
-    height?: ValueType<number | string | undefined>;
-    src?: ValueType<string | undefined>;
-    type?: ValueType<string | undefined>;
-    width?: ValueType<number | string | undefined>;
+    height?: number | string | undefined;
+    src?: string | undefined;
+    type?: string | undefined;
+    width?: number | string | undefined;
   }
 
   interface FieldsetHTMLAttributes<T> extends HTMLAttributes<T> {
-    disabled?: ValueType<boolean | undefined>;
-    form?: ValueType<string | undefined>;
-    name?: ValueType<string | undefined>;
+    disabled?: boolean | undefined;
+    form?: string | undefined;
+    name?: string | undefined;
   }
 
   interface FormHTMLAttributes<T> extends HTMLAttributes<T> {
-    acceptcharset?: ValueType<string>;
-    action?: ValueType<string>;
-    autocomplete?: ValueType<string>;
-    enctype?: ValueType<string>;
-    method?: ValueType<string>;
-    name?: ValueType<string>;
-    novalidate?: ValueType<boolean>;
-    target?: ValueType<string>;
-    rel?: ValueType<string>;
+    acceptcharset?: string;
+    action?: string;
+    autocomplete?: string;
+    enctype?: string;
+    method?: string;
+    name?: string;
+    novalidate?: boolean;
+    target?: string;
+    rel?: string;
   }
 
   interface HtmlHTMLAttributes<T> extends HTMLAttributes<T> {
-    manifest?: ValueType<string | undefined>;
+    manifest?: string | undefined;
   }
 
   interface IframeHTMLAttributes<T> extends HTMLAttributes<T> {
-    allow?: ValueType<string>;
-    allowfullscreen?: ValueType<boolean>;
-    allowtransparency?: ValueType<boolean>;
+    allow?: string;
+    allowfullscreen?: boolean;
+    allowtransparency?: boolean;
     /** @deprecated */
-    frameborder?: ValueType<number | string>;
-    height?: ValueType<number | string>;
-    loading?: ValueType<'eager' | 'lazy'>;
+    frameborder?: number | string;
+    height?: number | string;
+    loading?: "eager" | "lazy";
     /** @deprecated */
-    marginheight?: ValueType<number>;
+    marginheight?: number;
     /** @deprecated */
-    marginwidth?: ValueType<number>;
-    name?: ValueType<string>;
+    marginwidth?: number;
+    name?: string;
     referrerpolicy?: ReferrerPolicy;
-    sandbox?: ValueType<string>;
+    sandbox?: string;
     /** @deprecated */
-    scrolling?: ValueType<string>;
-    seamless?: ValueType<boolean>;
-    src?: ValueType<string>;
-    srcdoc?: ValueType<string>;
-    width?: ValueType<number | string>;
+    scrolling?: string;
+    seamless?: boolean;
+    src?: string;
+    srcdoc?: string;
+    width?: number | string;
   }
 
   interface ImgHTMLAttributes<T> extends HTMLAttributes<T> {
-    alt?: ValueType<string | undefined>;
-    crossorigin?: ValueType<
-      ValueType<'anonymous' | 'use-credentials' | '' | undefined>
-    >;
-    decoding?: ValueType<'async' | 'auto' | 'sync' | undefined>;
-    height?: ValueType<number | string | undefined>;
-    loading?: ValueType<'eager' | 'lazy' | undefined>;
+    alt?: string | undefined;
+    crossorigin?: "anonymous" | "use-credentials" | "" | undefined;
+    decoding?: "async" | "auto" | "sync" | undefined;
+    height?: number | string | undefined;
+    loading?: "eager" | "lazy" | undefined;
     referrerpolicy?: ReferrerPolicy | undefined;
-    sizes?: ValueType<string | undefined>;
-    src?: ValueType<string | undefined>;
-    srcset?: ValueType<string | undefined>;
-    usemap?: ValueType<string | undefined>;
-    width?: ValueType<number | string | undefined>;
+    sizes?: string | undefined;
+    src?: string | undefined;
+    srcset?: string | undefined;
+    usemap?: string | undefined;
+    width?: number | string | undefined;
   }
 
   interface InsHTMLAttributes<T> extends HTMLAttributes<T> {
-    cite?: ValueType<string | undefined>;
-    datetime?: ValueType<string | undefined>;
+    cite?: string | undefined;
+    datetime?: string | undefined;
   }
 
-  type HTMLInputTypeAttribute = ValueType<
-    | 'button'
-    | 'checkbox'
-    | 'color'
-    | 'date'
-    | 'datetime-local'
-    | 'email'
-    | 'file'
-    | 'hidden'
-    | 'image'
-    | 'month'
-    | 'number'
-    | 'password'
-    | 'radio'
-    | 'range'
-    | 'reset'
-    | 'search'
-    | 'submit'
-    | 'tel'
-    | 'text'
-    | 'time'
-    | 'url'
-    | 'week'
-    | (string & {})
-  >;
+  type HTMLInputTypeAttribute =
+    | "button"
+    | "checkbox"
+    | "color"
+    | "date"
+    | "datetime-local"
+    | "email"
+    | "file"
+    | "hidden"
+    | "image"
+    | "month"
+    | "number"
+    | "password"
+    | "radio"
+    | "range"
+    | "reset"
+    | "search"
+    | "submit"
+    | "tel"
+    | "text"
+    | "time"
+    | "url"
+    | "week"
+    | (string & {});
 
   interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
-    accept?: ValueType<string>;
-    alt?: ValueType<string>;
-    autocomplete?: ValueType<'off' | 'on'>;
-    capture?: ValueType<boolean | 'user' | 'environment'>; // https://www.w3.org/TR/html-media-capture/#the-capture-attribute
-    checked?: ValueType<boolean>;
-    crossorigin?: ValueType<string>;
-    disabled?: ValueType<boolean>;
-    form?: ValueType<string>;
-    formaction?: ValueType<string>;
-    formenctype?: ValueType<string>;
-    formmethod?: ValueType<string>;
-    formnovalidate?: ValueType<boolean>;
-    formtarget?: ValueType<string>;
-    height?: ValueType<number | string>;
-    list?: ValueType<string>;
-    max?: ValueType<number | string>;
-    maxlength?: ValueType<number>;
-    min?: ValueType<number | string>;
-    minlength?: ValueType<number>;
-    multiple?: ValueType<boolean>;
-    name?: ValueType<string>;
-    pattern?: ValueType<string>;
-    placeholder?: ValueType<string>;
-    readonly?: ValueType<boolean>;
-    required?: ValueType<boolean>;
-    size?: ValueType<number>;
-    src?: ValueType<string>;
-    step?: ValueType<number | string>;
+    accept?: string;
+    alt?: string;
+    autocomplete?: "off" | "on";
+    capture?: boolean | "user" | "environment"; // https://www.w3.org/TR/html-media-capture/#the-capture-attribute
+    checked?: boolean;
+    crossorigin?: string;
+    disabled?: boolean;
+    form?: string;
+    formaction?: string;
+    formenctype?: string;
+    formmethod?: string;
+    formnovalidate?: boolean;
+    formtarget?: string;
+    height?: number | string;
+    list?: string;
+    max?: number | string;
+    maxlength?: number;
+    min?: number | string;
+    minlength?: number;
+    multiple?: boolean;
+    name?: string;
+    pattern?: string;
+    placeholder?: string;
+    readonly?: boolean;
+    required?: boolean;
+    size?: number;
+    src?: string;
+    step?: number | string;
     type?: HTMLInputTypeAttribute;
     value?: any;
-    width?: ValueType<number | string>;
-    'on:change'?: NativeEvents.ChangeEventHandler<T>;
+    width?: number | string;
+    "on:change"?: NativeEvents.ChangeEventHandler<T>;
   }
 
   interface KeygenHTMLAttributes<T> extends HTMLAttributes<T> {
-    autofocus?: ValueType<boolean | undefined>;
-    challenge?: ValueType<string | undefined>;
-    disabled?: ValueType<boolean | undefined>;
-    form?: ValueType<string | undefined>;
-    keytype?: ValueType<string | undefined>;
-    keyparams?: ValueType<string | undefined>;
-    name?: ValueType<string | undefined>;
+    autofocus?: boolean | undefined;
+    challenge?: string | undefined;
+    disabled?: boolean | undefined;
+    form?: string | undefined;
+    keytype?: string | undefined;
+    keyparams?: string | undefined;
+    name?: string | undefined;
   }
 
   interface LabelHTMLAttributes<T> extends HTMLAttributes<T> {
-    form?: ValueType<string | undefined>;
-    for?: ValueType<string | undefined>;
+    form?: string | undefined;
+    for?: string | undefined;
   }
 
   interface LiHTMLAttributes<T> extends HTMLAttributes<T> {
-    value?: ValueType<string | ReadonlyArray<string> | number | undefined>;
+    value?: string | ReadonlyArray<string> | number | undefined;
   }
 
   interface LinkHTMLAttributes<T> extends HTMLAttributes<T> {
-    as?: ValueType<string | undefined>;
-    crossorigin?: ValueType<'anonymous' | 'use-credentials' | '' | undefined>;
-    href?: ValueType<string | undefined>;
-    'href-lang'?: ValueType<string | undefined>;
-    integrity?: ValueType<string | undefined>;
-    media?: ValueType<string | undefined>;
-    imagesrcset?: ValueType<string | undefined>;
-    imagesizes?: ValueType<string | undefined>;
+    as?: string | undefined;
+    crossorigin?: "anonymous" | "use-credentials" | "" | undefined;
+    href?: string | undefined;
+    "href-lang"?: string | undefined;
+    integrity?: string | undefined;
+    media?: string | undefined;
+    imagesrcset?: string | undefined;
+    imagesizes?: string | undefined;
     referrerpolicy?: ReferrerPolicy | undefined;
-    rel?: ValueType<string | undefined>;
-    sizes?: ValueType<string | undefined>;
-    type?: ValueType<string | undefined>;
-    charset?: ValueType<string | undefined>;
+    rel?: string | undefined;
+    sizes?: string | undefined;
+    type?: string | undefined;
+    charset?: string | undefined;
   }
 
   interface MapHTMLAttributes<T> extends HTMLAttributes<T> {
-    name?: ValueType<string | undefined>;
+    name?: string | undefined;
   }
 
   interface MenuHTMLAttributes<T> extends HTMLAttributes<T> {
-    type?: ValueType<string | undefined>;
+    type?: string | undefined;
   }
 
   interface MediaHTMLAttributes<T> extends HTMLAttributes<T> {
-    autoplay?: ValueType<boolean | undefined>;
-    controls?: ValueType<boolean | undefined>;
-    controlslist?: ValueType<string | undefined>;
-    crossorigin?: ValueType<'anonymous' | 'use-credentials' | '' | undefined>;
-    loop?: ValueType<boolean | undefined>;
-    mediagroup?: ValueType<string | undefined>;
-    muted?: ValueType<boolean | undefined>;
-    playsinline?: ValueType<boolean | undefined>;
-    preload?: ValueType<string | undefined>;
-    src?: ValueType<string | undefined>;
+    autoplay?: boolean | undefined;
+    controls?: boolean | undefined;
+    controlslist?: string | undefined;
+    crossorigin?: "anonymous" | "use-credentials" | "" | undefined;
+    loop?: boolean | undefined;
+    mediagroup?: string | undefined;
+    muted?: boolean | undefined;
+    playsinline?: boolean | undefined;
+    preload?: string | undefined;
+    src?: string | undefined;
   }
 
   interface MetaHTMLAttributes<T> extends HTMLAttributes<T> {
-    charset?: ValueType<string>;
-    content?: ValueType<string>;
-    httpequiv?: ValueType<string>;
-    name?: ValueType<string>;
-    media?: ValueType<string>;
+    charset?: string;
+    content?: string;
+    httpequiv?: string;
+    name?: string;
+    media?: string;
   }
 
   interface MeterHTMLAttributes<T> extends HTMLAttributes<T> {
-    form?: ValueType<string>;
-    high?: ValueType<number>;
-    low?: ValueType<number>;
-    max?: ValueType<number | string>;
-    min?: ValueType<number | string>;
-    optimum?: ValueType<number>;
-    value?: ValueType<string | string[] | number>;
+    form?: string;
+    high?: number;
+    low?: number;
+    max?: number | string;
+    min?: number | string;
+    optimum?: number;
+    value?: string | string[] | number;
   }
 
   interface QuoteHTMLAttributes<T> extends HTMLAttributes<T> {
-    cite?: ValueType<string>;
+    cite?: string;
   }
 
   interface ObjectHTMLAttributes<T> extends HTMLAttributes<T> {
-    classid?: ValueType<string>;
-    data?: ValueType<string>;
-    form?: ValueType<string>;
-    height?: ValueType<number | string>;
-    name?: ValueType<string>;
-    type?: ValueType<string>;
-    usemap?: ValueType<string>;
-    width?: ValueType<number | string>;
-    wmode?: ValueType<string>;
+    classid?: string;
+    data?: string;
+    form?: string;
+    height?: number | string;
+    name?: string;
+    type?: string;
+    usemap?: string;
+    width?: number | string;
+    wmode?: string;
   }
 
   interface OlHTMLAttributes<T> extends HTMLAttributes<T> {
-    reversed?: ValueType<boolean>;
-    start?: ValueType<number>;
-    type?: ValueType<'1' | 'a' | 'A' | 'i' | 'I'>;
+    reversed?: boolean;
+    start?: number;
+    type?: "1" | "a" | "A" | "i" | "I";
   }
 
   interface OptgroupHTMLAttributes<T> extends HTMLAttributes<T> {
-    disabled?: ValueType<boolean>;
-    label?: ValueType<string>;
+    disabled?: boolean;
+    label?: string;
   }
 
   interface OptionHTMLAttributes<T> extends HTMLAttributes<T> {
-    disabled?: ValueType<boolean>;
-    label?: ValueType<string>;
-    selected?: ValueType<boolean>;
+    disabled?: boolean;
+    label?: string;
+    selected?: boolean;
     value?: any;
   }
 
   interface OutputHTMLAttributes<T> extends HTMLAttributes<T> {
-    form?: ValueType<string>;
-    for?: ValueType<string>;
-    name?: ValueType<string>;
+    form?: string;
+    for?: string;
+    name?: string;
   }
 
   interface ParamHTMLAttributes<T> extends HTMLAttributes<T> {
-    name?: ValueType<string>;
-    value?: ValueType<string | string[] | number>;
+    name?: string;
+    value?: string | string[] | number;
   }
 
   interface ProgressHTMLAttributes<T> extends HTMLAttributes<T> {
-    max?: ValueType<number | string>;
-    value?: ValueType<string | string[] | number>;
+    max?: number | string;
+    value?: string | string[] | number;
   }
 
   interface SlotHTMLAttributes<T> extends HTMLAttributes<T> {
-    name?: ValueType<string>;
+    name?: string;
   }
 
   interface ScriptHTMLAttributes<T> extends HTMLAttributes<T> {
-    async?: ValueType<boolean>;
+    async?: boolean;
     /** @deprecated */
-    charset?: ValueType<string>;
-    crossorigin?: ValueType<string>;
-    defer?: ValueType<boolean>;
-    integrity?: ValueType<string>;
-    nomodule?: ValueType<boolean>;
-    nonce?: ValueType<string>;
+    charset?: string;
+    crossorigin?: string;
+    defer?: boolean;
+    integrity?: string;
+    nomodule?: boolean;
+    nonce?: string;
     referrerpolicy?: ReferrerPolicy;
-    src?: ValueType<string>;
-    type?: ValueType<string>;
+    src?: string;
+    type?: string;
   }
 
   interface SelectHTMLAttributes<T> extends HTMLAttributes<T> {
-    autocomplete?: ValueType<string>;
-    disabled?: ValueType<boolean>;
-    form?: ValueType<string>;
-    multiple?: ValueType<boolean>;
-    name?: ValueType<string>;
-    required?: ValueType<boolean>;
-    size?: ValueType<number>;
+    autocomplete?: string;
+    disabled?: boolean;
+    form?: string;
+    multiple?: boolean;
+    name?: string;
+    required?: boolean;
+    size?: number;
     value?: any;
   }
 
   interface SourceHTMLAttributes<T> extends HTMLAttributes<T> {
-    height?: ValueType<number | string>;
-    media?: ValueType<string>;
-    sizes?: ValueType<string>;
-    src?: ValueType<string>;
-    srcset?: ValueType<string>;
-    type?: ValueType<string>;
-    width?: ValueType<number | string>;
+    height?: number | string;
+    media?: string;
+    sizes?: string;
+    src?: string;
+    srcset?: string;
+    type?: string;
+    width?: number | string;
   }
 
   interface StyleHTMLAttributes<T> extends HTMLAttributes<T> {
-    media?: ValueType<string>;
-    nonce?: ValueType<string>;
-    scoped?: ValueType<boolean>;
-    type?: ValueType<string>;
+    media?: string;
+    nonce?: string;
+    scoped?: boolean;
+    type?: string;
   }
 
   interface TableHTMLAttributes<T> extends HTMLAttributes<T> {
-    align?: ValueType<'left' | 'center' | 'right'>;
-    bgcolor?: ValueType<string>;
-    border?: ValueType<number>;
-    cellpadding?: ValueType<number | string>;
-    cellspacing?: ValueType<number | string>;
-    frame?: ValueType<boolean>;
-    rules?: ValueType<'none' | 'groups' | 'rows' | 'columns' | 'all'>;
-    summary?: ValueType<string>;
-    width?: ValueType<number | string>;
+    align?: "left" | "center" | "right";
+    bgcolor?: string;
+    border?: number;
+    cellpadding?: number | string;
+    cellspacing?: number | string;
+    frame?: boolean;
+    rules?: "none" | "groups" | "rows" | "columns" | "all";
+    summary?: string;
+    width?: number | string;
   }
 
   interface TextareaHTMLAttributes<T> extends HTMLAttributes<T> {
-    autocomplete?: ValueType<string>;
-    cols?: ValueType<number>;
-    dirname?: ValueType<string>;
-    disabled?: ValueType<boolean>;
-    form?: ValueType<string>;
-    maxlength?: ValueType<number>;
-    minlength?: ValueType<number>;
-    name?: ValueType<string>;
-    placeholder?: ValueType<string>;
-    readonly?: ValueType<boolean>;
-    required?: ValueType<boolean>;
-    rows?: ValueType<number>;
-    value?: ValueType<string | string[] | number>;
-    wrap?: ValueType<string>;
+    autocomplete?: string;
+    cols?: number;
+    dirname?: string;
+    disabled?: boolean;
+    form?: string;
+    maxlength?: number;
+    minlength?: number;
+    name?: string;
+    placeholder?: string;
+    readonly?: boolean;
+    required?: boolean;
+    rows?: number;
+    value?: string | string[] | number;
+    wrap?: string;
   }
 
   interface TdHTMLAttributes<T> extends HTMLAttributes<T> {
-    align?: ValueType<'left' | 'center' | 'right' | 'justify' | 'char'>;
-    colspan?: ValueType<number>;
-    headers?: ValueType<string>;
-    rowspan?: ValueType<number>;
-    scope?: ValueType<string>;
-    abbr?: ValueType<string>;
-    height?: ValueType<number | string>;
-    width?: ValueType<number | string>;
-    valign?: ValueType<'top' | 'middle' | 'bottom' | 'baseline'>;
+    align?: "left" | "center" | "right" | "justify" | "char";
+    colspan?: number;
+    headers?: string;
+    rowspan?: number;
+    scope?: string;
+    abbr?: string;
+    height?: number | string;
+    width?: number | string;
+    valign?: "top" | "middle" | "bottom" | "baseline";
   }
 
   interface ThHTMLAttributes<T> extends HTMLAttributes<T> {
-    align?: ValueType<'left' | 'center' | 'right' | 'justify' | 'char'>;
-    colspan?: ValueType<number>;
-    headers?: ValueType<string>;
-    rowspan?: ValueType<number>;
-    scope?: ValueType<string>;
-    abbr?: ValueType<string>;
+    align?: "left" | "center" | "right" | "justify" | "char";
+    colspan?: number;
+    headers?: string;
+    rowspan?: number;
+    scope?: string;
+    abbr?: string;
   }
 
   interface TimeHTMLAttributes<T> extends HTMLAttributes<T> {
-    datetime?: ValueType<string>;
+    datetime?: string;
   }
 
   interface TrackHTMLAttributes<T> extends HTMLAttributes<T> {
-    default?: ValueType<boolean>;
-    kind?: ValueType<string>;
-    label?: ValueType<string>;
-    src?: ValueType<string>;
-    srclang?: ValueType<string>;
+    default?: boolean;
+    kind?: string;
+    label?: string;
+    src?: string;
+    srclang?: string;
   }
 
   interface VideoHTMLAttributes<T> extends MediaHTMLAttributes<T> {
-    height?: ValueType<number | string>;
-    playsinline?: ValueType<boolean>;
-    poster?: ValueType<string>;
-    width?: ValueType<number | string>;
-    disablepictureinpicture?: ValueType<boolean>;
-    disableremoteplayback?: ValueType<boolean>;
+    height?: number | string;
+    playsinline?: boolean;
+    poster?: string;
+    width?: number | string;
+    disablepictureinpicture?: boolean;
+    disableremoteplayback?: boolean;
   }
 
   interface SVGAttributes<T>
@@ -1006,318 +1012,327 @@ declare namespace Nixix {
       DOMAttributes<T>,
       NixixAttributes<T> {
     // Attributes which also defined in HTMLAttributes
-    className?: ValueType<string | undefined | null>;
-    class?: ValueType<string | undefined | null>;
-    color?: ValueType<CSSProperties['color']>;
-    height?: ValueType<number | string | undefined | null>;
-    id?: ValueType<string | undefined | null>;
-    lang?: ValueType<string | undefined | null>;
-    max?: ValueType<number | string | undefined | null>;
-    media?: ValueType<string | undefined | null>;
-    method?: ValueType<string | undefined | null>;
-    min?: ValueType<number | string | undefined | null>;
-    name?: ValueType<string | undefined | null>;
-    style?: HtmlHTMLAttributes<SVGSVGElement>['style'];
-    target?: ValueType<string | undefined | null>;
-    type?: ValueType<string | undefined | null>;
-    width?: ValueType<number | string | undefined | null>;
+    className?: string | null;
+    class?: string | null;
+    color?: CSSProperties["color"];
+    height?: number | string | null;
+    id?: string | null;
+    lang?: string | null;
+    max?: number | string | null;
+    media?: string | null;
+    method?: string | null;
+    min?: number | string | null;
+    name?: string | null;
+    style?: HtmlHTMLAttributes<SVGSVGElement>["style"];
+    target?: string | null;
+    type?: string | null;
+    width?: number | string | null;
 
     // Other HTML properties supported by SVG elements in browsers
-    role?: ValueType<AriaRole | undefined | null>;
-    tabindex?: ValueType<number | undefined | null>;
-    crossorigin?: ValueType<'anonymous' | 'use-credentials' | '' | undefined>;
+    role?: AriaRole | undefined | null;
+    tabindex?: number | undefined | null;
+    crossorigin?: "anonymous" | "use-credentials" | "" | undefined;
 
     // SVG Specific attributes
-    'accent-height'?: ValueType<number | string | undefined | null>;
-    accumulate?: ValueType<'none' | 'sum' | undefined | null>;
-    additive?: ValueType<'replace' | 'sum' | undefined | null>;
-    'alignment-baseline'?: ValueType<
-      | 'auto'
-      | 'baseline'
-      | 'before-edge'
-      | 'text-before-edge'
-      | 'middle'
-      | 'central'
-      | 'after-edge'
-      | 'text-after-edge'
-      | 'ideographic'
-      | 'alphabetic'
-      | 'hanging'
-      | 'mathematical'
-      | 'inherit'
+    "accent-height"?: number | string | null;
+    accumulate?: "none" | "sum" | undefined | null;
+    additive?: "replace" | "sum" | undefined | null;
+    "alignment-baseline"?:
+      | "auto"
+      | "baseline"
+      | "before-edge"
+      | "text-before-edge"
+      | "middle"
+      | "central"
+      | "after-edge"
+      | "text-after-edge"
+      | "ideographic"
+      | "alphabetic"
+      | "hanging"
+      | "mathematical"
+      | "inherit"
       | undefined
-      | null
-    >;
-    allowReorder?: ValueType<'no' | 'yes' | undefined | null>;
-    alphabetic?: ValueType<number | string | undefined | null>;
-    amplitude?: ValueType<number | string | undefined | null>;
-    'arabic-form'?: ValueType<
-      'initial' | 'medial' | 'terminal' | 'isolated' | undefined | null
-    >;
-    ascent?: ValueType<number | string | undefined | null>;
-    attributeName?: ValueType<string | undefined | null>;
-    attributeType?: ValueType<string | undefined | null>;
-    autoReverse?: ValueType<number | string | undefined | null>;
-    azimuth?: ValueType<number | string | undefined | null>;
-    baseFrequency?: ValueType<number | string | undefined | null>;
-    'baseline-shift'?: ValueType<number | string | undefined | null>;
-    baseProfile?: ValueType<number | string | undefined | null>;
-    bbox?: ValueType<number | string | undefined | null>;
-    begin?: ValueType<number | string | undefined | null>;
-    bias?: ValueType<number | string | undefined | null>;
-    by?: ValueType<number | string | undefined | null>;
-    calcMode?: ValueType<number | string | undefined | null>;
-    'cap-height'?: ValueType<number | string | undefined | null>;
-    clip?: ValueType<number | string | undefined | null>;
-    'clip-path'?: ValueType<string | undefined | null>;
-    clipPathUnits?: ValueType<number | string | undefined | null>;
-    'clip-rule'?: ValueType<number | string | undefined | null>;
-    'color-interpolation'?: ValueType<CSSProperties['colorInterpolation']>;
-    'color-interpolation-filters'?: ValueType<
-      'auto' | 'sRGB' | 'linearRGB' | 'inherit' | undefined | null
-    >;
-    'color-profile'?: ValueType<number | string | undefined | null>;
-    'color-rendering'?: ValueType<CSSProperties['colorRendering']>;
-    contentScriptType?: ValueType<number | string | undefined | null>;
-    contentStyleType?: ValueType<number | string | undefined | null>;
-    cursor?: ValueType<number | string | undefined | null>;
-    cx?: ValueType<number | string | undefined | null>;
-    cy?: ValueType<number | string | undefined | null>;
-    d?: ValueType<string | undefined | null>;
-    decelerate?: ValueType<number | string | undefined | null>;
-    descent?: ValueType<number | string | undefined | null>;
-    diffuseConstant?: ValueType<number | string | undefined | null>;
-    direction?: ValueType<number | string | undefined | null>;
-    display?: ValueType<number | string | undefined | null>;
-    divisor?: ValueType<number | string | undefined | null>;
-    'dominant-baseline'?: ValueType<number | string | undefined | null>;
-    dur?: ValueType<number | string | undefined | null>;
-    dx?: ValueType<number | string | undefined | null>;
-    dy?: ValueType<number | string | undefined | null>;
-    edgeMode?: ValueType<number | string | undefined | null>;
-    elevation?: ValueType<number | string | undefined | null>;
-    'enable-background'?: ValueType<number | string | undefined | null>;
-    end?: ValueType<number | string | undefined | null>;
-    exponent?: ValueType<number | string | undefined | null>;
-    externalResourcesRequired?: ValueType<number | string | undefined | null>;
-    fill?: ValueType<CSSProperties['fill']>;
-    'fill-opacity'?: ValueType<CSSProperties['fillOpacity']>;
-    'fill-rule'?: ValueType<
-      'nonzero' | 'evenodd' | 'inherit' | undefined | null
-    >;
-    filter?: ValueType<string | undefined | null>;
-    filterRes?: ValueType<number | string | undefined | null>;
-    filterUnits?: ValueType<number | string | undefined | null>;
-    'flood-color'?: ValueType<CSSProperties['floodColor']>;
-    'flood-opacity'?: ValueType<number | string | undefined | null>;
-    focusable?: ValueType<number | string | undefined | null>;
-    'font-family'?: ValueType<CSSProperties['fontFamily']>;
-    'font-size'?: ValueType<number | string | undefined | null>;
-    'font-size-adjust'?: ValueType<number | string | undefined | null>;
-    'font-stretch'?: ValueType<number | string | undefined | null>;
-    'font-style'?: ValueType<number | string | undefined | null>;
-    'font-variant'?: ValueType<number | string | undefined | null>;
-    'font-weight'?: ValueType<number | string | undefined | null>;
-    format?: ValueType<number | string | undefined | null>;
-    from?: ValueType<number | string | undefined | null>;
-    fx?: ValueType<number | string | undefined | null>;
-    fy?: ValueType<number | string | undefined | null>;
-    g1?: ValueType<number | string | undefined | null>;
-    g2?: ValueType<number | string | undefined | null>;
-    'glyph-name'?: ValueType<number | string | undefined | null>;
-    'glyph-orientation-horizontal'?: ValueType<
-      number | string | undefined | null
-    >;
-    'glyph-orientation-vertical'?: ValueType<
-      number | string | undefined | null
-    >;
-    glyphRef?: ValueType<number | string | undefined | null>;
-    gradientTransform?: ValueType<string | undefined | null>;
-    gradientUnits?: ValueType<string | undefined | null>;
-    hanging?: ValueType<number | string | undefined | null>;
-    href?: ValueType<string | undefined | null>;
-    'horiz-adv-x'?: ValueType<number | string | undefined | null>;
-    'horiz-origin-x'?: ValueType<number | string | undefined | null>;
-    ideographic?: ValueType<number | string | undefined | null>;
-    'image-rendering'?: ValueType<number | string | undefined | null>;
-    in2?: ValueType<number | string | undefined | null>;
-    in?: ValueType<string | undefined | null>;
-    intercept?: ValueType<number | string | undefined | null>;
-    k1?: ValueType<number | string | undefined | null>;
-    k2?: ValueType<number | string | undefined | null>;
-    k3?: ValueType<number | string | undefined | null>;
-    k4?: ValueType<number | string | undefined | null>;
-    k?: ValueType<number | string | undefined | null>;
-    kernelMatrix?: ValueType<number | string | undefined | null>;
-    kernelUnitLength?: ValueType<number | string | undefined | null>;
-    kerning?: ValueType<number | string | undefined | null>;
-    keyPoints?: ValueType<number | string | undefined | null>;
-    keySplines?: ValueType<number | string | undefined | null>;
-    keyTimes?: ValueType<number | string | undefined | null>;
-    lengthAdjust?: ValueType<number | string | undefined | null>;
-    'letter-spacing'?: ValueType<number | string | undefined | null>;
-    'lighting-color'?: ValueType<CSSProperties['lightingColor']>;
-    limitingConeAngle?: ValueType<number | string | undefined | null>;
-    local?: ValueType<number | string | undefined | null>;
-    'marker-end'?: ValueType<string | undefined | null>;
-    markerHeight?: ValueType<number | string | undefined | null>;
-    'marker-mid'?: ValueType<string | undefined | null>;
-    'marker-start'?: ValueType<string | undefined | null>;
-    markerUnits?: ValueType<number | string | undefined | null>;
-    markerWidth?: ValueType<number | string | undefined | null>;
-    mask?: ValueType<string | undefined | null>;
-    maskContentUnits?: ValueType<number | string | undefined | null>;
-    maskUnits?: ValueType<number | string | undefined | null>;
-    mathematical?: ValueType<number | string | undefined | null>;
-    mode?: ValueType<number | string | undefined | null>;
-    numOctaves?: ValueType<number | string | undefined | null>;
-    offset?: ValueType<number | string | undefined | null>;
-    opacity?: ValueType<number | string | undefined | null>;
-    operator?: ValueType<number | string | undefined | null>;
-    order?: ValueType<number | string | undefined | null>;
-    orient?: ValueType<number | string | undefined | null>;
-    orientation?: ValueType<number | string | undefined | null>;
-    origin?: ValueType<number | string | undefined | null>;
-    overflow?: ValueType<number | string | undefined | null>;
-    'overline-position'?: ValueType<number | string | undefined | null>;
-    'overline-thickness'?: ValueType<number | string | undefined | null>;
-    'paint-order'?: ValueType<number | string | undefined | null>;
-    'panose-1'?: ValueType<number | string | undefined | null>;
-    path?: ValueType<string | undefined | null>;
-    pathLength?: ValueType<number | string | undefined | null>;
-    patternContentUnits?: ValueType<string | undefined | null>;
-    patternTransform?: ValueType<number | string | undefined | null>;
-    patternUnits?: ValueType<string | undefined | null>;
-    'pointer-events'?: ValueType<number | string | undefined | null>;
-    points?: ValueType<string | undefined | null>;
-    pointsAtX?: ValueType<number | string | undefined | null>;
-    pointsAtY?: ValueType<number | string | undefined | null>;
-    pointsAtZ?: ValueType<number | string | undefined | null>;
-    preserveAlpha?: ValueType<number | string | undefined | null>;
-    preserveAspectRatio?: ValueType<string | undefined | null>;
-    primitiveUnits?: ValueType<number | string | undefined | null>;
-    r?: ValueType<number | string | undefined | null>;
-    radius?: ValueType<number | string | undefined | null>;
-    refX?: ValueType<number | string | undefined | null>;
-    refY?: ValueType<number | string | undefined | null>;
-    'rendering-intent'?: ValueType<number | string | undefined | null>;
-    repeatCount?: ValueType<number | string | undefined | null>;
-    repeatDur?: ValueType<number | string | undefined | null>;
-    requiredExtensions?: ValueType<number | string | undefined | null>;
-    requiredFeatures?: ValueType<number | string | undefined | null>;
-    restart?: ValueType<number | string | undefined | null>;
-    result?: ValueType<string | undefined | null>;
-    rotate?: ValueType<number | string | undefined | null>;
-    rx?: ValueType<number | string | undefined | null>;
-    ry?: ValueType<number | string | undefined | null>;
-    scale?: ValueType<number | string | undefined | null>;
-    seed?: ValueType<number | string | undefined | null>;
-    'shape-rendering'?: ValueType<number | string | undefined | null>;
-    slope?: ValueType<number | string | undefined | null>;
-    spacing?: ValueType<number | string | undefined | null>;
-    specularConstant?: ValueType<number | string | undefined | null>;
-    specularExponent?: ValueType<number | string | undefined | null>;
-    speed?: ValueType<number | string | undefined | null>;
-    spreadMethod?: ValueType<string | undefined | null>;
-    startOffset?: ValueType<number | string | undefined | null>;
-    stdDeviation?: ValueType<number | string | undefined | null>;
-    stemh?: ValueType<number | string | undefined | null>;
-    stemv?: ValueType<number | string | undefined | null>;
-    stitchTiles?: ValueType<number | string | undefined | null>;
-    'stop-color'?: ValueType<CSSProperties['stopColor']>;
-    'stop-opacity'?: ValueType<number | string | undefined | null>;
-    'strikethrough-position'?: ValueType<number | string | undefined | null>;
-    'strikethrough-thickness'?: ValueType<number | string | undefined | null>;
-    string?: ValueType<number | string | undefined | null>;
-    stroke?: ValueType<string | undefined | null>;
-    'stroke:dasharray'?: ValueType<string | number | undefined | null>;
-    'stroke:dashoffset'?: ValueType<string | number | undefined | null>;
-    'stroke:linecap'?: ValueType<
-      'butt' | 'round' | 'square' | 'inherit' | undefined | null
-    >;
-    'stroke:linejoin'?: ValueType<
-      'miter' | 'round' | 'bevel' | 'inherit' | undefined | null
-    >;
-    'stroke:miterlimit'?: ValueType<string | undefined | null>;
-    'stroke:opacity'?: ValueType<number | string | undefined | null>;
-    'stroke:width'?: ValueType<number | string | undefined | null>;
-    surfaceScale?: ValueType<number | string | undefined | null>;
-    systemLanguage?: ValueType<number | string | undefined | null>;
-    tableValues?: ValueType<number | string | undefined | null>;
-    targetX?: ValueType<number | string | undefined | null>;
-    targetY?: ValueType<number | string | undefined | null>;
-    'text-anchor'?: ValueType<string | undefined | null>;
-    'text-decoration'?: ValueType<number | string | undefined | null>;
-    textLength?: ValueType<number | string | undefined | null>;
-    'text-rendering'?: ValueType<number | string | undefined | null>;
-    to?: ValueType<number | string | undefined | null>;
-    transform?: ValueType<string | undefined | null>;
-    u1?: ValueType<number | string | undefined | null>;
-    u2?: ValueType<number | string | undefined | null>;
-    'underline-position'?: ValueType<number | string | undefined | null>;
-    'underline-thickness'?: ValueType<number | string | undefined | null>;
-    unicode?: ValueType<number | string | undefined | null>;
-    'unicode-bidi'?: ValueType<number | string | undefined | null>;
-    'unicode-range'?: ValueType<number | string | undefined | null>;
-    'units-per-em'?: ValueType<number | string | undefined | null>;
-    'v-alphabetic'?: ValueType<number | string | undefined | null>;
-    values?: ValueType<string | undefined | null>;
-    'vector-effect'?: ValueType<number | string | undefined | null>;
-    version?: ValueType<string | undefined | null>;
-    'vert-adv-y'?: ValueType<number | string | undefined | null>;
-    'vert-origin-x'?: ValueType<number | string | undefined | null>;
-    'vert-origin-y'?: ValueType<number | string | undefined | null>;
-    'v-hanging'?: ValueType<number | string | undefined | null>;
-    'v-ideographic'?: ValueType<number | string | undefined | null>;
-    viewBox?: ValueType<string | undefined | null>;
-    viewTarget?: ValueType<number | string | undefined | null>;
-    visibility?: ValueType<number | string | undefined | null>;
-    'v-mathematical'?: ValueType<number | string | undefined | null>;
-    widths?: ValueType<number | string | undefined | null>;
-    'word-spacing'?: ValueType<number | string | undefined | null>;
-    'writing-mode'?: ValueType<number | string | undefined | null>;
-    x1?: ValueType<number | string | undefined | null>;
-    x2?: ValueType<number | string | undefined | null>;
-    x?: ValueType<number | string | undefined | null>;
-    xChannelSelector?: ValueType<string | undefined | null>;
-    'x-height'?: ValueType<number | string | undefined | null>;
-    'xlink:actuate'?: ValueType<string | undefined | null>;
-    'xlink:arcrole'?: ValueType<string | undefined | null>;
-    'xlink:href'?: ValueType<string | undefined | null>;
-    'xlink:role'?: ValueType<string | undefined | null>;
-    'xlink:show'?: ValueType<string | undefined | null>;
-    'xlink:title'?: ValueType<string | undefined | null>;
-    'xlink:type'?: ValueType<string | undefined | null>;
-    'xml:base'?: ValueType<string | undefined | null>;
-    'xml:lang'?: ValueType<string | undefined | null>;
-    xmlns?: ValueType<string | undefined | null>;
-    'xmlns:xlink'?: ValueType<string | undefined | null>;
-    'xml:space'?: ValueType<string | undefined | null>;
-    y1?: ValueType<number | string | undefined | null>;
-    y2?: ValueType<number | string | undefined | null>;
-    y?: ValueType<number | string | undefined | null>;
-    yChannelSelector?: ValueType<string | undefined | null>;
-    z?: ValueType<number | string | undefined | null>;
-    zoomAndPan?: ValueType<string | undefined | null>;
+      | null;
+    allowReorder?: "no" | "yes" | undefined | null;
+    alphabetic?: number | string | null;
+    amplitude?: number | string | null;
+    "arabic-form"?:
+      | "initial"
+      | "medial"
+      | "terminal"
+      | "isolated"
+      | undefined
+      | null;
+    ascent?: number | string | null;
+    attributeName?: string | null;
+    attributeType?: string | null;
+    autoReverse?: number | string | null;
+    azimuth?: number | string | null;
+    baseFrequency?: number | string | null;
+    "baseline-shift"?: number | string | null;
+    baseProfile?: number | string | null;
+    bbox?: number | string | null;
+    begin?: number | string | null;
+    bias?: number | string | null;
+    by?: number | string | null;
+    calcMode?: number | string | null;
+    "cap-height"?: number | string | null;
+    clip?: number | string | null;
+    "clip-path"?: string | null;
+    clipPathUnits?: number | string | null;
+    "clip-rule"?: number | string | null;
+    "color-interpolation"?: CSSProperties["colorInterpolation"];
+    "color-interpolation-filters"?:
+      | "auto"
+      | "sRGB"
+      | "linearRGB"
+      | "inherit"
+      | undefined
+      | null;
+    "color-profile"?: number | string | null;
+    "color-rendering"?: CSSProperties["colorRendering"];
+    contentScriptType?: number | string | null;
+    contentStyleType?: number | string | null;
+    cursor?: number | string | null;
+    cx?: number | string | null;
+    cy?: number | string | null;
+    d?: string | null;
+    decelerate?: number | string | null;
+    descent?: number | string | null;
+    diffuseConstant?: number | string | null;
+    direction?: number | string | null;
+    display?: number | string | null;
+    divisor?: number | string | null;
+    "dominant-baseline"?: number | string | null;
+    dur?: number | string | null;
+    dx?: number | string | null;
+    dy?: number | string | null;
+    edgeMode?: number | string | null;
+    elevation?: number | string | null;
+    "enable-background"?: number | string | null;
+    end?: number | string | null;
+    exponent?: number | string | null;
+    externalResourcesRequired?: number | string | null;
+    fill?: CSSProperties["fill"];
+    "fill-opacity"?: CSSProperties["fillOpacity"];
+    "fill-rule"?: "nonzero" | "evenodd" | "inherit" | undefined | null;
+    filter?: string | null;
+    filterRes?: number | string | null;
+    filterUnits?: number | string | null;
+    "flood-color"?: CSSProperties["floodColor"];
+    "flood-opacity"?: number | string | null;
+    focusable?: number | string | null;
+    "font-family"?: CSSProperties["fontFamily"];
+    "font-size"?: number | string | null;
+    "font-size-adjust"?: number | string | null;
+    "font-stretch"?: number | string | null;
+    "font-style"?: number | string | null;
+    "font-variant"?: number | string | null;
+    "font-weight"?: number | string | null;
+    format?: number | string | null;
+    from?: number | string | null;
+    fx?: number | string | null;
+    fy?: number | string | null;
+    g1?: number | string | null;
+    g2?: number | string | null;
+    "glyph-name"?: number | string | null;
+    "glyph-orientation-horizontal"?: number | string | undefined | null;
+    "glyph-orientation-vertical"?: number | string | undefined | null;
+    glyphRef?: number | string | null;
+    gradientTransform?: string | null;
+    gradientUnits?: string | null;
+    hanging?: number | string | null;
+    href?: string | null;
+    "horiz-adv-x"?: number | string | null;
+    "horiz-origin-x"?: number | string | null;
+    ideographic?: number | string | null;
+    "image-rendering"?: number | string | null;
+    in2?: number | string | null;
+    in?: string | null;
+    intercept?: number | string | null;
+    k1?: number | string | null;
+    k2?: number | string | null;
+    k3?: number | string | null;
+    k4?: number | string | null;
+    k?: number | string | null;
+    kernelMatrix?: number | string | null;
+    kernelUnitLength?: number | string | null;
+    kerning?: number | string | null;
+    keyPoints?: number | string | null;
+    keySplines?: number | string | null;
+    keyTimes?: number | string | null;
+    lengthAdjust?: number | string | null;
+    "letter-spacing"?: number | string | null;
+    "lighting-color"?: CSSProperties["lightingColor"];
+    limitingConeAngle?: number | string | null;
+    local?: number | string | null;
+    "marker-end"?: string | null;
+    markerHeight?: number | string | null;
+    "marker-mid"?: string | null;
+    "marker-start"?: string | null;
+    markerUnits?: number | string | null;
+    markerWidth?: number | string | null;
+    mask?: string | null;
+    maskContentUnits?: number | string | null;
+    maskUnits?: number | string | null;
+    mathematical?: number | string | null;
+    mode?: number | string | null;
+    numOctaves?: number | string | null;
+    offset?: number | string | null;
+    opacity?: number | string | null;
+    operator?: number | string | null;
+    order?: number | string | null;
+    orient?: number | string | null;
+    orientation?: number | string | null;
+    origin?: number | string | null;
+    overflow?: number | string | null;
+    "overline-position"?: number | string | null;
+    "overline-thickness"?: number | string | null;
+    "paint-order"?: number | string | null;
+    "panose-1"?: number | string | null;
+    path?: string | null;
+    pathLength?: number | string | null;
+    patternContentUnits?: string | null;
+    patternTransform?: number | string | null;
+    patternUnits?: string | null;
+    "pointer-events"?: number | string | null;
+    points?: string | null;
+    pointsAtX?: number | string | null;
+    pointsAtY?: number | string | null;
+    pointsAtZ?: number | string | null;
+    preserveAlpha?: number | string | null;
+    preserveAspectRatio?: string | null;
+    primitiveUnits?: number | string | null;
+    r?: number | string | null;
+    radius?: number | string | null;
+    refX?: number | string | null;
+    refY?: number | string | null;
+    "rendering-intent"?: number | string | null;
+    repeatCount?: number | string | null;
+    repeatDur?: number | string | null;
+    requiredExtensions?: number | string | null;
+    requiredFeatures?: number | string | null;
+    restart?: number | string | null;
+    result?: string | null;
+    rotate?: number | string | null;
+    rx?: number | string | null;
+    ry?: number | string | null;
+    scale?: number | string | null;
+    seed?: number | string | null;
+    "shape-rendering"?: number | string | null;
+    slope?: number | string | null;
+    spacing?: number | string | null;
+    specularConstant?: number | string | null;
+    specularExponent?: number | string | null;
+    speed?: number | string | null;
+    spreadMethod?: string | null;
+    startOffset?: number | string | null;
+    stdDeviation?: number | string | null;
+    stemh?: number | string | null;
+    stemv?: number | string | null;
+    stitchTiles?: number | string | null;
+    "stop-color"?: CSSProperties["stopColor"];
+    "stop-opacity"?: number | string | null;
+    "strikethrough-position"?: number | string | null;
+    "strikethrough-thickness"?: number | string | null;
+    string?: number | string | null;
+    stroke?: string | null;
+    "stroke:dasharray"?: number | string | null;
+    "stroke:dashoffset"?: number | string | null;
+    "stroke:linecap"?:
+      | "butt"
+      | "round"
+      | "square"
+      | "inherit"
+      | undefined
+      | null;
+    "stroke:linejoin"?:
+      | "miter"
+      | "round"
+      | "bevel"
+      | "inherit"
+      | undefined
+      | null;
+    "stroke:miterlimit"?: string | null;
+    "stroke:opacity"?: number | string | null;
+    "stroke:width"?: number | string | null;
+    surfaceScale?: number | string | null;
+    systemLanguage?: number | string | null;
+    tableValues?: number | string | null;
+    targetX?: number | string | null;
+    targetY?: number | string | null;
+    "text-anchor"?: string | null;
+    "text-decoration"?: number | string | null;
+    textLength?: number | string | null;
+    "text-rendering"?: number | string | null;
+    to?: number | string | null;
+    transform?: string | null;
+    u1?: number | string | null;
+    u2?: number | string | null;
+    "underline-position"?: number | string | null;
+    "underline-thickness"?: number | string | null;
+    unicode?: number | string | null;
+    "unicode-bidi"?: number | string | null;
+    "unicode-range"?: number | string | null;
+    "units-per-em"?: number | string | null;
+    "v-alphabetic"?: number | string | null;
+    values?: string | null;
+    "vector-effect"?: number | string | null;
+    version?: string | null;
+    "vert-adv-y"?: number | string | null;
+    "vert-origin-x"?: number | string | null;
+    "vert-origin-y"?: number | string | null;
+    "v-hanging"?: number | string | null;
+    "v-ideographic"?: number | string | null;
+    viewBox?: string | null;
+    viewTarget?: number | string | null;
+    visibility?: number | string | null;
+    "v-mathematical"?: number | string | null;
+    widths?: number | string | null;
+    "word-spacing"?: number | string | null;
+    "writing-mode"?: number | string | null;
+    x1?: number | string | null;
+    x2?: number | string | null;
+    x?: number | string | null;
+    xChannelSelector?: string | null;
+    "x-height"?: number | string | null;
+    "xlink:actuate"?: string | null;
+    "xlink:arcrole"?: string | null;
+    "xlink:href"?: string | null;
+    "xlink:role"?: string | null;
+    "xlink:show"?: string | null;
+    "xlink:title"?: string | null;
+    "xlink:type"?: string | null;
+    "xml:base"?: string | null;
+    "xml:lang"?: string | null;
+    xmlns?: string | null;
+    "xmlns:xlink"?: string | null;
+    "xml:space"?: string | null;
+    y1?: number | string | null;
+    y2?: number | string | null;
+    y?: number | string | null;
+    yChannelSelector?: string | null;
+    z?: number | string | null;
+    zoomAndPan?: string | null;
   }
 
   interface WebViewHTMLAttributes<T> extends HTMLAttributes<T> {
-    allowfullscreen?: ValueType<boolean>;
-    allowpopups?: ValueType<boolean>;
-    autosize?: ValueType<boolean>;
-    blinkfeatures?: ValueType<string>;
-    disableblinkfeatures?: ValueType<string>;
-    disableguestresize?: ValueType<boolean>;
-    disablewebsecurity?: ValueType<boolean>;
-    guestinstance?: ValueType<string>;
-    httpreferrer?: ValueType<string>;
-    nodeintegration?: ValueType<boolean>;
-    partition?: ValueType<string>;
-    plugins?: ValueType<boolean>;
-    preload?: ValueType<string>;
-    src?: ValueType<string>;
-    useragent?: ValueType<string>;
-    webpreferences?: ValueType<string>;
+    allowfullscreen?: boolean;
+    allowpopups?: boolean;
+    autosize?: boolean;
+    blinkfeatures?: string;
+    disableblinkfeatures?: string;
+    disableguestresize?: boolean;
+    disablewebsecurity?: boolean;
+    guestinstance?: string;
+    httpreferrer?: string;
+    nodeintegration?: boolean;
+    partition?: string;
+    plugins?: boolean;
+    preload?: string;
+    src?: string;
+    useragent?: string;
+    webpreferences?: string;
   }
 
   type JSXElementConstructor<P> = (props?: P) => someView | Promise<someView>;
