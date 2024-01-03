@@ -1,9 +1,9 @@
 import { Signal, Store } from "./classes";
 import { nixixStore } from "../dom";
 import { cloneObject, isFunction, isPrimitive, forEach } from "./helpers";
-import { raise } from "../dom/helpers";
+import { getSignalValue, raise } from "../dom/helpers";
 import { patchObj } from "./patchObj";
-import { type NonPrimitive } from "./types";
+import { type Primitive, type NonPrimitive } from "./types";
 
 function callRef<R extends Element | HTMLElement>(ref: R): MutableRefObject {
   if (nixixStore["refCount"] === undefined) {
@@ -89,6 +89,26 @@ function memo<T>(fn: () => T, deps: any[]) {
     setState(fn());
   }, deps);
   return state;
+}
+
+function concat<T extends Signal>(
+  ...templ: Array<T | TemplateStringsArray | Primitive>
+) {
+  // ['', 'jjdj', '']
+  // [_Signal2, _Signal2]
+  const templates = templ[0] as TemplateStringsArray;
+  const expressions = templ.splice(1) as T[];
+  return memo(() => {
+    return templates.reduce((p, v, i) => {
+      const expression = expressions[i - 1];
+      let returnedVal: Primitive = "";
+      if (expression) {
+        if (expression.$$__reactive) returnedVal = getSignalValue(expression);
+        else if (isPrimitive(expression)) returnedVal = expression as any;
+      }
+      return p + returnedVal + v;
+    });
+  }, expressions);
 }
 
 function pushFurtherDeps(
@@ -219,8 +239,9 @@ export {
   callSignal,
   signal,
   store,
-  callStore,
   memo,
+  concat,
+  callStore,
   getValueType,
   effect,
   callEffect,

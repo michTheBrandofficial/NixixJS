@@ -1,22 +1,23 @@
 import { EmptyObject } from "../../types/index";
 
 // primitive
-export type SetSignalDispatcher<S> = (newValue: S | ((prev: S) => S)) => void;
+export type SetSignalDispatcher<S> = (newValue: S | ((prev: S) => S)) => void
+;
 export type SetStoreDispatcher<S> = (newValue: S | ((prev: S) => S)) => void;
 
 export type Signal<S> = S extends null | undefined
   ? {
-      value: S;
-    } & string
+    value: S;
+  } & string
   : {
-      value: S;
-    } & S;
+    value: S;
+  } & S;
 
 export type Store<O> = {
-  [index in keyof O]: O[index] extends NonPrimitive ? Store<O[index]> : Signal<O[index]>
-} & (O extends NonPrimitive ? {
-  $$__reactive: true
-} : {})
+  [index in keyof O]: O[index] extends NonPrimitive
+    ? Store<O[index]>
+    : Signal<O[index]>;
+};
 
 export type MemoSignal<S> = Signal<S>;
 
@@ -64,7 +65,7 @@ export const signal: typeof callSignal;
 
 export const store: typeof callStore;
 
-export function getValueType<T>(value: any): any[] | undefined;
+export function getValueType<T>(value: T): T[] | undefined;
 
 type Deps = (Signal<Primitive> | Store<NonPrimitive>)[];
 
@@ -82,6 +83,19 @@ export function memo<S extends NonPrimitive>(
   fn: () => S,
   deps: Deps
 ): MemoStore<S>;
+
+/**
+ * Creates a memoized concatenated string from a template string literal containing a signal(s);
+ * 
+ * `USAGE`
+ * ```jsx
+ * import { concat, signal } from 'nixix/primitives';
+ * const [display, setDisplay] = signal<'flex' | 'hidden'>('flex');
+ * const View = () => <div className={concat`${display} flex-col`} >I am a DIV</div>
+ * 
+ * ```
+ */
+export function concat(...templ: Array<Primitive | Signal<Primitive> | TemplateStringsArray>): MemoSignal<string>;
 
 /**
  * @deprecated PLEASE DO NOT USE THIS FUNCTION, USE `callEffect` or `callReaction`
@@ -125,29 +139,25 @@ export function renderEffect(
 ): void;
 
 export function removeSignal(
-  signals:
-    | Array<Store<any> | Signal<any>>
-    | Store<any>
-    | Signal<any>
+  signals: Array<Store<any> | Signal<any>> | Store<any> | Signal<any>
 ): void;
 
 export function removeEffect(fn: CallableFunction, signal: Deps[number]): void;
 
 /**
-     * ```jsx
-     * This function is used to get a reference to a dom element. To get the element you want to manipulate, add the 'bind:ref' prop with it's value as the ref variable. 
-     * import { callRef } from 'nixix';
-     * 
-     * function App() {
-        const div = callRef();
-
-        return (
-          <div bind:ref={div} >I'm a div</div>
-        )
-     }
-     * 
-     * ```
-     */
+ * ```jsx
+ * This function is used to get a reference to a dom element. To get the element you want to manipulate, add the 'bind:ref' prop with it's value as the ref variable. 
+ * import { callRef } from 'nixix';
+ * 
+ * function App() {
+    const div = callRef()
+    return (
+      <div bind:ref={div} >I'm a div</div>
+    )
+ }
+ * 
+ * ```
+ */
 export function callRef<
   R extends Element | null =
     | any

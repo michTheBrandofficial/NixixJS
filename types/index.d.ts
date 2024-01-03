@@ -6,7 +6,7 @@
 import * as CSS from 'csstype';
 import { AriaRole } from './aria';
 import * as NativeEvents from './eventhandlers';
-import { MutableRefObject } from '../primitives/types';
+import { MutableRefObject, Signal } from '../primitives/types';
 
 type Booleanish = boolean | 'true' | 'false';
 
@@ -27,16 +27,15 @@ declare namespace Nixix {
     children?: T;
   };
 
-  type Component = <T>(props?: T) => someView;
+  type Component<T> = (props?: T) => someView;
 
   type NixixNode = JSX.ElementType | Iterable<JSX.ElementType>;
 
   type ExoticComponent<P> = (props: P) => someView;
+  
   type RouteExoticComponent<T> = T;
 
-  type SignalObject<S extends any> = { value: S; $$__id?: number };
-
-  type ValueType<T> = T | (string & SignalObject<T>);
+  type ValueType<T> = T | (string & Signal<T>);
 
   interface CSSProperties extends CSS.Properties<string, number> {}
 
