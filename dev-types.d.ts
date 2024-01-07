@@ -1,8 +1,7 @@
 import {
-  StoreObject as NixixStoreObject,
   Signal,
   Store,
-} from './primitives/types';
+} from './primitives/classes';
 
 // These global types are used for the development of this project.
 declare global {
@@ -14,6 +13,7 @@ declare global {
     | ((props?: {} | null) => Element)
     | 'fragment';
   type Proptype = { children?: any; [index: string]: any } | null | undefined;
+
   type ChildrenType = Array<Element | string | Signal>;
 
   type ValueType = Signal | Store | string;
@@ -33,63 +33,16 @@ declare global {
     | 'styleProp'
     | 'childTextNode';
 
-  interface WindowStoreObject {
-    value: any;
-    effect?: CallableFunction[];
-    cleanup?: () => void;
-  }
   interface Window {
     $$__NixixStore?: {
-      $$__lastReactionProvider?: 'signal' | 'store';
       commentForLF: boolean;
       $$__routeStore?: {
         errorPage?: {
           errorRoute: string;
         };
-        common?: boolean;
-        [path: string]: string | Node | (string | Node)[] | any;
+        [path: string]: any;
       };
-      Store?: {
-        [index: string]: WindowStoreObject;
-      };
-      SignalStore?: {
-        [index: string]: {
-          value: any;
-          effect?: CallableFunction[];
-        };
-      };
-      storeCount?: number;
-      signalCount?: number;
-      refCount?: number;
     };
-  }
-
-  type SignalObject<S extends any> = { value: S; $$__id?: number };
-
-  interface StoreObject {
-    $$__id: string | number;
-  }
-
-  type SetSignalDispatcher<S> = (newValue: S | ((prev?: S) => S)) => void;
-  type SetStoreDispatcher<S> = (newValue: S | (() => S)) => void;
-
-  interface SuspenseProps {
-    fallback: string | Element | Signal | (string | Element | Signal)[];
-    children?: Promise<any>[];
-    onError?: string | Element | Signal;
-  }
-
-  interface ForProps {
-    fallback: string | Element | Signal;
-    children?: ((value: any, index?: number) => JSX.Element)[];
-    each: NixixStoreObject<any[]>;
-  }
-
-  interface ShowProps {
-    when: () => boolean;
-    switch: NixixStoreObject<any> | SignalObject<any>;
-    children: any;
-    fallback: any;
   }
 
   var window: Window & typeof globalThis;
@@ -102,6 +55,26 @@ declare global {
     nextElementSibling: Element['nextElementSibling'] | null;
     prevElementSibling: Element['previousElementSibling'] | null;
     parent: Element['parentElement'] | null;
+  }
+
+
+  interface SuspenseProps {
+    fallback: any;
+    children?: Promise<any>[];
+    onError?: string | Element | Signal;
+  }
+
+  interface ForProps {
+    fallback: any;
+    children?: ((value: any, index?: number) => JSX.Element)[];
+    each: any[]
+  }
+
+  interface ShowProps {
+    when: () => boolean;
+    children: any;
+    fallback: any;
+    switch: Signal
   }
 
   // @ts-ignore

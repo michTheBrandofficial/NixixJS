@@ -7,12 +7,14 @@ import {
   warn,
   getSignalValue,
   checkDataType,
+  isNull,
+  entries,
+  isReactiveValue,
 } from "./helpers";
 import { PROP_ALIASES, SVG_ELEMENTTAGS, SVG_NAMESPACE } from "./utilVars";
 import { isFunction } from "../primitives/helpers";
 
 type GlobalStore = {
-  $$__lastReactionProvider?: "signal" | "store";
   commentForLF: boolean;
   viewTransitions?: boolean;
   $$__routeStore?: {
@@ -22,75 +24,24 @@ type GlobalStore = {
     [path: string]: string | Node | (string | Node)[] | any;
   };
   root?: Element;
-  Store?: {
-    [index: string]: WindowStoreObject;
-  };
-  SignalStore?: {
-    [index: string]: {
-      value: any;
-      effect?: CallableFunction[];
-    };
-  };
-  jsx?: boolean;
-  storeCount?: number;
-  signalCount?: number;
-  refCount?: number;
 };
 
-// Global store for the store class and signals.
 window["$$__NixixStore"] = {
   commentForLF: false,
-  jsx: false,
 } as GlobalStore;
 export const nixixStore = window.$$__NixixStore as GlobalStore;
 
-const Nixix = {
-  create: function (
-    tagNameFC: target,
-    props: Proptype,
-    ...children: ChildrenType
-  ): Element | Array<Element | string | Signal> | undefined {
-    let returnedElement: any = null;
-    if (typeof tagNameFC === "string") {
-      if (tagNameFC === "fragment") {
-        if (children !== null) returnedElement = children;
-        else returnedElement = [];
-      } else {
-        const element = !SVG_ELEMENTTAGS.includes(tagNameFC)
-          ? document.createElement(tagNameFC)
-          : document.createElementNS(SVG_NAMESPACE, tagNameFC);
-        setProps(props, element);
-        setChildren(children, element);
-        returnedElement = element;
-      }
-    } else returnedElement = buildComponent(tagNameFC, props, children);
-    return returnedElement;
-  },
-  handleDirectives: handleDirectives_,
-  handleDynamicAttrs: ({
-    element,
-    attrPrefix,
-    attrName,
-    attrValue,
-  }: DynamicAttrType) => {
-    const attrSuffix = attrName.slice(attrPrefix.length);
-    const newAttrName = `${attrPrefix.replace(":", "-")}${attrSuffix}`;
-    setAttribute(element, newAttrName, attrValue);
-  },
-};
-
-function isNull(value: any) {
-  return value === null || value === undefined;
+function removeNode(node: Element | Text) {
+  const isConnected = node?.isConnected;
+  if (isConnected) node?.remove?.();
+  node?.dispatchEvent?.(new Event("remove:node"));
+  node?.childNodes?.forEach?.((child) => removeNode(child as any));
+  return isConnected;
 }
 
-function entries(obj: object) {
-  return Object.entries(obj);
-}
-
-function isReactiveValue(value: Signal | Store, prop: string) {
-  if (value.$$__reactive) {
-    raise(`The ${prop} prop value cannot be reactive.`);
-  }
+async function doBGWork(fn: CallableFunction) {
+  await Promise.resolve();
+  fn();
 }
 
 function setAttribute(
@@ -104,7 +55,6 @@ function setAttribute(
       `The ${attrName} prop cannot be null or undefined. Skipping attribute parsing.`
     );
   // signal check
-  // @ts-expect-error
   if ((attrValue as Signal).$$__reactive) {
     // @ts-expect-error
     function propEff() {
@@ -147,7 +97,6 @@ function setStyle(element: NixixElementType, styleValue: StyleValueType) {
     }
 
     // signal check
-    // @ts-expect-error
     if ((value as Signal).$$__reactive) {
       // @ts-expect-error
       function styleEff() {
@@ -256,24 +205,42 @@ function render(
   doBGWork(() => (nixixStore["root"] = root));
 }
 
-function removeNode(node: Element | Text) {
-  const isConnected = node?.isConnected;
-  if (isConnected) node?.remove?.();
-  node?.dispatchEvent?.(new Event("remove:node"));
-  node?.childNodes?.forEach?.((child) => removeNode(child as any));
-  return isConnected;
-}
-
-async function doBGWork(fn: CallableFunction) {
-  await Promise.resolve();
-  fn();
-}
-
-function turnOnJsx() {
-  nixixStore.jsx = true;
-}
+const Nixix = {
+  create: function (
+    tagNameFC: target,
+    props: Proptype,
+    ...children: ChildrenType
+  ): Element | Array<Element | string | Signal> | undefined {
+    let returnedElement: any = null;
+    if (typeof tagNameFC === "string") {
+      if (tagNameFC === "fragment") {
+        if (children !== null) returnedElement = children;
+        else returnedElement = [];
+      } else {
+        const element = !SVG_ELEMENTTAGS.includes(tagNameFC)
+          ? document.createElement(tagNameFC)
+          : document.createElementNS(SVG_NAMESPACE, tagNameFC);
+        setProps(props, element);
+        setChildren(children, element);
+        returnedElement = element;
+      }
+    } else returnedElement = buildComponent(tagNameFC, props, children);
+    return returnedElement;
+  },
+  handleDirectives: handleDirectives_,
+  handleDynamicAttrs: ({
+    element,
+    attrPrefix,
+    attrName,
+    attrValue,
+  }: DynamicAttrType) => {
+    const attrSuffix = attrName.slice(attrPrefix.length);
+    const newAttrName = `${attrPrefix.replace(":", "-")}${attrSuffix}`;
+    setAttribute(element, newAttrName, attrValue);
+  },
+};
 
 const create = Nixix.create;
 
 export default Nixix;
-export { create, render, setAttribute, turnOnJsx, removeNode };
+export { create, render, setAttribute, removeNode };

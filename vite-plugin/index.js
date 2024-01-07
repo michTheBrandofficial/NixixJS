@@ -1,38 +1,9 @@
 import { join, normalize } from "path";
 
-/**
- * @typedef {import('vite').Plugin} Plugin
- * @param {{hmr?: boolean, dev?: boolean}} param0 
- */
-export function NixixPlugin({hmr, dev}) {
-  /**
-   * @type {Plugin}
-   */
-  const reactivityplugin = {
-    name: "nixix-reactivity",
-    apply: () => {
-      return true;
-    },
-
-    async transform(code, id) {
-      // if file extension is not ts | js | jsx | tsx.
-      if (/node_modules/.test(id) || !/\.(t|j)sx?$/.test(id)) return;
-        return {
-          code: `${code}`,
-        };
-    },
-  };
-
-  const plugins = [reactivityplugin];
-  hmr && plugins.push(...NixixHMR(null, dev))
-  return plugins;
-}
-
 export default function NixixHMR(projectRoot, dev) {
   const hmrplugin = {
     name: "nixix-vite-hmr",
     apply: "serve",
-
     async transform(code, id) {
       // if file extension is not ts | js | jsx | tsx.
       if (/node_modules/.test(id) || !/\.(t|j)sx?$/.test(id)) return;
@@ -47,7 +18,6 @@ export default function NixixHMR(projectRoot, dev) {
             agnosticRouteObjects.length = 0;
             // @ts-ignore
             (nixixStore?.root)?.replaceChildren?.("");
-        
             newMod?.default?.();
           });
         };
@@ -69,7 +39,7 @@ const esbuildOptions = {
   jsxImportSource: "nixix",
   jsxDev: false,
   jsx: "transform",
-  jsxInject: "import Nixix, { nixixStore, turnOnJsx } from 'nixix/dom';",
+  jsxInject: "import Nixix, { nixixStore } from 'nixix/dom';",
   minifyIdentifiers: true,
 };
 
@@ -77,7 +47,7 @@ const devEsbuildOptions = {
   jsxFactory: "Nixix.create",
   jsxFragment: "'fragment'",
   jsxImportSource: "./index.js",
-  jsxInject: 'import Nixix, { nixixStore, turnOnJsx } from "dom"',
+  jsxInject: 'import Nixix, { nixixStore } from "dom"',
 };
 
 export { devEsbuildOptions, esbuildOptions };
