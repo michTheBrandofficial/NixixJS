@@ -65,7 +65,13 @@ export const signal: typeof callSignal;
 
 export const store: typeof callStore;
 
+export function splitProps<T extends EmptyObject<any>, K extends keyof T>(obj: T, ...props: K[]): {
+  [index in K]: T[K]
+}
+
 export function getValueType<T>(value: T): T[] | undefined;
+
+export function getSignalValue<S extends Primitive>(value: Signal<S>): S;
 
 type Deps = (Signal<Primitive> | Store<NonPrimitive>)[];
 

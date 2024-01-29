@@ -1,9 +1,9 @@
 import { Signal, Store } from "./classes";
-import { nixixStore } from "../dom";
+import { type EmptyObject, nixixStore } from "../dom";
 import { cloneObject, isFunction, isPrimitive, forEach } from "./helpers";
 import { getSignalValue, raise } from "../dom/helpers";
 import { patchObj } from "./patchObj";
-import { type Primitive, type NonPrimitive } from "./types";
+import type { Primitive, NonPrimitive, SetSignalDispatcher, Signal as Signal2 } from "./types";
 
 function callRef<R extends Element | HTMLElement>(ref: R): MutableRefObject {
   if (nixixStore["refCount"] === undefined) {
@@ -25,7 +25,7 @@ function callSignal<S>(
   config?: {
     equals: boolean;
   }
-): [SignalObject<S>, SetSignalDispatcher<S>] {
+): [Signal2<S>, SetSignalDispatcher<S>] {
   let value: string | number | boolean = isFunction(initialValue)
   ? (initialValue as Function)()
   : initialValue;
@@ -45,8 +45,18 @@ function callSignal<S>(
         initValue.$$__effects?.forEach((eff) => eff());
     }
   }
-  // @ts-expect-error
-  return [initValue, setter];
+  return [initValue as any, setter];
+}
+
+function splitProps<T extends EmptyObject<any>>(obj: T, ...props: (keyof T)[]) {
+  const splittedProps: Record<any, any> = {};
+  forEach(props, (p) => {
+    if (p in obj) {
+      splittedProps[p] = obj[p];
+      delete obj[p]  
+    }
+  })
+  return splittedProps;
 }
 
 function callStore<S extends NonPrimitive>(
@@ -55,19 +65,23 @@ function callStore<S extends NonPrimitive>(
     equals: boolean;
   }
 ): any[] {
+
   let value = cloneObject(
     isFunction(initialValue) ? (initialValue as Function)() : initialValue
   );
+  let objCopy = cloneObject(value);
   const initValue = new Store({ value: value, $$__effects: [] });
   const setter = (newValue: (prev?: any) => any) => {
+    let reactiveProps: Record<string, any> = splitProps(initValue, '$$__effects', '$$__reactive');
     let newValuePassed = isFunction(newValue)
-      ? newValue(cloneObject(initValue))
+      ? newValue(objCopy)
       : newValue;
     switch (true) {
       case config?.equals:
       default:
-        newValuePassed.$$__effects = initValue.$$__effects;
         patchObj(initValue, newValuePassed);
+        patchObj(objCopy, newValuePassed);
+        Object.assign(initValue, reactiveProps);
         initValue?.$$__effects?.forEach?.((eff) => eff());
     }
   }
@@ -243,6 +257,8 @@ export {
   concat,
   callStore,
   getValueType,
+  getSignalValue,
+  splitProps,
   effect,
   callEffect,
   renderEffect,

@@ -36,8 +36,10 @@ export function flatten(arr: Array<any>) {
 }
 
 export function getSignalValue(signal: Signal) {
-  const value = signal.value;
-  return isNull(value) ? "" : value;
+  if (signal.$$__reactive) {
+    const value = signal.value;
+    return value;
+  } else return signal as any;
 }
 
 export function raise(message: string) {
