@@ -186,8 +186,8 @@ function buildComponent(
     Boolean(children?.length) && (artificialProps.children = children);
     if (Object.getPrototypeOf(tagNameFC) === Component) {
       const componentObject = new (tagNameFC as any)(artificialProps) as Component;
-      if (Object.getOwnPropertyNames(componentObject).includes('jsx')) 
-        returnedElement = (componentObject as Component).jsx(artificialProps);
+      if (Object.getPrototypeOf(componentObject).jsx) 
+        returnedElement = (componentObject as any).jsx(artificialProps);
       else {
         raise(`Specify a ` + "`jsx` method in your " + `<${(tagNameFC as any).name}> class Component`)
       }

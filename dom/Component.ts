@@ -9,9 +9,6 @@ class Component {
   /**
    * This function is used to render the jsx
    */
-  jsx<P extends any>(props?: P): someView {
-    return ''
-  }
 }
 
 export default Component;
