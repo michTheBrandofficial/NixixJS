@@ -112,7 +112,6 @@ export function concat(...templ: Array<Primitive | Signal<Primitive> | TemplateS
  */
 export function effect(
   callbackFn: CallableFunction,
-  config?: "once" | null,
   deps?: Deps
 ): void;
 
@@ -140,7 +139,6 @@ export function callReaction(callbackFn: CallableFunction, deps?: Deps): void;
  */
 export function renderEffect(
   callbackFn: CallableFunction,
-  config?: "once" | null,
   deps?: Deps
 ): void;
 

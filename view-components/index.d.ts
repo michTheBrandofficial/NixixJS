@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes, FormHTMLAttributes, HTMLAttributes, InputHTMLAttributes, TextareaHTMLAttributes, ValueType } from '../types/index';
+import { ButtonHTMLAttributes, FormHTMLAttributes, HTMLAttributes, InputHTMLAttributes, TextareaHTMLAttributes } from '../types/index';
 import { BaseViewComponent, ViewComponent } from './types/index';
 /**
  * Returns a section that is a flexible box when NixixJS is used with TailwindCSS
@@ -52,7 +52,7 @@ export declare const Heading: (props: HeadingProps) => someView;
  */
 export declare const Main: (props: BaseViewComponent) => someView;
 type TextNodeProps<T = string | number | boolean> = {
-    children?: ValueType<T> | ValueType<T>[];
+    children?: T[];
 };
 /**
  * Returns a textnode

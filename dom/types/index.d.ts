@@ -18,19 +18,7 @@ interface $$__NixixStore {
     redirect?: string | null;
     currentRoute?: RouteType;
   };
-  Store?: {
-    [index: string]: WindowStoreObject;
-  };
-  SignalStore?: {
-    [index: string]: {
-      value: any;
-      effect?: CallableFunction[];
-    };
-  };
-  storeCount?: number;
-  signalCount?: number;
   refCount?: number;
-  jsx?: boolean;
 }
 
 declare module '../../types/index.d.ts' {
@@ -71,6 +59,7 @@ declare module '../../types/index.d.ts' {
    * This function should be used to remove nodes, it also removes reactions and signals from the nodes, thereby helping in garbage collection of dom nodes.
    */
   function removeNode(node: Element | Text): boolean;
+
 }
 
 export as namespace Nixix;

@@ -27,7 +27,19 @@ declare namespace Nixix {
     children?: T;
   };
 
-  type Component<T> = (props?: T) => someView;
+  class Component {
+    constructor (props?: {});
+  
+    /**
+     * This function is used to bind event handlers that are methods of the sub classes of `Component`
+     */
+    static bindEvent<T extends Function = Function>(fn: T): T;
+  
+    /**
+     * This function is used to render the jsx
+     */
+    jsx(): someView;
+  }
 
   type NixixNode = JSX.ElementType | Iterable<JSX.ElementType>;
 
@@ -1366,6 +1378,7 @@ declare global {
       | null
       | undefined
       | Nixix.JSXElementConstructor<any>
+      | typeof Nixix.Component
       | JSX.Element
       | Iterable<ElementType>;
 

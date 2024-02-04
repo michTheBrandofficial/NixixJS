@@ -143,30 +143,6 @@ function pushInEffects(cb: CallableFunction, dep: Signal | Store) {
   if (effectsArray) !effectsArray.includes?.(cb) && effectsArray.push(cb);
 }
 
-function dispatchEffect(
-  callbackFn: CallableFunction,
-  config?: "once",
-  furtherDependents?: (Signal | Store)[],
-  id = nixixStore["$$__lastReactionProvider"] === "signal"
-    ? nixixStore["signalCount"]
-    : nixixStore["storeCount"]
-) {
-  if (!config) {
-    if (nixixStore["$$__lastReactionProvider"]) {
-      const lastRP = nixixStore["$$__lastReactionProvider"];
-      if (lastRP === "signal") {
-        let obj = nixixStore.SignalStore?.[`_${id}_`];
-        obj ? (obj.effect ? null : (obj.effect = [callbackFn])) : null;
-      } else {
-        let obj = nixixStore.Store?.[`_${id}_`];
-        obj ? (obj.effect ? null : (obj.effect = [callbackFn])) : null;
-      }
-    }
-
-    pushFurtherDeps(callbackFn, furtherDependents);
-  }
-}
-
 async function resolveImmediate(fn: CallableFunction) {
   await Promise.resolve();
   (async (cb: CallableFunction) => {
@@ -174,17 +150,7 @@ async function resolveImmediate(fn: CallableFunction) {
   })(fn);
 }
 
-function effect(
-  callbackFn: CallableFunction,
-  config?: "once",
-  furtherDependents?: (Signal | Store)[],
-  id = nixixStore["$$__lastReactionProvider"] === "signal"
-    ? nixixStore["signalCount"]
-    : nixixStore["storeCount"]
-) {
-  dispatchEffect(callbackFn, config, furtherDependents, id);
-  resolveImmediate(callbackFn);
-}
+const effect = callEffect;
 
 function callEffect(
   callbackFn: CallableFunction,
@@ -203,17 +169,13 @@ function callReaction(
 
 function renderEffect(
   callbackFn: CallableFunction,
-  config?: "once",
   furtherDependents?: (Signal | Store)[],
-  id = nixixStore["$$__lastReactionProvider"] === "signal"
-    ? nixixStore["signalCount"]
-    : nixixStore["storeCount"]
 ) {
   window.addEventListener("DOMContentLoaded", function rendered() {
     callbackFn();
     this.window.removeEventListener("DOMContentLoaded", rendered);
   });
-  dispatchEffect(callbackFn, config, furtherDependents, id);
+  pushFurtherDeps(callbackFn, furtherDependents);
 }
 
 function dispatchSignalRemoval(signal: Store | Signal) {

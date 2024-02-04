@@ -5,7 +5,6 @@ import {
   FormHTMLAttributes,
   NixixNode,
   RouteExoticComponent,
-  ValueType,
 } from "../../types";
 import { MemoStore } from "../../primitives/types";
 
@@ -29,7 +28,7 @@ export type RoutePath = string;
 export interface RouteLink<T extends string>
   extends AnchorHTMLAttributes<HTMLAnchorElement> {
   children?: NixixNode;
-  to: ValueType<T>;
+  to: T;
 }
 export interface RouteConfig<T extends string> {
   element: NixixNode | (() => NixixNode);

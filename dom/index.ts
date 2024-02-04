@@ -13,6 +13,7 @@ import {
 } from "./helpers";
 import { PROP_ALIASES, SVG_ELEMENTTAGS, SVG_NAMESPACE } from "./utilVars";
 import { isFunction } from "../primitives/helpers";
+import Component from "./Component";
 
 type GlobalStore = {
   commentForLF: boolean;
@@ -183,7 +184,20 @@ function buildComponent(
   if (isFunction(tagNameFC)) {
     const artificialProps = props || {};
     Boolean(children?.length) && (artificialProps.children = children);
-    returnedElement = (tagNameFC as Function)(artificialProps);
+    if (Object.getPrototypeOf(tagNameFC) === Component) {
+      const componentObject = new (tagNameFC as any)(artificialProps) as Component;
+      if (Object.getOwnPropertyNames(componentObject).includes('jsx')) 
+        returnedElement = (componentObject as Component).jsx(artificialProps);
+      else {
+        raise(`Specify a ` + "`jsx` method in your " + `<${(tagNameFC as any).name}> class Component`)
+      }
+    } else {
+      try {
+        returnedElement = (tagNameFC as Function)(artificialProps);
+      } catch (error) {
+        throw new Error(error as any);
+      }
+    }
   }
   return returnedElement;
 }
@@ -243,4 +257,4 @@ const Nixix = {
 const create = Nixix.create;
 
 export default Nixix;
-export { create, render, setAttribute, removeNode };
+export { create, render, setAttribute, removeNode, Component };

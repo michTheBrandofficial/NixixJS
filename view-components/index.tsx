@@ -7,7 +7,6 @@ import type {
   HTMLAttributes,
   InputHTMLAttributes,
   TextareaHTMLAttributes,
-  ValueType,
 } from "../types/index";
 import { removeUnusedProps } from "./helpers";
 import type { BaseViewComponent, ViewComponent } from "./types/index";
@@ -168,7 +167,7 @@ export const Main = (props: BaseViewComponent): someView => {
 };
 
 type TextNodeProps<T = string | number | boolean> = {
-  children?: ValueType<T> | ValueType<T>[];
+  children?: T[];
 };
 /**
  * Returns a textnode
