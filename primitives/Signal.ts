@@ -1,24 +1,26 @@
 import { type Primitive } from "./types";
 
-const primitivesMap = {
-  'string': String,
-  'boolean': Boolean,
-  'number': Number
-} as const
+export interface Signal {
+  value: Primitive,
+  readonly $$__reactive: true,
+  $$__effects?: CallableFunction[],
+  toJSON(): Primitive;
+  [index: symbol]:  () => Primitive;
+}
 
-type KeyofPMap = keyof typeof primitivesMap
+
 
 export class Signal {
   constructor(public value: Primitive, public readonly $$__reactive: true, public $$__effects?: CallableFunction[]) {
-    const ClassConstructor = primitivesMap[typeof value as KeyofPMap] as (any);
-    if (ClassConstructor) {
-      class _Signal extends ClassConstructor {
-        constructor(public value: any, public readonly $$__reactive: true, public $$__effects?: CallableFunction[]) {
-          super(value)
-        }
-      } 
-      return new _Signal(value, $$__reactive, []) as Signal
-    } else return { value, $$__reactive, $$__effects: [] } as Signal
+    const symbol = Symbol.toPrimitive
+    this[symbol] = function toPrimitive() {
+      return this.value;
+    }
+
+  }
+
+  toJSON() {
+    return this.value;
   }
 }
 

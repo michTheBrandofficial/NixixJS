@@ -1,6 +1,7 @@
 import { entries, forEach, isPrimitive } from "./helpers";
 import { signal } from "../primitives";
 import { EmptyObject } from "../types";
+import { nixixStore } from '../dom/index'
 
 type StoreProps<T extends object | any[]> = {
   value?: T;
@@ -12,6 +13,7 @@ type StoreProxyHandler<T extends object> = ProxyHandler<T> & {
 };
 
 const skippedPropNames = ["$$__reactive", "$$__effects"] as const;
+
 const arrayPropNames: (keyof Array<any>)[] = [ 'length' ]
 
 function isArrayPropName(target: object | any[], p: any) {
@@ -23,7 +25,7 @@ function createStoreProxy<T = EmptyObject>(obj: object | any[]): T {
   const proxy = new Proxy<EmptyObject>(obj, {
     signalMap: new Map(),
     get(target, p) {
-      if (!(p in target)) return null; 
+      if (!(p in target) && !nixixStore.reactiveScope) return null; 
       const val = target[p];
       let returnedValue: any = null;
       const skipProps = skippedPropNames.includes(
@@ -104,3 +106,9 @@ export interface Store {
   $$__reactive: true;
   [index: string | number]: any;
 }
+
+// const value = {}
+
+// value.name // Signal { value: null, $$__reactive: true, $$__effects: [], toJSON: [Function: toJSON] }
+// setValue({ name: 'John' })
+// value.name // Signal { value: 'John', $$__reactive: true, $$__effects: [], toJSON: [Function: toJSON] }

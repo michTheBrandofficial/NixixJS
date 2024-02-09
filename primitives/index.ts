@@ -1,19 +1,14 @@
 import { Signal, Store } from "./classes";
-import { type EmptyObject, nixixStore } from "../dom";
+import { type EmptyObject } from "../dom";
 import { cloneObject, isFunction, isPrimitive, forEach } from "./helpers";
 import { getSignalValue, raise } from "../dom/helpers";
 import { patchObj } from "./patchObj";
 import type { Primitive, NonPrimitive, SetSignalDispatcher, Signal as Signal2 } from "./types";
+import { nixixStore } from "../dom/index";
 
 function callRef<R extends Element | HTMLElement>(ref: R): MutableRefObject {
-  if (nixixStore["refCount"] === undefined) {
-    nixixStore["refCount"] = 0;
-  } else if (nixixStore["refCount"] != undefined) {
-    nixixStore["refCount"] = nixixStore["refCount"] + 1;
-  }
   return {
     current: {} as Current,
-    refId: nixixStore["refCount"],
     nextElementSibling: ref,
     prevElementSibling: ref,
     parent: ref ? (ref as HTMLElement) : null,
@@ -59,6 +54,12 @@ function splitProps<T extends EmptyObject<any>>(obj: T, ...props: (keyof T)[]) {
   return splittedProps;
 }
 
+function closeReactiveProxyScope(fn: (() => void)) {
+  nixixStore.reactiveScope = false;
+  fn()
+  nixixStore.reactiveScope = true;
+}
+
 function callStore<S extends NonPrimitive>(
   initialValue: S,
   config?: {
@@ -79,7 +80,7 @@ function callStore<S extends NonPrimitive>(
     switch (true) {
       case config?.equals:
       default:
-        patchObj(initValue, newValuePassed);
+        closeReactiveProxyScope(() => patchObj(initValue, newValuePassed));
         patchObj(objCopy, newValuePassed);
         Object.assign(initValue, reactiveProps);
         initValue?.$$__effects?.forEach?.((eff) => eff());
@@ -90,8 +91,7 @@ function callStore<S extends NonPrimitive>(
 }
 
 function getValueType<T>(value: any) {
-  if (typeof value === "function")
-    raise(`Cannot pass a function as a reactive value.`);
+  if (isFunction(value)) raise(`Cannot pass a function as a reactive value.`);
   if (isPrimitive(value)) return callSignal<T>(value);
   if (typeof value === "object") return callStore<NonPrimitive>(value);
 }
@@ -132,7 +132,7 @@ function pushFurtherDeps(
   if (furtherDependents)
     resolveImmediate(() => {
       forEach(furtherDependents, (dep) => {
-        dep.$$__reactive && pushInEffects(callbackFn, dep as Signal);
+        dep?.$$__reactive && pushInEffects(callbackFn, dep as Signal);
       });
     });
 }

@@ -8,7 +8,7 @@
     "module": "es2020",
     "types": ["./types", "@remix-run/router"],
     "moduleResolution": "Bundler",
-    "skipLibCheck": false
+    "skipLibCheck": true
   },
   "include": ["./**/*"]
 }

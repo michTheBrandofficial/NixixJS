@@ -1,19 +1,19 @@
+import { Signal } from "../primitives/classes";
+import { isFunction } from "../primitives/helpers";
 import { callEffect, removeEffect } from "../primitives/index";
-import { Signal, Store } from "../primitives/classes";
+import Component from "./Component";
 import {
-  raise,
   addChildren,
-  handleDirectives_,
-  warn,
-  getSignalValue,
   checkDataType,
-  isNull,
   entries,
+  getSignalValue,
+  handleDirectives_,
+  isNull,
   isReactiveValue,
+  raise,
+  warn,
 } from "./helpers";
 import { PROP_ALIASES, SVG_ELEMENTTAGS, SVG_NAMESPACE } from "./utilVars";
-import { isFunction } from "../primitives/helpers";
-import Component from "./Component";
 
 type GlobalStore = {
   commentForLF: boolean;
@@ -25,12 +25,13 @@ type GlobalStore = {
     [path: string]: string | Node | (string | Node)[] | any;
   };
   root?: Element;
+  /**
+   * this prop is for stores to be patched efficiiently
+   */
+  reactiveScope: boolean;
 };
 
-window["$$__NixixStore"] = {
-  commentForLF: false,
-} as GlobalStore;
-export const nixixStore = window.$$__NixixStore as GlobalStore;
+export const nixixStore = { commentForLF: false, reactiveScope: true } as GlobalStore;
 
 function removeNode(node: Element | Text) {
   const isConnected = node?.isConnected;
@@ -185,11 +186,17 @@ function buildComponent(
     const artificialProps = props || {};
     Boolean(children?.length) && (artificialProps.children = children);
     if (Object.getPrototypeOf(tagNameFC) === Component) {
-      const componentObject = new (tagNameFC as any)(artificialProps) as Component;
-      if (Object.getPrototypeOf(componentObject).jsx) 
+      const componentObject = new (tagNameFC as any)(
+        artificialProps
+      ) as Component;
+      if (Object.getPrototypeOf(componentObject).jsx)
         returnedElement = (componentObject as any).jsx(artificialProps);
       else {
-        raise(`Specify a ` + "`jsx` method in your " + `<${(tagNameFC as any).name}> class Component`)
+        raise(
+          `Specify a ` +
+            "`jsx` method in your " +
+            `<${(tagNameFC as any).name}> class Component`
+        );
       }
     } else {
       try {
@@ -257,4 +264,4 @@ const Nixix = {
 const create = Nixix.create;
 
 export default Nixix;
-export { create, render, setAttribute, removeNode, Component };
+export { Component, buildComponent, create, removeNode, render, setAttribute };

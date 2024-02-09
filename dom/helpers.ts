@@ -70,7 +70,7 @@ export function fillInChildren(
   return (child: ChildrenType[number]) => {
     if (typeof child === "object") {
       // signal check
-      if ((child as Signal).$$__reactive) {
+      if ((child as Signal)?.$$__reactive) {
         const text = addText(element);
         // @ts-expect-error
         function textEff() {
