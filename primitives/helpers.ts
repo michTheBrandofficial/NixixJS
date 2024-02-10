@@ -1,4 +1,5 @@
-import { nixixStore } from "../dom";
+import { type EmptyObject, nixixStore } from "../dom";
+import { Signal, Store } from "./classes";
 import { type NonPrimitive } from "./types";
 
 function incrementId(prop: keyof typeof nixixStore) {
@@ -11,6 +12,18 @@ function incrementId(prop: keyof typeof nixixStore) {
   }
   return nixixStore[prop];
 }
+
+function splitProps<T extends EmptyObject<any>>(obj: T, ...props: (keyof T)[]) {
+  const splittedProps: Record<any, any> = {};
+  forEach(props, (p) => {
+    if (p in obj) {
+      splittedProps[p] = obj[p];
+      delete obj[p]  
+    }
+  })
+  return splittedProps;
+}
+
 
 function entries(obj: object) {
   return Object.entries(obj);
@@ -45,7 +58,7 @@ function checkType(value: string | number | boolean) {
 
 function isPrimitive(value: any) {
   return (
-    ["string", "boolean", "number"].includes(typeof value) || isNull(value)
+    ["string", "boolean", "number", "bigint"].includes(typeof value) || isNull(value)
   );
 }
 
@@ -62,8 +75,13 @@ function forEach<T>(
   arr?.forEach?.(cb, thisArg);
 }
 
+function isReactive(value: any) {
+  return (value as Signal | Store).$$__reactive as boolean;
+}
+
+
 export {
-  incrementId,
+  splitProps,
   checkType,
   isNull,
   isPrimitive,
@@ -72,4 +90,5 @@ export {
   isFunction,
   entries,
   forEach,
+  isReactive
 };

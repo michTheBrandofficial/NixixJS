@@ -18,6 +18,7 @@ export const Router = {
   push: (path: string) => {
     let { $$__routeStore } = nixixStore as Required<typeof nixixStore>;
     path = getLink(path);
+    if ($$__routeStore.currentRoute?.path === path) return;
     const routeMatches = matchRoutes(agnosticRouteObjects, {
       pathname: path,
     })!;

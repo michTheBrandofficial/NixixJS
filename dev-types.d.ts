@@ -51,7 +51,6 @@ declare global {
 
   interface MutableRefObject {
     current: Current & object;
-    refId: number;
     nextElementSibling: Element['nextElementSibling'] | null;
     prevElementSibling: Element['previousElementSibling'] | null;
     parent: Element['parentElement'] | null;

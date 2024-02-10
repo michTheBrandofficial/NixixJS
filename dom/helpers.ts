@@ -1,5 +1,7 @@
 import { Signal, Store } from "../primitives/classes";
-import { callEffect, removeEffect } from "../primitives/index";
+import { isReactive } from "../primitives/helpers";
+import { effect } from "../primitives/index";
+import { nonNull, raise } from "../shared";
 
 export function checkDataType(value: any) {
   return (
@@ -42,26 +44,8 @@ export function getSignalValue(signal: Signal) {
   } else return signal as any;
 }
 
-export function raise(message: string) {
-  throw `${message}`;
-}
-
-export function warn(message: string) {
-  console.warn(message);
-}
-
-export function isNull(value: any) {
-  return value === null || value === undefined;
-}
-
-export function entries(obj: object) {
-  return Object.entries(obj);
-}
-
-export function isReactiveValue(value: Signal | Store, prop: string) {
-  if (value.$$__reactive) {
-    raise(`The ${prop} prop value cannot be reactive.`);
-  }
+export function raiseIfReactive(value: Signal | Store, prop: string) {
+  isReactive(value) && raise(`The ${prop} prop value cannot be reactive.`);
 }
 
 export function fillInChildren(
@@ -70,20 +54,24 @@ export function fillInChildren(
   return (child: ChildrenType[number]) => {
     if (typeof child === "object") {
       // signal check
-      if ((child as Signal).$$__reactive) {
+      if ((child as Signal)?.$$__reactive) {
+        const signal = child as Signal;
         const text = addText(element);
         // @ts-expect-error
         function textEff() {
-          text.textContent = getSignalValue(child as any) as any;
+          text.textContent = nonNull(signal.value, "");
         }
-        text.addEventListener("remove:node", function removeRxn(e) {
-          // remove the effect;
-          removeEffect(textEff, child as any);
-          e.currentTarget?.removeEventListener?.("remove:node", removeRxn);
-        });
-        callEffect(textEff, [child as any]);
+        text.addEventListener(
+          "remove:node",
+          () => signal.removeEffect(textEff),
+          {
+            once: true,
+          }
+        );
+        effect(textEff);
       } else element?.append?.(child as unknown as string);
-    } else if (checkDataType(child)) element?.append?.(createText(child as any));
+    } else if (checkDataType(child))
+      element?.append?.(createText(child as any));
   };
 }
 
@@ -104,11 +92,8 @@ export const directiveMap = {
         `The bind:ref directive's value cannot be reactive, it must be a MutableRefObject.`
       );
     value["current"] = element;
-    (async () => {
-      await Promise.resolve()
-      parseRef(value)
-    })()
-  }
+    queueMicrotask(() => parseRef(value));
+  },
 } as const;
 
 export function handleDirectives_(
@@ -116,7 +101,10 @@ export function handleDirectives_(
   directiveValue: {} & MutableRefObject,
   element: NixixElementType
 ) {
-  directiveMap?.[bindtype as keyof typeof directiveMap]?.(directiveValue, element);
+  directiveMap?.[bindtype as keyof typeof directiveMap]?.(
+    directiveValue,
+    element
+  );
 }
 
 export function parseRef(refObject: MutableRefObject) {

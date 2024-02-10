@@ -1,19 +1,14 @@
-import { callEffect, removeEffect } from "../primitives/index";
-import { Signal, Store } from "../primitives/classes";
+import { isNull, nonNull, raise, warn } from "../shared";
+import { Signal } from "../primitives/classes";
+import { entries, isFunction } from "../primitives/helpers";
+import { effect } from "../primitives/index";
+import Component from "./Component";
 import {
-  raise,
   addChildren,
   handleDirectives_,
-  warn,
-  getSignalValue,
-  checkDataType,
-  isNull,
-  entries,
-  isReactiveValue,
+  raiseIfReactive,
 } from "./helpers";
 import { PROP_ALIASES, SVG_ELEMENTTAGS, SVG_NAMESPACE } from "./utilVars";
-import { isFunction } from "../primitives/helpers";
-import Component from "./Component";
 
 type GlobalStore = {
   commentForLF: boolean;
@@ -25,12 +20,16 @@ type GlobalStore = {
     [path: string]: string | Node | (string | Node)[] | any;
   };
   root?: Element;
+  /**
+   * this prop is for stores to be patched efficiiently
+   */
+  reactiveScope: boolean;
 };
 
-window["$$__NixixStore"] = {
+export const nixixStore = {
   commentForLF: false,
+  reactiveScope: true,
 } as GlobalStore;
-export const nixixStore = window.$$__NixixStore as GlobalStore;
 
 function removeNode(node: Element | Text) {
   const isConnected = node?.isConnected;
@@ -38,11 +37,6 @@ function removeNode(node: Element | Text) {
   node?.dispatchEvent?.(new Event("remove:node"));
   node?.childNodes?.forEach?.((child) => removeNode(child as any));
   return isConnected;
-}
-
-async function doBGWork(fn: CallableFunction) {
-  await Promise.resolve();
-  fn();
 }
 
 function setAttribute(
@@ -55,30 +49,21 @@ function setAttribute(
     return warn(
       `The ${attrName} prop cannot be null or undefined. Skipping attribute parsing.`
     );
-  // signal check
   if ((attrValue as Signal).$$__reactive) {
+    const signal = attrValue as Signal;
     // @ts-expect-error
     function propEff() {
-      type === "propertyAttribute"
-        ? // @ts-ignore
-          (element[attrName] = getSignalValue(attrValue))
-        : element.setAttribute(
-            attrName,
-            getSignalValue(attrValue as any) as any
-          );
+      setProp(element, attrName, type!, signal.value)
     }
-    element.addEventListener("remove:node", function removeRxn(e) {
-      // remove the effect;
-      removeEffect(propEff, attrValue as any);
-      e.currentTarget?.removeEventListener?.("remove:node", removeRxn);
-    });
-    callEffect(propEff, [attrValue as any]);
-  } else if (checkDataType(attrValue)) {
-    type === "propertyAttribute"
-      ? // @ts-ignore
-        (element[attrName] = attrValue)
-      : element.setAttribute(attrName, attrValue as any);
-  }
+    element.addEventListener(
+      "remove:node",
+      () => signal.removeEffect(propEff),
+      {
+        once: true,
+      }
+    );
+    effect(propEff);
+  } else setProp(element, attrName, type!, attrValue)
 }
 
 function setStyle(element: NixixElementType, styleValue: StyleValueType) {
@@ -86,32 +71,30 @@ function setStyle(element: NixixElementType, styleValue: StyleValueType) {
     return warn(
       `The style prop cannot be null or undefined. Skipping attribute parsing.`
     );
+
   const cssStyleProperties = entries(styleValue) as [string, ValueType][];
   for (let [property, value] of cssStyleProperties) {
-    // typed as display to remove the ts error
     let styleKey = property as "display";
-    if (isNull(value)) {
+    value ??
       warn(
         `The ${styleKey} CSS property cannot be null or undefined. Skipping CSS property parsing.`
       );
-      continue;
-    }
 
-    // signal check
     if ((value as Signal).$$__reactive) {
+      const signal = value as Signal;
       // @ts-expect-error
       function styleEff() {
-        element["style"][styleKey] = getSignalValue(value as any) as any;
+        element["style"][styleKey] = nonNull(signal.value, '');
       }
-      element.addEventListener("remove:node", function removeRxn(e) {
-        // remove the effect;
-        removeEffect(styleEff, value as any);
-        e.currentTarget?.removeEventListener?.("remove:node", removeRxn);
-      });
-      callEffect(styleEff, [value as any]);
-    } else {
-      element["style"][styleKey] = value as string;
-    }
+      element.addEventListener(
+        "remove:node",
+        () => signal.removeEffect(styleEff),
+        {
+          once: true,
+        }
+      );
+      effect(styleEff);
+    } else element["style"][styleKey] = nonNull(value, '');
   }
 }
 
@@ -134,7 +117,7 @@ function setProps(props: Proptype | null, element: NixixElementType) {
           return warn(
             `The ${k} prop cannot be null or undefined. Skipping prop parsing`
           );
-        isReactiveValue(v as any, k);
+        raiseIfReactive(v as any, k);
         const domAttribute = k.slice(3);
         element.addEventListener(domAttribute, v as any);
       } else if (k.startsWith("aria:")) {
@@ -156,7 +139,7 @@ function setProps(props: Proptype | null, element: NixixElementType) {
           return raise(
             `The ${k} directive value cannot be null or undefined. Skipping directive parsing`
           );
-        isReactiveValue(v as any, k);
+        raiseIfReactive(v as any, k);
         Nixix.handleDirectives(
           k.slice(5),
           v as unknown as MutableRefObject,
@@ -169,10 +152,18 @@ function setProps(props: Proptype | null, element: NixixElementType) {
   }
 }
 
-function setChildren(children: ChildrenType | null, element: NixixElementType) {
-  if (children != undefined || children != null) {
-    addChildren(children, element);
+function setProp(element: NixixElementType, attrName: any, type: TypeOf, value: any) {
+  switch (type === 'propertyAttribute') {
+    case true:
+      // @ts-expect-error
+      return element[attrName] = nonNull(value, '')
+    case false:
+      return element.setAttribute(attrName, `${nonNull(value, '')}`);
   }
+}
+
+function setChildren(children: ChildrenType | null, element: NixixElementType) {
+  if (children) return addChildren(children, element);
 }
 
 function buildComponent(
@@ -180,16 +171,22 @@ function buildComponent(
   props: Proptype,
   children: ChildrenType
 ) {
-  let returnedElement: any = null;
+  let returnedElement: any = '';
   if (isFunction(tagNameFC)) {
     const artificialProps = props || {};
     Boolean(children?.length) && (artificialProps.children = children);
     if (Object.getPrototypeOf(tagNameFC) === Component) {
-      const componentObject = new (tagNameFC as any)(artificialProps) as Component;
-      if (Object.getPrototypeOf(componentObject).jsx) 
+      const componentObject = new (tagNameFC as any)(
+        artificialProps
+      ) as Component;
+      if (Object.getPrototypeOf(componentObject).jsx)
         returnedElement = (componentObject as any).jsx(artificialProps);
       else {
-        raise(`Specify a ` + "`jsx` method in your " + `<${(tagNameFC as any).name}> class Component`)
+        raise(
+          `Specify a ` +
+            "`jsx` method in your " +
+            `<${(tagNameFC as any).name}> Class Component`
+        );
       }
     } else {
       try {
@@ -216,7 +213,7 @@ function render(
     );
   nixixStore.commentForLF = config.commentForLF;
   addChildren((bool ? fn() : fn) as any, root);
-  doBGWork(() => (nixixStore["root"] = root));
+  nixixStore["root"] = root;
 }
 
 const Nixix = {
@@ -257,4 +254,4 @@ const Nixix = {
 const create = Nixix.create;
 
 export default Nixix;
-export { create, render, setAttribute, removeNode, Component };
+export { Component, buildComponent, create, removeNode, render, setAttribute };

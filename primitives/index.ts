@@ -1,19 +1,26 @@
+import { getSignalValue } from "../dom/helpers";
+import { nixixStore } from "../dom/index";
+import { raise } from "../shared";
 import { Signal, Store } from "./classes";
-import { type EmptyObject, nixixStore } from "../dom";
-import { cloneObject, isFunction, isPrimitive, forEach } from "./helpers";
-import { getSignalValue, raise } from "../dom/helpers";
+import {
+  cloneObject,
+  forEach,
+  isFunction,
+  isPrimitive,
+  splitProps,
+} from "./helpers";
 import { patchObj } from "./patchObj";
-import type { Primitive, NonPrimitive, SetSignalDispatcher, Signal as Signal2 } from "./types";
+import { EFFECT_STACK } from "./shared";
+import type {
+  NonPrimitive,
+  Primitive,
+  SetSignalDispatcher,
+  Signal as Signal2,
+} from "./types";
 
 function callRef<R extends Element | HTMLElement>(ref: R): MutableRefObject {
-  if (nixixStore["refCount"] === undefined) {
-    nixixStore["refCount"] = 0;
-  } else if (nixixStore["refCount"] != undefined) {
-    nixixStore["refCount"] = nixixStore["refCount"] + 1;
-  }
   return {
     current: {} as Current,
-    refId: nixixStore["refCount"],
     nextElementSibling: ref,
     prevElementSibling: ref,
     parent: ref ? (ref as HTMLElement) : null,
@@ -27,13 +34,13 @@ function callSignal<S>(
   }
 ): [Signal2<S>, SetSignalDispatcher<S>] {
   let value: string | number | boolean = isFunction(initialValue)
-  ? (initialValue as Function)()
-  : initialValue;
+    ? (initialValue as Function)()
+    : initialValue;
   // value - in the worst case of it being an instance of object, throw an error.
   !isPrimitive(value) &&
     raise(`You must pass a primitve to the signal function`);
-   const initValue = new Signal(value, true, []);
-   const setter: SetSignalDispatcher<S> = function (newState) {
+  const initValue = new Signal(value);
+  const setter: SetSignalDispatcher<S> = function (newState) {
     let oldState = initValue.value;
     let newStatePassed = isFunction(newState)
       ? (newState as Function)(oldState)
@@ -42,21 +49,15 @@ function callSignal<S>(
       case config?.equals:
       case String(oldState) !== String(newStatePassed):
         initValue.value = newStatePassed;
-        initValue.$$__effects?.forEach((eff) => eff());
     }
-  }
+  };
   return [initValue as any, setter];
 }
 
-function splitProps<T extends EmptyObject<any>>(obj: T, ...props: (keyof T)[]) {
-  const splittedProps: Record<any, any> = {};
-  forEach(props, (p) => {
-    if (p in obj) {
-      splittedProps[p] = obj[p];
-      delete obj[p]  
-    }
-  })
-  return splittedProps;
+function closeReactiveProxyScope(fn: () => void) {
+  nixixStore.reactiveScope = false;
+  fn();
+  nixixStore.reactiveScope = true;
 }
 
 function callStore<S extends NonPrimitive>(
@@ -65,33 +66,33 @@ function callStore<S extends NonPrimitive>(
     equals: boolean;
   }
 ): any[] {
-
   let value = cloneObject(
     isFunction(initialValue) ? (initialValue as Function)() : initialValue
   );
   let objCopy = cloneObject(value);
-  const initValue = new Store({ value: value, $$__effects: [] });
+  const initValue = new Store({ value });
   const setter = (newValue: (prev?: any) => any) => {
-    let reactiveProps: Record<string, any> = splitProps(initValue, '$$__effects', '$$__reactive');
-    let newValuePassed = isFunction(newValue)
-      ? newValue(objCopy)
-      : newValue;
+    let reactiveProps: Record<string, any> = splitProps(
+      initValue,
+      "$$__deps",
+      "$$__reactive"
+    );
+    let newValuePassed = isFunction(newValue) ? newValue(objCopy) : newValue;
     switch (true) {
       case config?.equals:
       default:
-        patchObj(initValue, newValuePassed);
+        closeReactiveProxyScope(() => patchObj(initValue, newValuePassed));
         patchObj(objCopy, newValuePassed);
         Object.assign(initValue, reactiveProps);
-        initValue?.$$__effects?.forEach?.((eff) => eff());
+        initValue?.$$__deps?.forEach?.((eff) => eff());
     }
-  }
+  };
 
   return [initValue, setter];
 }
 
 function getValueType<T>(value: any) {
-  if (typeof value === "function")
-    raise(`Cannot pass a function as a reactive value.`);
+  if (isFunction(value)) raise(`Cannot pass a function as a reactive value.`);
   if (isPrimitive(value)) return callSignal<T>(value);
   if (typeof value === "object") return callStore<NonPrimitive>(value);
 }
@@ -125,61 +126,64 @@ function concat<T extends Signal>(
   }, expressions);
 }
 
-function pushFurtherDeps(
+function subscribeDeps(
   callbackFn: CallableFunction,
   furtherDependents?: (Signal | Store)[]
 ) {
   if (furtherDependents)
     resolveImmediate(() => {
       forEach(furtherDependents, (dep) => {
-        dep.$$__reactive && pushInEffects(callbackFn, dep as Signal);
+        dep?.$$__reactive && addDep(callbackFn, dep as Signal);
       });
     });
 }
 
-function pushInEffects(cb: CallableFunction, dep: Signal | Store) {
-  // check if the dep is a Store then check if it is a Signal
-  let { $$__effects: effectsArray } = dep;
-  if (effectsArray) !effectsArray.includes?.(cb) && effectsArray.push(cb);
+function addDep(cb: CallableFunction, dep: Signal | Store) {
+  dep.$$__deps?.add(cb)
 }
 
-async function resolveImmediate(fn: CallableFunction) {
-  await Promise.resolve();
-  (async (cb: CallableFunction) => {
-    cb();
-  })(fn);
+function resolveImmediate(fn: CallableFunction) {
+  queueMicrotask(fn as () => void);
 }
 
 const effect = callEffect;
 
-function callEffect(
-  callbackFn: CallableFunction,
-  furtherDependents?: (Signal | Store)[]
-) {
-  pushFurtherDeps(callbackFn, furtherDependents);
-  resolveImmediate(callbackFn);
+function callEffect(callbackFn: CallableFunction) {
+  resolveImmediate(() => {
+    try {
+      EFFECT_STACK.push(callbackFn);
+      callbackFn();
+    } finally {
+      EFFECT_STACK.pop();
+    }
+  });
 }
 
-function callReaction(
-  callbackFn: CallableFunction,
-  furtherDependents?: (Signal | Store)[]
-) {
-  pushFurtherDeps(callbackFn, furtherDependents);
+const reaction = callReaction;
+
+function callReaction(callbackFn: CallableFunction, deps?: (Signal | Store)[]) {
+  subscribeDeps(callbackFn, deps);
 }
 
 function renderEffect(
   callbackFn: CallableFunction,
-  furtherDependents?: (Signal | Store)[],
+  furtherDependents?: (Signal | Store)[]
 ) {
-  window.addEventListener("DOMContentLoaded", function rendered() {
-    callbackFn();
-    this.window.removeEventListener("DOMContentLoaded", rendered);
-  });
-  pushFurtherDeps(callbackFn, furtherDependents);
+  window.addEventListener(
+    "DOMContentLoaded",
+    function rendered() {
+      callbackFn();
+    },
+    {
+      once: true,
+    }
+  );
+  subscribeDeps(callbackFn, furtherDependents);
 }
 
 function dispatchSignalRemoval(signal: Store | Signal) {
-  delete signal.$$__effects;
+  // @ts-expect-error
+  delete signal.$$__deps;
   // @ts-expect-error
   delete signal.$$__reactive;
 }
@@ -194,39 +198,27 @@ function removeSignal<T extends Store | Signal = Store | Signal>(
     : dispatchSignalRemoval(signals);
 }
 
-function dispatchEffectRemoval(fn: CallableFunction, signal: Store | Signal) {
-  const { $$__effects: effects } = signal;
-  if (effects) {
-    if (effects.includes(fn)) effects.splice(effects.indexOf(fn), 1);
-    return true;
-  } else return false;
-}
-
-function removeEffect(fn: CallableFunction, signal: Store | Signal) {
-  dispatchEffectRemoval(fn, signal);
-}
-
 // This is only for simplicity
 const signal = callSignal;
 const store = callStore;
 
 export {
+  Signal,
+  Store,
+  callEffect,
+  callReaction,
   callRef,
   callSignal,
-  signal,
-  store,
-  memo,
-  concat,
   callStore,
-  getValueType,
   getSignalValue,
-  splitProps,
-  effect,
-  callEffect,
-  renderEffect,
-  callReaction,
-  Store,
-  Signal,
+  getValueType,
   removeSignal,
-  removeEffect,
+  renderEffect,
+  splitProps,
+  memo,
+  signal,
+  concat,
+  store,
+  effect,
+  reaction
 };

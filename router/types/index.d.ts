@@ -1,5 +1,6 @@
 import {
   AnchorHTMLAttributes,
+  Component,
   EmptyObject,
   ExoticComponent,
   FormHTMLAttributes,
@@ -31,7 +32,10 @@ export interface RouteLink<T extends string>
   to: T;
 }
 export interface RouteConfig<T extends string> {
-  element: NixixNode | (() => NixixNode);
+  /**
+   * element should be called only when we hit a route match
+   */
+  element: (() => NixixNode) | typeof Component;
   children?: NixixNode;
   path?: T;
   errorRoute?: boolean;
