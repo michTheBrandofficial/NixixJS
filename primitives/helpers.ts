@@ -1,36 +1,20 @@
-import { type EmptyObject, nixixStore } from "../dom";
+import { type EmptyObject } from "../dom";
 import { Signal, Store } from "./classes";
 import { type NonPrimitive } from "./types";
-
-function incrementId(prop: keyof typeof nixixStore) {
-  if (nixixStore[prop] === undefined) {
-    // @ts-ignore
-    nixixStore[prop] = 0;
-  } else {
-    // @ts-ignore
-    nixixStore[prop] = nixixStore[prop] + 1;
-  }
-  return nixixStore[prop];
-}
 
 function splitProps<T extends EmptyObject<any>>(obj: T, ...props: (keyof T)[]) {
   const splittedProps: Record<any, any> = {};
   forEach(props, (p) => {
     if (p in obj) {
       splittedProps[p] = obj[p];
-      delete obj[p]  
+      delete obj[p];
     }
-  })
+  });
   return splittedProps;
 }
 
-
 function entries(obj: object) {
   return Object.entries(obj);
-}
-
-function isFunction(val: any) {
-  return typeof val === "function";
 }
 
 function cloneObject<T extends NonPrimitive>(object: T) {
@@ -58,7 +42,8 @@ function checkType(value: string | number | boolean) {
 
 function isPrimitive(value: any) {
   return (
-    ["string", "boolean", "number", "bigint"].includes(typeof value) || isNull(value)
+    ["string", "boolean", "number", "bigint"].includes(typeof value) ||
+    isNull(value)
   );
 }
 
@@ -79,16 +64,14 @@ function isReactive(value: any) {
   return (value as Signal | Store).$$__reactive as boolean;
 }
 
-
 export {
-  splitProps,
   checkType,
-  isNull,
-  isPrimitive,
-  removeChars,
   cloneObject,
-  isFunction,
   entries,
   forEach,
-  isReactive
+  isNull,
+  isPrimitive,
+  isReactive,
+  removeChars,
+  splitProps,
 };

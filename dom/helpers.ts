@@ -1,7 +1,8 @@
 import { Signal, Store } from "../primitives/classes";
 import { isReactive } from "../primitives/helpers";
 import { effect } from "../primitives/index";
-import { nonNull, raise } from "../shared";
+import { isFunction, nonNull, raise } from "../shared";
+import { type RefFunction } from "./types";
 
 export function checkDataType(value: any) {
   return (
@@ -86,13 +87,22 @@ export function addChildren(
 }
 
 export const directiveMap = {
-  ref: (value: MutableRefObject, element: NixixElementType) => {
-    if ((value as unknown as Signal).$$__reactive)
+  ref: (
+    value: MutableRefObject | RefFunction<any>,
+    element: NixixElementType
+  ) => {
+    if (isReactive(value))
       raise(
         `The bind:ref directive's value cannot be reactive, it must be a MutableRefObject.`
       );
-    value["current"] = element;
-    queueMicrotask(() => parseRef(value));
+    if (isFunction(value))
+      return (value as RefFunction<any>)({ current: element });
+    else {
+      const ref = value as MutableRefObject;
+      ref["current"] = element;
+      queueMicrotask(() => parseRef(ref));
+      return 
+    }
   },
 } as const;
 

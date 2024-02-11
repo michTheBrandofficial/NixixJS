@@ -3,7 +3,7 @@ import { nixixStore } from "../dom";
 import type { EmptyObject } from "../types";
 import { callLoader } from "./callLoader";
 import { navigate } from "./Router";
-import { isFunction } from "../primitives/helpers";
+import { isFunction } from "../shared";
 import { buildComponent } from "../dom/index";
 
 export function handleLocation() {

@@ -47,6 +47,8 @@ declare namespace Nixix {
 
   type RouteExoticComponent<T> = T;
 
+  type RefFunction<T> = (({current}: {current: T}) => void)
+
   interface CSSProperties extends CSS.Properties<string, number> {}
 
   interface DOMAttributes<T> {
@@ -248,8 +250,11 @@ declare namespace Nixix {
     "on:transitionendcapture"?: NativeEvents.TransitionEventHandler<T>;
   }
 
-  interface NixixAttributes<T> {
-    "bind:ref"?: MutableRefObject<T | null>;
+  interface BindDirectives<T> {
+    "bind:ref"?: MutableRefObject<T | null> | RefFunction<T>;
+  }
+
+  interface NixixAttributes<T> extends BindDirectives<T> {
     key?: number;
   }
 

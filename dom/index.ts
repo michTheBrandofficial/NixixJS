@@ -1,6 +1,7 @@
 import { isNull, nonNull, raise, warn } from "../shared";
 import { Signal } from "../primitives/classes";
-import { entries, isFunction } from "../primitives/helpers";
+import { entries } from "../primitives/helpers";
+import { isFunction } from "../shared";
 import { effect } from "../primitives/index";
 import Component from "./Component";
 import {

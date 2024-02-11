@@ -5,7 +5,6 @@ import { Signal, Store } from "./classes";
 import {
   cloneObject,
   forEach,
-  isFunction,
   isPrimitive,
   splitProps,
 } from "./helpers";
@@ -17,6 +16,7 @@ import type {
   SetSignalDispatcher,
   Signal as Signal2,
 } from "./types";
+import { isFunction } from "../shared";
 
 function callRef<R extends Element | HTMLElement>(ref: R): MutableRefObject {
   return {
