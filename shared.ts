@@ -17,3 +17,7 @@ export function entries(obj: object) {
 export function nonNull<V>(value: V, fallback: any) {
   return isNull(value) ? fallback : value;
 }
+
+export function isFunction(val: any) {
+  return typeof val === "function";
+}

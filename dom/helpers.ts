@@ -1,7 +1,8 @@
 import { Signal, Store } from "../primitives/classes";
 import { isReactive } from "../primitives/helpers";
 import { effect } from "../primitives/index";
-import { nonNull, raise } from "../shared";
+import { isFunction, nonNull, raise } from "../shared";
+import { type RefFunction } from "./types";
 
 export function checkDataType(value: any) {
   return (
@@ -85,26 +86,57 @@ export function addChildren(
   } else fillInChildren(element)(children);
 }
 
-export const directiveMap = {
-  ref: (value: MutableRefObject, element: NixixElementType) => {
-    if ((value as unknown as Signal).$$__reactive)
+const bindDirectiveMap = {
+  ref: (
+    value: MutableRefObject | RefFunction<any>,
+    element: NixixElementType
+  ) => {
+    if (isReactive(value))
       raise(
         `The bind:ref directive's value cannot be reactive, it must be a MutableRefObject.`
       );
-    value["current"] = element;
-    queueMicrotask(() => parseRef(value));
+    if (isFunction(value))
+      return (value as RefFunction<any>)({ current: element });
+    else {
+      const ref = value as MutableRefObject;
+      ref["current"] = element;
+      queueMicrotask(() => parseRef(ref));
+      return;
+    }
+  },
+  value: (value: Signal, element: HTMLInputElement | HTMLSelectElement) => {
+    if (!isReactive(value))
+      raise(`The bind:value directive's value must be a signal.`);
+    effect(() => {
+      element.value = value.value as any;
+    });
+    element.addEventListener("input", ({ currentTarget }) => {
+      value.value = (currentTarget as any)?.value;
+    });
+  },
+};
+
+export const directiveMap = {
+  "bind:": bindDirectiveMap,
+  "animate:": {
+    in: (value: object, element: NixixElementType) => undefined,
   },
 } as const;
 
+type DirectiveMap = typeof directiveMap;
+
+type KeyOfAllDirectives =
+  | keyof DirectiveMap["animate:"]
+  | keyof DirectiveMap["bind:"];
+
 export function handleDirectives_(
-  bindtype: string,
-  directiveValue: {} & MutableRefObject,
+  prefix: keyof DirectiveMap,
+  suffix: KeyOfAllDirectives,
+  directiveValue: any,
   element: NixixElementType
 ) {
-  directiveMap?.[bindtype as keyof typeof directiveMap]?.(
-    directiveValue,
-    element
-  );
+  // @ts-expect-error
+  directiveMap[prefix]?.[suffix]?.(directiveValue, element);
 }
 
 export function parseRef(refObject: MutableRefObject) {
