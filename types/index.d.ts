@@ -931,6 +931,7 @@ declare namespace Nixix {
 
   interface SelectHTMLAttributes<T> extends HTMLAttributes<T> {
     autocomplete?: string;
+    "bind:value"?: Signal<string>;
     disabled?: boolean;
     form?: string;
     multiple?: boolean;

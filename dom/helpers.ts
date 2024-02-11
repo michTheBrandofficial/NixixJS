@@ -101,34 +101,33 @@ const bindDirectiveMap = {
       const ref = value as MutableRefObject;
       ref["current"] = element;
       queueMicrotask(() => parseRef(ref));
-      return 
+      return;
     }
   },
-  value: (
-    value: Signal,
-    element: HTMLInputElement
-  ) => {
+  value: (value: Signal, element: HTMLInputElement | HTMLSelectElement) => {
     if (!isReactive(value))
-      raise(
-        `The bind:value directive's value must be a signal.`
-      );
+      raise(`The bind:value directive's value must be a signal.`);
+    effect(() => {
       element.value = value.value as any;
-      (element as HTMLInputElement | HTMLDetailsElement).addEventListener('input', ({currentTarget}) => {
-        value.value = (currentTarget as any)?.value;
-      })
-    }
-  }
+    });
+    element.addEventListener("input", ({ currentTarget }) => {
+      value.value = (currentTarget as any)?.value;
+    });
+  },
+};
 
 export const directiveMap = {
-  'bind:': bindDirectiveMap,
-  'animate:': {
-    in: (value: object, element: NixixElementType) => undefined
-  }
+  "bind:": bindDirectiveMap,
+  "animate:": {
+    in: (value: object, element: NixixElementType) => undefined,
+  },
 } as const;
 
 type DirectiveMap = typeof directiveMap;
 
-type KeyOfAllDirectives = keyof DirectiveMap['animate:'] | keyof DirectiveMap['bind:']
+type KeyOfAllDirectives =
+  | keyof DirectiveMap["animate:"]
+  | keyof DirectiveMap["bind:"];
 
 export function handleDirectives_(
   prefix: keyof DirectiveMap,
