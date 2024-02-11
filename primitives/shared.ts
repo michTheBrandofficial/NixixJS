@@ -1,0 +1,1 @@
+export const EFFECT_STACK: CallableFunction[] = []

@@ -1,11 +1,8 @@
 node_modules/
-jsdoc/
-signal/
 src/
 .vscode
 *.sh
 *.ps1
-esbuild.config.js
 out.js
 *.html
 vite.config.js

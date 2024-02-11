@@ -5,14 +5,14 @@ import { nixixStore } from '../dom/index'
 
 type StoreProps<T extends object | any[]> = {
   value?: T;
-  $$__effects?: CallableFunction[];
+  $$__deps?: Set<CallableFunction>;
 };
 
 type StoreProxyHandler<T extends object> = ProxyHandler<T> & {
   signalMap: Map<string | symbol, ReturnType<typeof signal>>;
 };
 
-const skippedPropNames = ["$$__reactive", "$$__effects"] as const;
+const skippedPropNames = ["$$__reactive", "$$__deps"] as const;
 
 const arrayPropNames: (keyof Array<any>)[] = [ 'length' ]
 
@@ -56,11 +56,12 @@ function createStoreProxy<T = EmptyObject>(obj: object | any[]): T {
 }
 
 export class Store {
-  constructor({ value, $$__effects }: StoreProps<object | any[]>) {
+  constructor({ value }: StoreProps<object | any[]>) {
+    const $$__deps = new Set<CallableFunction>()
     // @ts-expect-error
     return Array.isArray(value)
-      ? new Store_Array({ value, $$__effects })
-      : new Store_Object({ value, $$__effects });
+      ? new Store_Array({ value, $$__deps })
+      : new Store_Object({ value, $$__deps });
   }
 }
 
@@ -77,7 +78,7 @@ class Store_Object {
       }
     });
     const proxyvalue = createStoreProxy<Store>(value!);
-    proxyvalue.$$__effects = []
+    proxyvalue.$$__deps = new Set();
     proxyvalue.$$__reactive = true;
     return proxyvalue;
   }
@@ -95,20 +96,19 @@ class Store_Array {
         }
       });
       const proxyvalue = createStoreProxy<Store>(value!);
-      proxyvalue.$$__effects = [],
+      proxyvalue.$$__deps = new Set();
       proxyvalue.$$__reactive = true;
     return proxyvalue;
   }
 }
 
 export interface Store {
-  $$__effects: CallableFunction[];
+  $$__deps: Set<CallableFunction>;
   $$__reactive: true;
   [index: string | number]: any;
 }
 
 // const value = {}
-
-// value.name // Signal { value: null, $$__reactive: true, $$__effects: [], toJSON: [Function: toJSON] }
+// value.name // Signal { value: null, $$__reactive: true, $$__deps: [], toJSON: [Function: toJSON] }
 // setValue({ name: 'John' })
-// value.name // Signal { value: 'John', $$__reactive: true, $$__effects: [], toJSON: [Function: toJSON] }
+// value.name // Signal { value: 'John', $$__reactive: true, $$__deps: [], toJSON: [Function: toJSON] }

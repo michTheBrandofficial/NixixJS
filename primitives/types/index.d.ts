@@ -7,10 +7,10 @@ export type SetStoreDispatcher<S> = (newValue: S | ((prev: S) => S)) => void;
 
 export type Signal<S> = S extends null | undefined
   ? {
-    value: S;
+    readonly value: S;
   } & string
   : {
-    value: S;
+    readonly value: S;
   } & S;
 
 export type Store<O> = {
@@ -80,6 +80,7 @@ type Deps = (Signal<Primitive> | Store<NonPrimitive>)[];
  *
  * @param fn callback function to return the initialValue
  * @param deps array of signals or stores to which when changed re-runs and updates the memo's value;
+ * 
  */
 export function memo<S extends Primitive>(
   fn: () => S,
@@ -93,53 +94,53 @@ export function memo<S extends NonPrimitive>(
 /**
  * Creates a memoized concatenated string from a template string literal containing a signal(s);
  * 
- * `USAGE`
+ * @example
  * ```jsx
  * import { concat, signal } from 'nixix/primitives';
  * const [display, setDisplay] = signal<'flex' | 'hidden'>('flex');
  * const View = () => <div className={concat`${display} flex-col`} >I am a DIV</div>
- * 
  * ```
  */
 export function concat(...templ: Array<Primitive | Signal<Primitive> | TemplateStringsArray>): MemoSignal<string>;
 
 /**
- * @deprecated PLEASE DO NOT USE THIS FUNCTION, USE `callEffect` or `callReaction`
- * Tracks the closest (signal or store) and calls the callback function whenever the (signal or store)'s value changes.
- * If there is no signal or store, it does no tracking.
- *
- * @param callbackFn callback function to be called once all the synchronous code has finished running.
+ * Places the callback function to be passed to it in aa stack, so signal values acessed within the callback can subscribe the callback to themselves.
+ * 
+ * @example 
+ * ```jsx
+ * import { effect, signal } from 'nixix/primitves';
+ * 
+ * const [count, setCount] = signal(0);
+ * effect(() => {
+ *  console.log(count.value)
+ * })
+ * ```
  */
 export function effect(
   callbackFn: CallableFunction,
-  deps?: Deps
 ): void;
 
-/**
- *
- * @param callbackFn callback function to be executed
- * @param deps furtherDependencies array to subscribe to
- * This function doesn't work like the effect function that subscribes it's callback function to the last signal or store created.
- */
-export function callEffect(callbackFn: CallableFunction, deps?: Deps): void;
+export const callEffect: typeof effect
 
 /**
- *
- * @param callbackFn callback function to be executed
- * @param deps furtherDependencies array to subscribe to
- * This function doesn't work like the effect function that subscribes it's callback function to the last signal or store created. It does not call the callback else just subscribes to all of the signals or stores in the dependencies array
+ * Takes a callback function and a dependency array. Containing signals or stores to subscribe to. The callback will be called only when te signal changes;
+ * 
+ * @example 
+ * ```jsx
+ * import { callReaction, signal } from 'nixix/primitives';
+ * 
+ * const [count, setCount] = signal(0);
+ * callReaction(() => {
+ *  console.log(count.value)
+ * }, [count])
+ * ```
  */
-export function callReaction(callbackFn: CallableFunction, deps?: Deps): void;
+export function callReaction(callbackFn: CallableFunction, deps: Deps): void;
 
-/**
- * Tracks the closest (signal or store) and calls the callback function whenever the (signal or store)'s value changes.
- * If there is no signal or store, it does no tracking.
- *
- * @param callbackFn callback function to be called once the DOM content has loaded.
- */
+export const reaction: typeof callReaction
+
 export function renderEffect(
   callbackFn: CallableFunction,
-  deps?: Deps
 ): void;
 
 export function removeSignal(
@@ -149,6 +150,7 @@ export function removeSignal(
 export function removeEffect(fn: CallableFunction, signal: Deps[number]): void;
 
 /**
+ * @example
  * ```jsx
  * This function is used to get a reference to a dom element. To get the element you want to manipulate, add the 'bind:ref' prop with it's value as the ref variable. 
  * import { callRef } from 'nixix';
