@@ -86,7 +86,7 @@ export function addChildren(
   } else fillInChildren(element)(children);
 }
 
-export const directiveMap = {
+const bindDirectiveMap = {
   ref: (
     value: MutableRefObject | RefFunction<any>,
     element: NixixElementType
@@ -104,17 +104,40 @@ export const directiveMap = {
       return 
     }
   },
+  value: (
+    value: Signal,
+    element: HTMLInputElement
+  ) => {
+    if (!isReactive(value))
+      raise(
+        `The bind:value directive's value must be a signal.`
+      );
+      element.value = value.value as any;
+      (element as HTMLInputElement | HTMLDetailsElement).addEventListener('input', ({currentTarget}) => {
+        value.value = (currentTarget as any)?.value;
+      })
+    }
+  }
+
+export const directiveMap = {
+  'bind:': bindDirectiveMap,
+  'animate:': {
+    in: (value: object, element: NixixElementType) => undefined
+  }
 } as const;
 
+type DirectiveMap = typeof directiveMap;
+
+type KeyOfAllDirectives = keyof DirectiveMap['animate:'] | keyof DirectiveMap['bind:']
+
 export function handleDirectives_(
-  bindtype: string,
-  directiveValue: {} & MutableRefObject,
+  prefix: keyof DirectiveMap,
+  suffix: KeyOfAllDirectives,
+  directiveValue: any,
   element: NixixElementType
 ) {
-  directiveMap?.[bindtype as keyof typeof directiveMap]?.(
-    directiveValue,
-    element
-  );
+  // @ts-expect-error
+  directiveMap[prefix]?.[suffix]?.(directiveValue, element);
 }
 
 export function parseRef(refObject: MutableRefObject) {

@@ -1,14 +1,9 @@
-import { isNull, nonNull, raise, warn } from "../shared";
 import { Signal } from "../primitives/classes";
 import { entries } from "../primitives/helpers";
-import { isFunction } from "../shared";
 import { effect } from "../primitives/index";
+import { isFunction, isNull, nonNull, raise, warn } from "../shared";
 import Component from "./Component";
-import {
-  addChildren,
-  handleDirectives_,
-  raiseIfReactive,
-} from "./helpers";
+import { addChildren, handleDirectives_, raiseIfReactive } from "./helpers";
 import { PROP_ALIASES, SVG_ELEMENTTAGS, SVG_NAMESPACE } from "./utilVars";
 
 type GlobalStore = {
@@ -54,7 +49,7 @@ function setAttribute(
     const signal = attrValue as Signal;
     // @ts-expect-error
     function propEff() {
-      setProp(element, attrName, type!, signal.value)
+      setProp(element, attrName, type!, signal.value);
     }
     element.addEventListener(
       "remove:node",
@@ -64,7 +59,7 @@ function setAttribute(
       }
     );
     effect(propEff);
-  } else setProp(element, attrName, type!, attrValue)
+  } else setProp(element, attrName, type!, attrValue);
 }
 
 function setStyle(element: NixixElementType, styleValue: StyleValueType) {
@@ -85,7 +80,7 @@ function setStyle(element: NixixElementType, styleValue: StyleValueType) {
       const signal = value as Signal;
       // @ts-expect-error
       function styleEff() {
-        element["style"][styleKey] = nonNull(signal.value, '');
+        element["style"][styleKey] = nonNull(signal.value, "");
       }
       element.addEventListener(
         "remove:node",
@@ -95,7 +90,7 @@ function setStyle(element: NixixElementType, styleValue: StyleValueType) {
         }
       );
       effect(styleEff);
-    } else element["style"][styleKey] = nonNull(value, '');
+    } else element["style"][styleKey] = nonNull(value, "");
   }
 }
 
@@ -121,31 +116,12 @@ function setProps(props: Proptype | null, element: NixixElementType) {
         raiseIfReactive(v as any, k);
         const domAttribute = k.slice(3);
         element.addEventListener(domAttribute, v as any);
-      } else if (k.startsWith("aria:")) {
-        Nixix.handleDynamicAttrs({
-          element,
-          attrPrefix: "aria:",
-          attrName: k,
-          attrValue: v as ValueType,
-        });
-      } else if (k.startsWith("stroke:")) {
-        Nixix.handleDynamicAttrs({
-          element,
-          attrPrefix: "stroke:",
-          attrName: k,
-          attrValue: v as ValueType,
-        });
       } else if (k.startsWith("bind:")) {
         if (isNull(v))
-          return raise(
+          return warn(
             `The ${k} directive value cannot be null or undefined. Skipping directive parsing`
           );
-        raiseIfReactive(v as any, k);
-        Nixix.handleDirectives(
-          k.slice(5),
-          v as unknown as MutableRefObject,
-          element
-        );
+        Nixix.handleDirectives('bind:', k.slice(5), v, element);
       } else {
         setAttribute(element, k, v as ValueType);
       }
@@ -153,13 +129,18 @@ function setProps(props: Proptype | null, element: NixixElementType) {
   }
 }
 
-function setProp(element: NixixElementType, attrName: any, type: TypeOf, value: any) {
-  switch (type === 'propertyAttribute') {
+function setProp(
+  element: NixixElementType,
+  attrName: any,
+  type: TypeOf,
+  value: any
+) {
+  switch (type === "propertyAttribute") {
     case true:
       // @ts-expect-error
-      return element[attrName] = nonNull(value, '')
+      return (element[attrName] = nonNull(value, ""));
     case false:
-      return element.setAttribute(attrName, `${nonNull(value, '')}`);
+      return element.setAttribute(attrName, `${nonNull(value, "")}`);
   }
 }
 
@@ -172,7 +153,7 @@ function buildComponent(
   props: Proptype,
   children: ChildrenType
 ) {
-  let returnedElement: any = '';
+  let returnedElement: any = "";
   if (isFunction(tagNameFC)) {
     const artificialProps = props || {};
     Boolean(children?.length) && (artificialProps.children = children);
@@ -205,7 +186,7 @@ function render(
   root: HTMLElement,
   config: {
     commentForLF: boolean;
-  } = { commentForLF: true }
+  } = { commentForLF: false }
 ) {
   let bool = isFunction(fn);
   if (!bool)
